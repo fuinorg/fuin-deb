@@ -17,8 +17,6 @@
  */
 package org.fuin.deb.commons;
 
-import java.io.Serializable;
-
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -31,9 +29,7 @@ import org.fuin.objects4j.common.Nullable;
  * Dependency to a package. Redefines equals and hash code based on the name.
  */
 @XmlRootElement(name = "dependency")
-public final class DebDependency implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public final class DebDependency {
 
     @XmlAttribute(name = "name")
     private String name;

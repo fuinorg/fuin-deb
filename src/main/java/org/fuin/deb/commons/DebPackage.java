@@ -25,14 +25,17 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.NotEmpty;
 import org.fuin.objects4j.common.Nullable;
 
 /**
  * A binary Debian package to create. Equals and hash code are based on the
  * name.
  */
+@XmlRootElement(name = "package")
 public final class DebPackage extends AbstractPackage {
 
     @XmlAttribute(name = "name")
@@ -54,9 +57,9 @@ public final class DebPackage extends AbstractPackage {
      * @param name
      *            Unique package name.
      */
-    public DebPackage(@NotNull final String name) {
+    public DebPackage(@NotEmpty final String name) {
         super();
-        Contract.requireArgNotNull("name", name);
+        Contract.requireArgNotEmpty("name", name);
         this.name = name;
     }
 
@@ -80,14 +83,14 @@ public final class DebPackage extends AbstractPackage {
      * @param dependencies
      *            Array of dependencies.
      */
-    public DebPackage(@NotNull final String name,
+    public DebPackage(@NotEmpty final String name,
             @Nullable final String version, @Nullable final String description,
             @Nullable final String prefix, @Nullable final String maintainer,
             @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final DebDependency... dependencies) {
         super(version, description, prefix, maintainer, arch, installationPath);
-        Contract.requireArgNotNull("name", name);
+        Contract.requireArgNotEmpty("name", name);
         this.name = name;
         if (dependencies == null) {
             this.dependencies = null;
@@ -116,14 +119,14 @@ public final class DebPackage extends AbstractPackage {
      * @param dependencies
      *            List of dependencies.
      */
-    public DebPackage(@NotNull final String name,
+    public DebPackage(@NotEmpty final String name,
             @Nullable final String prefix, @Nullable final String maintainer,
             @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String version, @Nullable final String description,
             @Nullable final List<DebDependency> dependencies) {
         super(prefix, maintainer, arch, installationPath, version, description);
-        Contract.requireArgNotNull("name", name);
+        Contract.requireArgNotEmpty("name", name);
         this.name = name;
         this.dependencies = dependencies;
     }
