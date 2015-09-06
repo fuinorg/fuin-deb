@@ -36,15 +36,15 @@ import org.junit.Before;
 import org.junit.Test;
 
 //CHECKSTYLE:OFF for tests
-public class DebDependencyTest {
+public class DebPackageTest {
 
     private static final String NAME = "jdk8";
 
-    private DebDependency testee;
+    private DebPackage testee;
 
     @Before
     public void setup() {
-        testee = new DebDependency(NAME);
+        testee = new DebPackage(NAME);
     }
 
     @After
@@ -54,7 +54,7 @@ public class DebDependencyTest {
 
     @Test
     public void testEqualsHashCode() {
-        EqualsVerifier.forClass(DebDependency.class)
+        EqualsVerifier.forClass(DebPackage.class)
                 .suppress(Warning.NONFINAL_FIELDS, Warning.NULL_FIELDS)
                 .verify();
     }
@@ -62,7 +62,7 @@ public class DebDependencyTest {
     @Test
     public void testNullName() {
         try {
-            new DebDependency(null);
+            new DebPackage((String) null);
             fail();
         } catch (final ContractViolationException ex) {
             assertThat(ex.getMessage()).isEqualTo(
@@ -73,7 +73,7 @@ public class DebDependencyTest {
     @Test
     public void testEmptyName() {
         try {
-            new DebDependency("");
+            new DebPackage("");
             fail();
         } catch (final ContractViolationException ex) {
             assertThat(ex.getMessage()).isEqualTo(
@@ -85,74 +85,62 @@ public class DebDependencyTest {
     public final void testMarshalUnmarshalXML() throws Exception {
 
         // PREPARE
-        final DebDependency original = testee;
+        final String name = "abc";
+        final String version = "1.2.3";
+        final String description = "Aa Bb Cc";
+        final String prefix = "fuin-";
+        final String maintainer = "michael@fuin.org";
+        final String arch = "amd64";
+        final String installationPath = "/opt";
+        final DebDependency depDef = new DebDependency("def");
+        final DebDependency depGhi = new DebDependency("ghi");
+        final DebPackage original = new DebPackage(name, version, description,
+                prefix, maintainer, arch, installationPath, depDef, depGhi);
 
         // TEST
-        String xml = marshal(original, createXmlAdapter(), DebDependency.class);
+        final String xml = marshal(original, createXmlAdapter(),
+                DebPackage.class);
 
         // VERIFY
         XMLUnit.setIgnoreWhitespace(true);
-        XMLAssert.assertXMLEqual(XML_PREFIX + "<dependency name=\"jdk8\"/>",
-                xml);
-
+        XMLAssert
+                .assertXMLEqual(
+                        XML_PREFIX
+                                + "<package name=\"abc\" version=\"1.2.3\" description=\"Aa Bb Cc\" "
+                                + "prefix=\"fuin-\" maintainer=\"michael@fuin.org\" arch=\"amd64\" "
+                                + "installation-path=\"/opt\">"
+                                + "    <dependency name=\"def\"/>"
+                                + "    <dependency name=\"ghi\"/>"
+                                + "</package>", xml);
+        final DebPackage copy = unmarshal(xml, createXmlAdapter(),
+                DebPackage.class);
+        assertThat(copy.getName()).isEqualTo("abc");
+        assertThat(copy.getVersion()).isEqualTo("1.2.3");
+        assertThat(copy.getDescription()).isEqualTo("Aa Bb Cc");
+        assertThat(copy.getPrefix()).isEqualTo("fuin-");
+        assertThat(copy.getMaintainer()).isEqualTo("michael@fuin.org");
+        assertThat(copy.getArch()).isEqualTo("amd64");
+        assertThat(copy.getInstallationPath()).isEqualTo("/opt");
+        assertThat(copy.getDependencies()).containsOnly(depDef, depGhi);
+        assertThat(copy.getDebFilename()).isEqualTo("fuin-abc_1.2.3_amd64.deb");
+        assertThat(copy.getPrefixedName()).isEqualTo("fuin-abc");
     }
 
     @Test
     public final void testMarshalUnmarshalEquals() throws Exception {
 
         // PREPARE
-        final DebDependency original = testee;
+        final DebPackage original = testee;
 
         // TEST
         final String xml = marshal(original, createXmlAdapter(),
-                DebDependency.class);
+                DebPackage.class);
 
-        final DebDependency copy = unmarshal(xml, createXmlAdapter(),
-                DebDependency.class);
+        final DebPackage copy = unmarshal(xml, createXmlAdapter(),
+                DebPackage.class);
 
         // VERIFY
         assertThat(copy).isEqualTo(original);
-    }
-
-    @Test
-    public final void testResolveTrue() {
-
-        // PREPARE
-        final DebPackage pkg = new DebPackage(NAME);
-        final DebPackageResolver resolver = new DebPackageResolver() {
-            @Override
-            public DebPackage resolve(final String packageName) {
-                return pkg;
-            }
-        };
-
-        // TEST
-        final boolean ok = testee.resolve(resolver);
-
-        // VERIFY
-        assertThat(ok).isTrue();
-        assertThat(testee.getResolvedDependency()).isSameAs(pkg);
-
-    }
-
-    @Test
-    public final void testResolveFalse() {
-
-        // PREPARE
-        final DebPackageResolver resolver = new DebPackageResolver() {
-            @Override
-            public DebPackage resolve(final String packageName) {
-                return null;
-            }
-        };
-
-        // TEST
-        final boolean ok = testee.resolve(resolver);
-
-        // VERIFY
-        assertThat(ok).isFalse();
-        assertThat(testee.getResolvedDependency()).isNull();
-
     }
 
     private XmlAdapter<?, ?>[] createXmlAdapter() {
