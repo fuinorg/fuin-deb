@@ -44,9 +44,14 @@ import org.slf4j.LoggerFactory;
 import org.vafer.jdeb.shaded.compress.io.IOUtils;
 
 /**
- * Provides utility methods for creating company specific binary Debian packages.
+ * Provides utility methods for creating company specific binary Debian
+ * packages.
  */
 public final class FuinDebUtils {
+
+    /** Prefix used for XML files.  */
+    public static final String XML_PREFIX = "<?xml version=\"1.0\" encoding=\"UTF-8\""
+            + " standalone=\"yes\"?>";
 
     private static final Logger LOG = LoggerFactory
             .getLogger(FuinDebUtils.class);
@@ -105,12 +110,12 @@ public final class FuinDebUtils {
     public static void download(@NotNull final URL url, @NotNull final File file) {
         Contract.requireArgNotNull("url", url);
         Contract.requireArgNotNull("file", file);
-        
-        // wget --no-check-certificate 
-        //      --no-cookies 
-        //      --header "Cookie: oraclelicense=accept-securebackup-cookie" 
-        //      http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jdk-8u60-linux-x64.tar.gz
-        
+
+        // wget --no-check-certificate
+        // --no-cookies
+        // --header "Cookie: oraclelicense=accept-securebackup-cookie"
+        // http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jdk-8u60-linux-x64.tar.gz
+
         try {
             final InputStream in = new CountingInputStream(url.openStream()) {
 

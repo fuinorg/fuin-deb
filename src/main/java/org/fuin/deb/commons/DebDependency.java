@@ -17,19 +17,25 @@
  */
 package org.fuin.deb.commons;
 
+import java.io.Serializable;
+
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.NotEmpty;
+import org.fuin.objects4j.common.Nullable;
 
 /**
- * Dependency to a package.
+ * Dependency to a package. Redefines equals and hash code based on the name.
  */
 @XmlRootElement(name = "dependency")
-public final class DebDependency {
+public final class DebDependency implements Serializable {
 
-    @XmlElement(name = "name")
+    private static final long serialVersionUID = 1L;
+
+    @XmlAttribute(name = "name")
     private String name;
 
     private transient DebPackage resolvedDependency;
@@ -47,9 +53,9 @@ public final class DebDependency {
      * @param name
      *            Unique name of the dependency.
      */
-    public DebDependency(@NotNull final String name) {
+    public DebDependency(@NotEmpty final String name) {
         super();
-        Contract.requireArgNotNull("name", name);
+        Contract.requireArgNotEmpty("name", name);
         this.name = name;
     }
 
@@ -82,9 +88,30 @@ public final class DebDependency {
      * 
      * @return TRUE if the package could be resolved.
      */
-    public final boolean resolve(final DebPackageResolver resolver) {
+    public final boolean resolve(@NotNull final DebPackageResolver resolver) {
+        Contract.requireArgNotNull("resolver", resolver);
         resolvedDependency = resolver.resolve(name);
         return resolvedDependency != null;
+    }
+
+    @Override
+    public final int hashCode() {
+        return name.hashCode();
+    }
+
+    @Override
+    public final boolean equals(@Nullable final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final DebDependency other = (DebDependency) obj;
+        return name.equals(other.name);
     }
 
     @Override
