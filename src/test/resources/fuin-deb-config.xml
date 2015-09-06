@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fuin-deb-config>
+
+	<modules prefix="fuin" maintainer="michael@fuin.org" arch="amd64"
+		installation-path="/opt">
+
+		<jdk version="1.8.0.60" description="Java SE Development Kit 8"
+			url="http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jdk-8u60-linux-x64.tar.gz">
+
+			<package name="jdk8" />
+
+		</jdk>
+
+		<eclipse version="4.4" description="Eclipse Luna IDE for Java EE Developers"
+			url="http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/luna/SR2/eclipse-jee-luna-SR2-linux-gtk-x86_64.tar.gz">
+
+			<package name="eclipse-jee-luna">
+				<dependency name="jdk8" />
+			</package>
+
+		</eclipse>
+
+		<eclipse version="4.5" description="Eclipse Mars IDE for Java EE Developers"
+			url="http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/mars/R/eclipse-jee-mars-R-linux-gtk-x86_64.tar.gz">
+
+			<package name="eclipse-jee-mars">
+				<dependency name="jdk8" />
+			</package>
+
+		</eclipse>
+
+		<eclipse-plugin version="6.5.0"
+			repository="http://eclipse-cs.sourceforge.net/update/" installIUs="net.sf.eclipsecs.feature.group">
+
+			<package name="eclipse-jee-luna-plugins-checkstyle"
+				description="Eclipse Luna Checkstyle Plugin">
+				<dependency name="eclipse-jee-luna" />
+			</package>
+
+			<package name="eclipse-jee-mars-plugins-checkstyle"
+				description="Eclipse Mars Checkstyle Plugin">
+				<dependency name="eclipse-jee-mars" />
+			</package>
+
+		</eclipse-plugin>
+
+	</modules>
+
+</fuin-deb-config>

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<configuration>
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{dd.MM.yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
+    <root level="error">
+        <appender-ref ref="STDOUT" />
+    </root>
+
+	<logger name="org.fuin.deb" level="info" />
+
+	<logger name="org.vafer.jdeb" additivity="false">
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+</configuration>
