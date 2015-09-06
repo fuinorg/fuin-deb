@@ -22,7 +22,8 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlAnyElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.ContractViolationException;
@@ -31,9 +32,10 @@ import org.fuin.objects4j.common.Nullable;
 /**
  * Provides default settings for the modules it contains.
  */
-public abstract class DebModules extends AbstractPackage {
+@XmlRootElement(name = "modules")
+public final class DebModules extends AbstractPackage {
 
-    @XmlElement
+    @XmlAnyElement(lax = true)
     private List<DebModule> modules;
 
     /**
@@ -105,9 +107,9 @@ public abstract class DebModules extends AbstractPackage {
     /**
      * Returns the list of modules to create.
      * 
-     * @return Immutable package list.
+     * @return Immutable modules list.
      */
-    public final List<DebModule> getPackages() {
+    public final List<DebModule> getModules() {
         return Collections.unmodifiableList(modules);
     }
 
