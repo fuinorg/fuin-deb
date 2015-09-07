@@ -18,11 +18,16 @@
 package org.fuin.deb.commons;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.LineNumberReader;
+import java.io.StringReader;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.validation.constraints.NotNull;
@@ -33,9 +38,9 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.Executor;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.input.CountingInputStream;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Nullable;
 import org.fuin.utils4j.Utils4J;
@@ -49,7 +54,7 @@ import org.vafer.jdeb.shaded.compress.io.IOUtils;
  */
 public final class FuinDebUtils {
 
-    /** Prefix used for XML files.  */
+    /** Prefix used for XML files. */
     public static final String XML_PREFIX = "<?xml version=\"1.0\" encoding=\"UTF-8\""
             + " standalone=\"yes\"?>";
 
@@ -69,25 +74,31 @@ public final class FuinDebUtils {
      * 
      * @param url
      *            URL to load.
-     * @param targetFile
-     *            Position where to store the result of the download.
+     * @param dir
+     *            Target directory
+     * @param args
+     *            Additional arguments for wget command.
+     * 
+     * @return Downloaded file.
      */
-    public static void cachedDownload(@NotNull final URL url,
-            @NotNull final File targetFile) {
+    public static File cachedWget(@NotNull final URL url,
+            @NotNull final File dir, final String... args) {
         Contract.requireArgNotNull("url", url);
-        Contract.requireArgNotNull("targetFile", targetFile);
+        Contract.requireArgNotNull("dir", dir);
 
+        final File targetFile = new File(dir, FilenameUtils.getName(url
+                .getFile()));
         try {
             if (targetFile.exists()) {
                 LOG.info("File already exists in target directory: {}",
                         targetFile);
             } else {
-                LOG.info("Dowloading: {}", url);
+                LOG.info("Downloading: {}", url);
                 // Cache the file locally in the temporary directory
                 final File tmpFile = new File(Utils4J.getTempDir(),
                         targetFile.getName());
                 if (!tmpFile.exists()) {
-                    download(url, tmpFile);
+                    wget(url, Utils4J.getTempDir(), args);
                     LOG.info("Downloaded to: {}", tmpFile);
                 }
                 FileUtils.copyFile(tmpFile, targetFile);
@@ -96,6 +107,8 @@ public final class FuinDebUtils {
         } catch (final IOException ex) {
             throw new RuntimeException("Error downloading: " + url, ex);
         }
+        return targetFile;
+
     }
 
     /**
@@ -104,41 +117,25 @@ public final class FuinDebUtils {
      * 
      * @param url
      *            URL to download.
-     * @param file
-     *            Target file to write.
+     * @param dir
+     *            Target directory.
+     * @param args
+     *            Additional arguments for wget command.
      */
-    public static void download(@NotNull final URL url, @NotNull final File file) {
+    public static void wget(@NotNull final URL url, @NotNull final File dir,
+            final String... args) {
         Contract.requireArgNotNull("url", url);
-        Contract.requireArgNotNull("file", file);
+        Contract.requireArgNotNull("dir", dir);
 
-        // wget --no-check-certificate
-        // --no-cookies
-        // --header "Cookie: oraclelicense=accept-securebackup-cookie"
-        // http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jdk-8u60-linux-x64.tar.gz
-
-        try {
-            final InputStream in = new CountingInputStream(url.openStream()) {
-
-                private int called = 0;
-
-                @Override
-                protected final void afterRead(final int n) {
-                    super.afterRead(n);
-                    called++;
-                    if ((called % 1000) == 0) {
-                        LOG.info("{} - {} bytes", file.getName(), getCount());
-                    }
-                }
-            };
-            try {
-                FileUtils.copyInputStreamToFile(in, file);
-            } finally {
-                in.close();
+        final CommandLine cmdLine = new CommandLine("wget");
+        if (args != null) {
+            for (final String arg : args) {
+                cmdLine.addArgument(arg);
             }
-        } catch (final IOException ex) {
-            throw new RuntimeException("Error downloading from " + url
-                    + " to: " + file, ex);
         }
+        cmdLine.addArgument(url.toExternalForm());
+        execute(cmdLine, dir, "Download: " + url);
+
     }
 
     /**
@@ -176,13 +173,13 @@ public final class FuinDebUtils {
     }
 
     /**
-     * Untars a given file on a linux system using the 'tar' command in the
-     * directory where it is placed.
+     * Untars a given 'tar.gz' file on a linux system using the 'tar' command in
+     * the directory where it is placed.
      * 
      * @param tarFile
      *            File to unpack.
      */
-    public static final void linuxUntar(@NotNull final File tarFile) {
+    public static final void unTarGz(@NotNull final File tarFile) {
         Contract.requireArgNotNull("tarFile", tarFile);
 
         final String tarFilePath = Utils4J.getCanonicalPath(tarFile);
@@ -190,22 +187,13 @@ public final class FuinDebUtils {
         final CommandLine cmdLine = new CommandLine("tar");
         cmdLine.addArgument("-zvxf");
         cmdLine.addArgument(tarFilePath);
-        final Executor executor = new DefaultExecutor();
-        executor.setWorkingDirectory(tarFile.getParentFile());
-        try {
-            final int result = executor.execute(cmdLine);
-            if (result != 0) {
-                throw new RuntimeException("Error # " + result
-                        + " while trying to untar file: " + tarFilePath);
-            }
-        } catch (final IOException ex) {
-            throw new RuntimeException("Error while trying untar file: "
-                    + tarFilePath, ex);
-        }
+
+        execute(cmdLine, tarFile.getParentFile(), "unTarGz: " + tarFilePath);
+
     }
 
     /**
-     * Creates a tar file on a linux system using the 'tar' command.
+     * Creates a tar.gz file on a linux system using the 'tar' command.
      * 
      * @param parentDir
      *            Working directory.
@@ -214,32 +202,21 @@ public final class FuinDebUtils {
      * 
      * @return Tar file.
      */
-    public static final File linuxTar(@NotNull final File parentDir,
+    public static final File tarGz(@NotNull final File parentDir,
             final String dirName) {
 
         Contract.requireArgNotNull("parentDir", parentDir);
         Contract.requireArgNotNull("dirName", dirName);
 
         final File tarFile = new File(parentDir, dirName + ".tar.gz");
-        final String tarFilePath = Utils4J.getCanonicalPath(tarFile);
+        final String tarFileNameAndPath = Utils4J.getCanonicalPath(tarFile);
 
         final CommandLine cmdLine = new CommandLine("tar");
-        cmdLine.addArgument("-cvjf");
-        cmdLine.addArgument(tarFilePath);
+        cmdLine.addArgument("-zvcf");
+        cmdLine.addArgument(tarFileNameAndPath);
         cmdLine.addArgument(dirName);
 
-        final Executor executor = new DefaultExecutor();
-        executor.setWorkingDirectory(parentDir);
-        try {
-            final int result = executor.execute(cmdLine);
-            if (result != 0) {
-                throw new RuntimeException("Error # " + result
-                        + " while trying to tar file: " + tarFilePath);
-            }
-        } catch (final IOException ex) {
-            throw new RuntimeException("Error while trying tar file: "
-                    + tarFilePath, ex);
-        }
+        execute(cmdLine, parentDir, "tar file: " + tarFileNameAndPath);
 
         return tarFile;
     }
@@ -280,4 +257,81 @@ public final class FuinDebUtils {
                             + resourceName + "' to: " + outFile, ex);
         }
     }
+
+    /**
+     * Copies a resource to a file.
+     * 
+     * @param clasz
+     *            Class to use for getting the resource.
+     * @param resource
+     *            Path and name of the resource.
+     * @param targetFile
+     *            Target file to create.
+     */
+    public static void copyResourceToFile(final Class<?> clasz,
+            final String resource, final File targetFile) {
+        try {
+            final InputStream in = clasz.getResourceAsStream(resource);
+            try {
+                FileUtils.copyInputStreamToFile(in, targetFile);
+            } finally {
+                in.close();
+            }
+        } catch (final IOException ex) {
+            throw new RuntimeException("Error while copying resource '"
+                    + resource + "' to: " + targetFile, ex);
+        }
+    }
+
+    /**
+     * Returns the string as list.
+     * 
+     * @param str
+     *            String to split into lines.
+     * 
+     * @return List of lines.
+     */
+    public static final List<String> asList(final String str) {
+        try {
+            final List<String> lines = new ArrayList<String>();
+            final LineNumberReader reader = new LineNumberReader(
+                    new StringReader(str));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+            return lines;
+        } catch (final IOException ex) {
+            throw new RuntimeException("Error creating string list", ex);
+        }
+    }
+
+    private static void logError(final List<String> messages) {
+        if (LOG.isErrorEnabled()) {
+            for (final String message : messages) {
+                LOG.error(message);
+            }
+        }
+    }
+
+    private static void execute(final CommandLine cmdLine,
+            final File workingDir, final String errorMsg) {
+        final Executor executor = new DefaultExecutor();
+        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        final PumpStreamHandler psh = new PumpStreamHandler(bos);
+        executor.setStreamHandler(psh);
+        executor.setWorkingDirectory(workingDir);
+        try {
+            final int result = executor.execute(cmdLine);
+            if (result != 0) {
+                logError(asList(bos.toString()));
+                throw new RuntimeException("Error # " + result + " / "
+                        + errorMsg);
+            }
+        } catch (final IOException ex) {
+            logError(asList(bos.toString()));
+            throw new RuntimeException(errorMsg, ex);
+        }
+    }
+
 }

@@ -53,8 +53,6 @@ public class DebModulesTest {
         final String xml = marshal(original, createXmlAdapter(),
                 DebModules.class, DebModule1.class, DebModule2.class);
 
-        System.out.println(xml);
-
         // VERIFY
         XMLUnit.setIgnoreWhitespace(true);
         XMLAssert

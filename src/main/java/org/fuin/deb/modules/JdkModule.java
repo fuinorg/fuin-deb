@@ -17,15 +17,14 @@
  */
 package org.fuin.deb.modules;
 
-import static org.fuin.deb.commons.FuinDebUtils.cachedDownload;
-import static org.fuin.deb.commons.FuinDebUtils.linuxTar;
-import static org.fuin.deb.commons.FuinDebUtils.linuxUntar;
+import static org.fuin.deb.commons.FuinDebUtils.cachedWget;
 import static org.fuin.deb.commons.FuinDebUtils.peekFirstTarGzFolderName;
+import static org.fuin.deb.commons.FuinDebUtils.tarGz;
+import static org.fuin.deb.commons.FuinDebUtils.unTarGz;
 import static org.fuin.deb.commons.FuinDebUtils.writeReplacedResource;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +33,6 @@ import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.tools.ant.Project;
 import org.fuin.deb.commons.DebModule;
 import org.fuin.deb.commons.DebPackage;
@@ -134,11 +132,9 @@ public final class JdkModule extends DebModule {
         Contract.requireArgNotNull("buildDirectory", buildDirectory);
         LOG.info("Creating module in: {}", buildDirectory);
 
-        final URL downloadUrl = url(urlStr);
-        final File jdkArchiveFile = new File(buildDirectory,
-                FilenameUtils.getName(downloadUrl.getFile()));
-
-        cachedDownload(url(urlStr), jdkArchiveFile);
+       final File jdkArchiveFile = cachedWget(url(urlStr), buildDirectory,
+                "--no-check-certificate", "--no-cookies", "--header",
+                "\"Cookie: oraclelicense=accept-securebackup-cookie\"");
 
         final List<DebPackage> debPackages = getPackages();
         for (final DebPackage pkg : debPackages) {
@@ -159,10 +155,10 @@ public final class JdkModule extends DebModule {
             if (srcDir.exists()) {
                 LOG.info("Renamed JDK root folder already exists: " + srcDir);
             } else {
-                linuxUntar(jdkArchiveFile);
+                unTarGz(jdkArchiveFile);
                 renameJdkToPackageDir(srcDir, packageDir);
             }
-            final File tarFile = linuxTar(buildDirectory,
+            final File tarFile = tarGz(buildDirectory,
                     debPackage.getPrefixedName());
             copyControlFiles(debPackage, getModuleName(), controlDir);
             createDebianPackage(debPackage, buildDirectory, packageDir,
