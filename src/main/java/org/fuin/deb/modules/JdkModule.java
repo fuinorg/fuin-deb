@@ -153,7 +153,7 @@ public final class JdkModule extends DebModule {
 
             final File srcDir = rootJdkFolder(buildDirectory, jdkArchiveFile);
             if (srcDir.exists()) {
-                LOG.info("Renamed JDK root folder already exists: " + srcDir);
+                LOG.info("JDK directory already exists: " + srcDir);
             } else {
                 unTarGz(jdkArchiveFile);
                 renameJdkToPackageDir(srcDir, packageDir);
@@ -170,6 +170,10 @@ public final class JdkModule extends DebModule {
 
     private static void renameJdkToPackageDir(final File srcDir,
             final File packageDir) {
+        if (packageDir.exists()) {
+            LOG.info("Delete existing package directory: {}", packageDir);
+            FileUtils.deleteQuietly(packageDir);
+        }
         LOG.info("Rename JDK root folder '{}' to: {}", srcDir, packageDir);
         try {
             FileUtils.moveDirectory(srcDir, packageDir);

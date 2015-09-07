@@ -20,6 +20,7 @@ package org.fuin.deb.commons;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -33,13 +34,9 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.fuin.utils4j.Utils4J;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.LoggerFactory;
 
@@ -52,26 +49,6 @@ import ch.qos.logback.core.Appender;
 @RunWith(MockitoJUnitRunner.class)
 public class FuinDebUtilsTest {
 
-    @Mock
-    private Appender mockAppender;
-
-    @Captor
-    private ArgumentCaptor<LoggingEvent> captorLoggingEvent;
-
-    @Before
-    public void setup() {
-        final Logger logger = (Logger) LoggerFactory
-                .getLogger(Logger.ROOT_LOGGER_NAME);
-        logger.addAppender(mockAppender);
-    }
-
-    @After
-    public void teardown() {
-        final Logger logger = (Logger) LoggerFactory
-                .getLogger(Logger.ROOT_LOGGER_NAME);
-        logger.detachAppender(mockAppender);
-    }
-
     @Test
     public void testCachedWgetAlreadyExistsInTarget() throws IOException {
 
@@ -81,14 +58,31 @@ public class FuinDebUtilsTest {
         FuinDebUtils.copyResourceToFile(getClass(), "/smiley.gif", targetFile);
 
         // TEST
-        FuinDebUtils.cachedWget(
-                new URL("http://www.fuin.org/images/smiley.gif"), targetDir);
+        final Appender mockAppender = mock(Appender.class);
+        final Logger logger = (Logger) LoggerFactory
+                .getLogger(Logger.ROOT_LOGGER_NAME);
+        logger.addAppender(mockAppender);
+        try {
+
+            FuinDebUtils.cachedWget(new URL(
+                    "http://www.fuin.org/images/smiley.gif"), targetDir);
+
+        } finally {
+            logger.detachAppender(mockAppender);
+        }
 
         // VERIFY
-        verify(mockAppender).doAppend(captorLoggingEvent.capture());
-        final LoggingEvent loggingEvent = captorLoggingEvent.getValue();
-        assertThat(loggingEvent.getLevel(), is(Level.INFO));
-        assertThat(loggingEvent.getFormattedMessage(),
+        final ArgumentCaptor<LoggingEvent> captorLoggingEvent = ArgumentCaptor
+                .forClass(LoggingEvent.class);
+        verify(mockAppender, times(2)).doAppend(captorLoggingEvent.capture());
+        final List<LoggingEvent> events = captorLoggingEvent.getAllValues();
+
+        assertThat(events.get(0).getLevel(), is(Level.INFO));
+        assertThat(events.get(0).getFormattedMessage(),
+                is("cachedWget: http://www.fuin.org/images/smiley.gif"));
+
+        assertThat(events.get(1).getLevel(), is(Level.INFO));
+        assertThat(events.get(1).getFormattedMessage(),
                 is("File already exists in target directory: " + targetFile));
 
     }
@@ -104,21 +98,33 @@ public class FuinDebUtilsTest {
         FileUtils.deleteQuietly(targetFile);
 
         // TEST
-        final File resultFile = FuinDebUtils.cachedWget(new URL(
-                "http://www.fuin.org/images/smiley.gif"), targetDir);
+        final Appender mockAppender = mock(Appender.class);
+        final Logger logger = (Logger) LoggerFactory
+                .getLogger(Logger.ROOT_LOGGER_NAME);
+        logger.addAppender(mockAppender);
+        try {
+            FuinDebUtils.cachedWget(new URL(
+                    "http://www.fuin.org/images/smiley.gif"), targetDir);
+        } finally {
+            logger.detachAppender(mockAppender);
+        }
 
         // VERIFY
-        verify(mockAppender, times(2)).doAppend(captorLoggingEvent.capture());
+        final ArgumentCaptor<LoggingEvent> captorLoggingEvent = ArgumentCaptor
+                .forClass(LoggingEvent.class);
+        verify(mockAppender, times(3)).doAppend(captorLoggingEvent.capture());
         final List<LoggingEvent> events = captorLoggingEvent.getAllValues();
 
-        final LoggingEvent loggingEvent1 = events.get(0);
-        assertThat(loggingEvent1.getLevel(), is(Level.INFO));
-        assertThat(loggingEvent1.getFormattedMessage(),
+        assertThat(events.get(0).getLevel(), is(Level.INFO));
+        assertThat(events.get(0).getFormattedMessage(),
+                is("cachedWget: http://www.fuin.org/images/smiley.gif"));
+
+        assertThat(events.get(1).getLevel(), is(Level.INFO));
+        assertThat(events.get(1).getFormattedMessage(),
                 is("Downloading: http://www.fuin.org/images/smiley.gif"));
 
-        final LoggingEvent loggingEvent2 = events.get(1);
-        assertThat(loggingEvent2.getLevel(), is(Level.INFO));
-        assertThat(loggingEvent2.getFormattedMessage(),
+        assertThat(events.get(2).getLevel(), is(Level.INFO));
+        assertThat(events.get(2).getFormattedMessage(),
                 is("Copied from '/tmp/smiley.gif' to: " + targetFile));
 
     }
@@ -134,26 +140,41 @@ public class FuinDebUtilsTest {
         FileUtils.deleteQuietly(tempFile);
 
         // TEST
-        final File resultFile = FuinDebUtils.cachedWget(new URL(
-                "http://www.fuin.org/images/smiley.gif"), targetDir);
+        final Appender mockAppender = mock(Appender.class);
+        final Logger logger = (Logger) LoggerFactory
+                .getLogger(Logger.ROOT_LOGGER_NAME);
+        logger.addAppender(mockAppender);
+        try {
+            FuinDebUtils.cachedWget(new URL(
+                    "http://www.fuin.org/images/smiley.gif"), targetDir);
+        } finally {
+            logger.detachAppender(mockAppender);
+        }
 
         // VERIFY
-        verify(mockAppender, times(3)).doAppend(captorLoggingEvent.capture());
+        final ArgumentCaptor<LoggingEvent> captorLoggingEvent = ArgumentCaptor
+                .forClass(LoggingEvent.class);
+        verify(mockAppender, times(5)).doAppend(captorLoggingEvent.capture());
         final List<LoggingEvent> events = captorLoggingEvent.getAllValues();
 
-        final LoggingEvent loggingEvent1 = events.get(0);
-        assertThat(loggingEvent1.getLevel(), is(Level.INFO));
-        assertThat(loggingEvent1.getFormattedMessage(),
+        assertThat(events.get(0).getLevel(), is(Level.INFO));
+        assertThat(events.get(0).getFormattedMessage(),
+                is("cachedWget: http://www.fuin.org/images/smiley.gif"));
+
+        assertThat(events.get(1).getLevel(), is(Level.INFO));
+        assertThat(events.get(1).getFormattedMessage(),
                 is("Downloading: http://www.fuin.org/images/smiley.gif"));
 
-        final LoggingEvent loggingEvent2 = events.get(1);
-        assertThat(loggingEvent2.getLevel(), is(Level.INFO));
-        assertThat(loggingEvent2.getFormattedMessage(),
+        assertThat(events.get(2).getLevel(), is(Level.INFO));
+        assertThat(events.get(2).getFormattedMessage(),
+                is("wget: http://www.fuin.org/images/smiley.gif"));
+
+        assertThat(events.get(3).getLevel(), is(Level.INFO));
+        assertThat(events.get(3).getFormattedMessage(),
                 is("Downloaded to: /tmp/smiley.gif"));
 
-        final LoggingEvent loggingEvent3 = events.get(2);
-        assertThat(loggingEvent3.getLevel(), is(Level.INFO));
-        assertThat(loggingEvent3.getFormattedMessage(),
+        assertThat(events.get(4).getLevel(), is(Level.INFO));
+        assertThat(events.get(4).getFormattedMessage(),
                 is("Copied from '/tmp/smiley.gif' to: " + targetFile));
 
     }

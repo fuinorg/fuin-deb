@@ -86,6 +86,8 @@ public final class FuinDebUtils {
         Contract.requireArgNotNull("url", url);
         Contract.requireArgNotNull("dir", dir);
 
+        LOG.info("cachedWget: {}", url);
+        
         final File targetFile = new File(dir, FilenameUtils.getName(url
                 .getFile()));
         try {
@@ -127,6 +129,8 @@ public final class FuinDebUtils {
         Contract.requireArgNotNull("url", url);
         Contract.requireArgNotNull("dir", dir);
 
+        LOG.info("wget: {}", url);
+        
         final CommandLine cmdLine = new CommandLine("wget");
         if (args != null) {
             for (final String arg : args) {
@@ -134,6 +138,8 @@ public final class FuinDebUtils {
             }
         }
         cmdLine.addArgument(url.toExternalForm());
+        
+                
         execute(cmdLine, dir, "Download: " + url);
 
     }
@@ -183,6 +189,7 @@ public final class FuinDebUtils {
         Contract.requireArgNotNull("tarFile", tarFile);
 
         final String tarFilePath = Utils4J.getCanonicalPath(tarFile);
+        LOG.info("unTarGz: {}", tarFilePath);
 
         final CommandLine cmdLine = new CommandLine("tar");
         cmdLine.addArgument("-zvxf");
@@ -210,6 +217,7 @@ public final class FuinDebUtils {
 
         final File tarFile = new File(parentDir, dirName + ".tar.gz");
         final String tarFileNameAndPath = Utils4J.getCanonicalPath(tarFile);
+        LOG.info("tarGz '{}': {}", dirName, tarFileNameAndPath);
 
         final CommandLine cmdLine = new CommandLine("tar");
         cmdLine.addArgument("-zvcf");
@@ -227,7 +235,7 @@ public final class FuinDebUtils {
      * 
      * @param clasz
      *            Class to use for reading teh resource.
-     * @param resourceName
+     * @param resource
      *            Full path to the resource.
      * @param outDir
      *            Output directory to create a file inside.
@@ -235,14 +243,16 @@ public final class FuinDebUtils {
      *            Variables to replace.
      */
     public static void writeReplacedResource(final Class<?> clasz,
-            final String resourceName, final File outDir,
+            final String resource, final File outDir,
             final Map<String, String> vars) {
 
+        LOG.info("Write replaced resource '{}' to directory: {}", resource, outDir);
+        
         final File outFile = new File(outDir,
-                FilenameUtils.getName(resourceName));
+                FilenameUtils.getName(resource));
         try {
             final InputStream inStream = clasz
-                    .getResourceAsStream(resourceName);
+                    .getResourceAsStream(resource);
             try {
                 final String inStr = IOUtils.toString(inStream);
                 final String outStr = Utils4J.replaceVars(inStr, vars);
@@ -254,7 +264,7 @@ public final class FuinDebUtils {
         } catch (IOException ex) {
             throw new RuntimeException(
                     "Error replacing and writing resource file '"
-                            + resourceName + "' to: " + outFile, ex);
+                            + resource + "' to: " + outFile, ex);
         }
     }
 
@@ -270,6 +280,7 @@ public final class FuinDebUtils {
      */
     public static void copyResourceToFile(final Class<?> clasz,
             final String resource, final File targetFile) {
+        LOG.info("Copy resource '{}' to file: {}", resource, targetFile);
         try {
             final InputStream in = clasz.getResourceAsStream(resource);
             try {
@@ -316,6 +327,9 @@ public final class FuinDebUtils {
 
     private static void execute(final CommandLine cmdLine,
             final File workingDir, final String errorMsg) {
+        
+        LOG.debug("execute: " + cmdLine);
+        
         final Executor executor = new DefaultExecutor();
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         final PumpStreamHandler psh = new PumpStreamHandler(bos);
