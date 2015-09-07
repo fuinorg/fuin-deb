@@ -22,16 +22,16 @@ import static org.fest.assertions.Assertions.assertThat;
 import java.io.File;
 
 import org.fuin.deb.commons.DebPackage;
-import org.fuin.deb.modules.JdkModule;
 import org.junit.Test;
 
 /**
  * Tests the {@link JdkModule} class.
  */
+// CHECKSTYLE:OFF for tests
 public final class JdkModuleTest {
 
     @Test
-    public final void testIsValid() {
+    public final void testCreate() {
 
         // PREPARE
         final String version = "1.8.0.60";
@@ -46,12 +46,13 @@ public final class JdkModuleTest {
                 maintainer, arch, installationPath, jdkUrl, pkg);
 
         final File buildDir = new File("./target");
-        
+
         // TEST
         testee.create(buildDir);
 
         // VERIFY
-        final File changesFile = new File(buildDir, "fuin-jdk8_1.8.0.60_amd64.changes");
+        final File changesFile = new File(buildDir,
+                "fuin-jdk8_1.8.0.60_amd64.changes");
         final File debFile = new File(buildDir, "fuin-jdk8_1.8.0.60_amd64.deb");
         assertThat(changesFile).exists();
         assertThat(debFile).exists();
@@ -59,3 +60,4 @@ public final class JdkModuleTest {
     }
 
 }
+// CHECKSTYLE:ON
