@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <own-deb-config>
 
-	<modules prefix="fuin" maintainer="michael@fuin.org" arch="amd64"
-		installation-path="/opt">
+    <!-- The 'modules' section defines standards that are inherited by all childs -->
+	<modules prefix="fuin-" maintainer="michael@fuin.org" arch="amd64" installation-path="/opt">
 
+        <!-- Every module can override the inherited properties -->
 		<jdk version="1.8.0.60" description="Java SE Development Kit 8"
 			url="http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jdk-8u60-linux-x64.tar.gz">
 
+            <!-- The full name of the package is 'fuin-jdk8' (prefix+name) --> 
 			<package name="jdk8" />
 
 		</jdk>
@@ -14,7 +16,9 @@
 		<eclipse version="4.4" description="Eclipse Luna IDE for Java EE Developers"
 			url="http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/luna/SR2/eclipse-jee-luna-SR2-linux-gtk-x86_64.tar.gz">
 
+            <!-- The full name of the package is 'fuin-eclipse-jee-luna' (prefix+name) --> 
 			<package name="eclipse-jee-luna">
+                <!-- Requires the module jdk8  to be installed --> 
 				<dependency name="jdk8" />
 			</package>
 
@@ -23,22 +27,25 @@
 		<eclipse version="4.5" description="Eclipse Mars IDE for Java EE Developers"
 			url="http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/mars/R/eclipse-jee-mars-R-linux-gtk-x86_64.tar.gz">
 
+            <!-- The full name of the package is 'fuin-eclipse-jee-mars' (prefix+name) --> 
 			<package name="eclipse-jee-mars">
+                <!-- Requires the module jdk8  to be installed --> 
 				<dependency name="jdk8" />
 			</package>
 
 		</eclipse>
 
-		<eclipse-plugin version="6.5.0"
-			repository="http://eclipse-cs.sourceforge.net/update/" installIUs="net.sf.eclipsecs.feature.group">
+		<eclipse-plugin version="6.5.0"	repository="http://eclipse-cs.sourceforge.net/update/" installIUs="net.sf.eclipsecs.feature.group">
 
-			<package name="eclipse-jee-luna-plugins-checkstyle"
-				description="Eclipse Luna Checkstyle Plugin">
+            <!-- Creates two binary packages with different names, descriptions and dependencies --> 
+
+            <!-- Requires Eclipse Luna to be installed --> 
+			<package name="eclipse-jee-luna-plugins-checkstyle"	description="Eclipse Luna Checkstyle Plugin">
 				<dependency name="eclipse-jee-luna" />
 			</package>
 
-			<package name="eclipse-jee-mars-plugins-checkstyle"
-				description="Eclipse Mars Checkstyle Plugin">
+            <!-- Requires Eclipse Mars to be installed --> 
+			<package name="eclipse-jee-mars-plugins-checkstyle"	description="Eclipse Mars Checkstyle Plugin">
 				<dependency name="eclipse-jee-mars" />
 			</package>
 
