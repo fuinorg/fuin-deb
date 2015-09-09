@@ -22,7 +22,6 @@ import static org.fest.assertions.Assertions.assertThat;
 import java.io.File;
 
 import org.fuin.owndeb.commons.DebPackage;
-import org.fuin.owndeb.modules.JdkModule;
 import org.junit.Test;
 
 /**

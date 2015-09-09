@@ -31,8 +31,6 @@ import nl.jqno.equalsverifier.Warning;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.fuin.objects4j.common.ContractViolationException;
-import org.fuin.owndeb.commons.DebDependency;
-import org.fuin.owndeb.commons.DebPackage;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

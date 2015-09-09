@@ -29,8 +29,6 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.fuin.owndeb.commons.DebModule;
-import org.fuin.owndeb.commons.DebModules;
 import org.junit.Test;
 
 //CHECKSTYLE:OFF for tests

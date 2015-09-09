@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.fuin.owndeb.commons.DebUtils;
 import org.fuin.utils4j.Utils4J;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,7 +50,7 @@ import ch.qos.logback.core.Appender;
 public class DebUtilsTest {
 
     @Test
-    public void testCachedWgetAlreadyExistsInTarget() throws IOException {
+    public void testCachedDownloadAlreadyExistsInTarget() throws IOException {
 
         // PREPARE
         final File targetDir = new File("./target").getCanonicalFile();
@@ -65,7 +64,7 @@ public class DebUtilsTest {
         logger.addAppender(mockAppender);
         try {
 
-            DebUtils.cachedWget(new URL(
+            DebUtils.cachedDownload(new URL(
                     "http://www.fuin.org/images/smiley.gif"), targetDir);
 
         } finally {
@@ -89,7 +88,7 @@ public class DebUtilsTest {
     }
 
     @Test
-    public void testCachedWgetAlreadyExistsInTemp() throws IOException {
+    public void testCachedDownloadAlreadyExistsInTemp() throws IOException {
 
         // PREPARE
         final File targetDir = new File("./target").getCanonicalFile();
@@ -104,7 +103,7 @@ public class DebUtilsTest {
                 .getLogger(Logger.ROOT_LOGGER_NAME);
         logger.addAppender(mockAppender);
         try {
-            DebUtils.cachedWget(new URL(
+            DebUtils.cachedDownload(new URL(
                     "http://www.fuin.org/images/smiley.gif"), targetDir);
         } finally {
             logger.detachAppender(mockAppender);
@@ -131,7 +130,7 @@ public class DebUtilsTest {
     }
 
     @Test
-    public void testCachedWgetDoesNotExist() throws IOException {
+    public void testCachedDownloadDoesNotExist() throws IOException {
 
         // PREPARE
         final File targetDir = new File("./target").getCanonicalFile();
@@ -146,7 +145,7 @@ public class DebUtilsTest {
                 .getLogger(Logger.ROOT_LOGGER_NAME);
         logger.addAppender(mockAppender);
         try {
-            DebUtils.cachedWget(new URL(
+            DebUtils.cachedDownload(new URL(
                     "http://www.fuin.org/images/smiley.gif"), targetDir);
         } finally {
             logger.detachAppender(mockAppender);
@@ -168,7 +167,7 @@ public class DebUtilsTest {
 
         assertThat(events.get(2).getLevel(), is(Level.INFO));
         assertThat(events.get(2).getFormattedMessage(),
-                is("wget: http://www.fuin.org/images/smiley.gif"));
+                is("Download: http://www.fuin.org/images/smiley.gif"));
 
         assertThat(events.get(3).getLevel(), is(Level.INFO));
         assertThat(events.get(3).getFormattedMessage(),
@@ -181,18 +180,17 @@ public class DebUtilsTest {
     }
 
     @Test
-    public void testWget() throws MalformedURLException {
+    public void testDownload() throws MalformedURLException {
 
         // PREPARE
         final File expectedFile = new File(Utils4J.getTempDir(),
                 "test-smiley.gif");
-        DebUtils
-                .copyResourceToFile(getClass(), "/smiley.gif", expectedFile);
+        DebUtils.copyResourceToFile(getClass(), "/smiley.gif", expectedFile);
         final File file = new File(Utils4J.getTempDir(), "smiley.gif");
         FileUtils.deleteQuietly(file);
 
         // TEST
-        DebUtils.wget(new URL("http://www.fuin.org/images/smiley.gif"),
+        DebUtils.download(new URL("http://www.fuin.org/images/smiley.gif"),
                 Utils4J.getTempDir());
 
         // VERIFY
@@ -206,12 +204,10 @@ public class DebUtilsTest {
         // PREPARE
         final File targetFile = new File(Utils4J.getTempDir(),
                 "test-dir.tar.gz");
-        DebUtils.copyResourceToFile(getClass(), "/test-dir.tar.gz",
-                targetFile);
+        DebUtils.copyResourceToFile(getClass(), "/test-dir.tar.gz", targetFile);
 
         // TEST
-        final String folderName = DebUtils
-                .peekFirstTarGzFolderName(targetFile);
+        final String folderName = DebUtils.peekFirstTarGzFolderName(targetFile);
 
         // VERIFY
         assertThat(folderName).isEqualTo("test-dir/");
@@ -225,8 +221,7 @@ public class DebUtilsTest {
         final File tarGzFile = new File(Utils4J.getTempDir(), "test-dir.tar.gz");
         FileUtils.deleteDirectory(new File(Utils4J.getTempDir(), "test-dir"));
         FileUtils.deleteQuietly(tarGzFile);
-        DebUtils.copyResourceToFile(getClass(), "/test-dir.tar.gz",
-                tarGzFile);
+        DebUtils.copyResourceToFile(getClass(), "/test-dir.tar.gz", tarGzFile);
 
         // TEST
         DebUtils.unTarGz(tarGzFile);

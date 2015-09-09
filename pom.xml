@@ -112,6 +112,12 @@
 			<version>2.4</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>fluent-hc</artifactId>
+			<version>4.5</version>
+		</dependency>
+
 		<!-- test -->
 
 		<dependency>

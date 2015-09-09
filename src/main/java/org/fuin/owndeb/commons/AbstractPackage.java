@@ -84,7 +84,6 @@ public abstract class AbstractPackage extends AbstractBase {
         return description;
     }
 
-
     /**
      * Copy all attributes from the given object if the field is
      * <code>null</code>.
@@ -101,5 +100,5 @@ public abstract class AbstractPackage extends AbstractBase {
             this.description = other.description;
         }
     }
-    
+
 }

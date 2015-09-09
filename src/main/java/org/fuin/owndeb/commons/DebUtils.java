@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.LineNumberReader;
 import java.io.StringReader;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,7 @@ import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.http.client.fluent.Request;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Nullable;
 import org.fuin.utils4j.Utils4J;
@@ -58,8 +60,7 @@ public final class DebUtils {
     public static final String XML_PREFIX = "<?xml version=\"1.0\" encoding=\"UTF-8\""
             + " standalone=\"yes\"?>";
 
-    private static final Logger LOG = LoggerFactory
-            .getLogger(DebUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DebUtils.class);
 
     private DebUtils() {
         throw new UnsupportedOperationException(
@@ -76,18 +77,18 @@ public final class DebUtils {
      *            URL to load.
      * @param dir
      *            Target directory
-     * @param args
-     *            Additional arguments for wget command.
+     * @param cookies
+     *            Cookies for the request (Format: "name=value").
      * 
      * @return Downloaded file.
      */
-    public static File cachedWget(@NotNull final URL url,
-            @NotNull final File dir, final String... args) {
+    public static File cachedDownload(@NotNull final URL url,
+            @NotNull final File dir, final String... cookies) {
         Contract.requireArgNotNull("url", url);
         Contract.requireArgNotNull("dir", dir);
 
         LOG.info("cachedWget: {}", url);
-        
+
         final File targetFile = new File(dir, FilenameUtils.getName(url
                 .getFile()));
         try {
@@ -100,7 +101,7 @@ public final class DebUtils {
                 final File tmpFile = new File(Utils4J.getTempDir(),
                         targetFile.getName());
                 if (!tmpFile.exists()) {
-                    wget(url, Utils4J.getTempDir(), args);
+                    download(url, Utils4J.getTempDir(), cookies);
                     LOG.info("Downloaded to: {}", tmpFile);
                 }
                 FileUtils.copyFile(tmpFile, targetFile);
@@ -121,27 +122,34 @@ public final class DebUtils {
      *            URL to download.
      * @param dir
      *            Target directory.
-     * @param args
-     *            Additional arguments for wget command.
+     * @param cookies
+     *            Cookies for the request (Format: "name=value").
      */
-    public static void wget(@NotNull final URL url, @NotNull final File dir,
-            final String... args) {
+    public static void download(@NotNull final URL url,
+            @NotNull final File dir, final String... cookies) {
         Contract.requireArgNotNull("url", url);
         Contract.requireArgNotNull("dir", dir);
 
-        LOG.info("wget: {}", url);
-        
-        final CommandLine cmdLine = new CommandLine("wget");
-        if (args != null) {
-            for (final String arg : args) {
-                cmdLine.addArgument(arg);
-            }
-        }
-        cmdLine.addArgument(url.toExternalForm());
-        
-                
-        execute(cmdLine, dir, "Download: " + url);
+        LOG.info("Download: {}", url);
 
+        try {
+            final Request request = Request.Get(url.toURI());
+            if (cookies != null) {
+                final StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < cookies.length; i++) {
+                    if (i > 0) {
+                        sb.append(";");
+                    }
+                    sb.append(cookies[i]);
+                }
+                request.addHeader("Cookie", sb.toString());
+            }
+            final File file = new File(dir,
+                    FilenameUtils.getName(url.getFile()));
+            request.execute().saveContent(file);
+        } catch (final IOException | URISyntaxException ex) {
+            throw new RuntimeException("Error downloading: " + url, ex);
+        }
     }
 
     /**
@@ -246,13 +254,12 @@ public final class DebUtils {
             final String resource, final File outDir,
             final Map<String, String> vars) {
 
-        LOG.info("Write replaced resource '{}' to directory: {}", resource, outDir);
-        
-        final File outFile = new File(outDir,
-                FilenameUtils.getName(resource));
+        LOG.info("Write replaced resource '{}' to directory: {}", resource,
+                outDir);
+
+        final File outFile = new File(outDir, FilenameUtils.getName(resource));
         try {
-            final InputStream inStream = clasz
-                    .getResourceAsStream(resource);
+            final InputStream inStream = clasz.getResourceAsStream(resource);
             try {
                 final String inStr = IOUtils.toString(inStream);
                 final String outStr = Utils4J.replaceVars(inStr, vars);
@@ -263,8 +270,8 @@ public final class DebUtils {
             }
         } catch (IOException ex) {
             throw new RuntimeException(
-                    "Error replacing and writing resource file '"
-                            + resource + "' to: " + outFile, ex);
+                    "Error replacing and writing resource file '" + resource
+                            + "' to: " + outFile, ex);
         }
     }
 
@@ -327,9 +334,9 @@ public final class DebUtils {
 
     private static void execute(final CommandLine cmdLine,
             final File workingDir, final String errorMsg) {
-        
-        LOG.debug("execute: " + cmdLine);
-        
+
+        LOG.debug("Execute: " + cmdLine.toString());
+
         final Executor executor = new DefaultExecutor();
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         final PumpStreamHandler psh = new PumpStreamHandler(bos);

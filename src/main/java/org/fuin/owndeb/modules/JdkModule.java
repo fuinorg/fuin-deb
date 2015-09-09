@@ -17,7 +17,7 @@
  */
 package org.fuin.owndeb.modules;
 
-import static org.fuin.owndeb.commons.DebUtils.cachedWget;
+import static org.fuin.owndeb.commons.DebUtils.cachedDownload;
 import static org.fuin.owndeb.commons.DebUtils.peekFirstTarGzFolderName;
 import static org.fuin.owndeb.commons.DebUtils.tarGz;
 import static org.fuin.owndeb.commons.DebUtils.unTarGz;
@@ -44,6 +44,9 @@ import org.vafer.jdeb.ant.Data;
 import org.vafer.jdeb.ant.DebAntTask;
 import org.vafer.jdeb.ant.Mapper;
 
+/**
+ * Downloads and Oracle JDK and creates a binary Debian package from it.
+ */
 public final class JdkModule extends DebModule {
 
     private static final Logger LOG = LoggerFactory.getLogger(JdkModule.class);
@@ -132,9 +135,8 @@ public final class JdkModule extends DebModule {
         Contract.requireArgNotNull("buildDirectory", buildDirectory);
         LOG.info("Creating module in: {}", buildDirectory);
 
-       final File jdkArchiveFile = cachedWget(url(urlStr), buildDirectory,
-                "--no-check-certificate", "--no-cookies", "--header",
-                "\"Cookie: oraclelicense=accept-securebackup-cookie\"");
+        final File jdkArchiveFile = cachedDownload(url(urlStr), buildDirectory,
+                "oraclelicense=accept-securebackup-cookie");
 
         final List<DebPackage> debPackages = getPackages();
         for (final DebPackage pkg : debPackages) {
