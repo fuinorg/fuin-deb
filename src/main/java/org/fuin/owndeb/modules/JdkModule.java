@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.deb.modules;
+package org.fuin.owndeb.modules;
 
-import static org.fuin.deb.commons.FuinDebUtils.cachedWget;
-import static org.fuin.deb.commons.FuinDebUtils.peekFirstTarGzFolderName;
-import static org.fuin.deb.commons.FuinDebUtils.tarGz;
-import static org.fuin.deb.commons.FuinDebUtils.unTarGz;
-import static org.fuin.deb.commons.FuinDebUtils.writeReplacedResource;
+import static org.fuin.owndeb.commons.DebUtils.cachedWget;
+import static org.fuin.owndeb.commons.DebUtils.peekFirstTarGzFolderName;
+import static org.fuin.owndeb.commons.DebUtils.tarGz;
+import static org.fuin.owndeb.commons.DebUtils.unTarGz;
+import static org.fuin.owndeb.commons.DebUtils.writeReplacedResource;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,10 +34,10 @@ import javax.xml.bind.annotation.XmlAttribute;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.tools.ant.Project;
-import org.fuin.deb.commons.DebModule;
-import org.fuin.deb.commons.DebPackage;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Nullable;
+import org.fuin.owndeb.commons.DebModule;
+import org.fuin.owndeb.commons.DebPackage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vafer.jdeb.ant.Data;

@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.deb.commons;
+package org.fuin.owndeb.commons;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.fuin.deb.commons.FuinDebUtils.XML_PREFIX;
+import static org.fuin.owndeb.commons.DebUtils.XML_PREFIX;
 import static org.fuin.units4j.Units4JUtils.marshal;
 import static org.fuin.units4j.Units4JUtils.unmarshal;
 
@@ -29,6 +29,8 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.fuin.owndeb.commons.DebModule;
+import org.fuin.owndeb.commons.DebModules;
 import org.junit.Test;
 
 //CHECKSTYLE:OFF for tests

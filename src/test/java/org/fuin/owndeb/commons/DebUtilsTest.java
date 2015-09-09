@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.deb.commons;
+package org.fuin.owndeb.commons;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.fuin.owndeb.commons.DebUtils;
 import org.fuin.utils4j.Utils4J;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,7 +48,7 @@ import ch.qos.logback.core.Appender;
 
 //CHECKSTYLE:OFF for tests
 @RunWith(MockitoJUnitRunner.class)
-public class FuinDebUtilsTest {
+public class DebUtilsTest {
 
     @Test
     public void testCachedWgetAlreadyExistsInTarget() throws IOException {
@@ -55,7 +56,7 @@ public class FuinDebUtilsTest {
         // PREPARE
         final File targetDir = new File("./target").getCanonicalFile();
         final File targetFile = new File(targetDir, "smiley.gif");
-        FuinDebUtils.copyResourceToFile(getClass(), "/smiley.gif", targetFile);
+        DebUtils.copyResourceToFile(getClass(), "/smiley.gif", targetFile);
 
         // TEST
         final Appender mockAppender = mock(Appender.class);
@@ -64,7 +65,7 @@ public class FuinDebUtilsTest {
         logger.addAppender(mockAppender);
         try {
 
-            FuinDebUtils.cachedWget(new URL(
+            DebUtils.cachedWget(new URL(
                     "http://www.fuin.org/images/smiley.gif"), targetDir);
 
         } finally {
@@ -94,7 +95,7 @@ public class FuinDebUtilsTest {
         final File targetDir = new File("./target").getCanonicalFile();
         final File targetFile = new File(targetDir, "smiley.gif");
         final File tempFile = new File(Utils4J.getTempDir(), "smiley.gif");
-        FuinDebUtils.copyResourceToFile(getClass(), "/smiley.gif", tempFile);
+        DebUtils.copyResourceToFile(getClass(), "/smiley.gif", tempFile);
         FileUtils.deleteQuietly(targetFile);
 
         // TEST
@@ -103,7 +104,7 @@ public class FuinDebUtilsTest {
                 .getLogger(Logger.ROOT_LOGGER_NAME);
         logger.addAppender(mockAppender);
         try {
-            FuinDebUtils.cachedWget(new URL(
+            DebUtils.cachedWget(new URL(
                     "http://www.fuin.org/images/smiley.gif"), targetDir);
         } finally {
             logger.detachAppender(mockAppender);
@@ -145,7 +146,7 @@ public class FuinDebUtilsTest {
                 .getLogger(Logger.ROOT_LOGGER_NAME);
         logger.addAppender(mockAppender);
         try {
-            FuinDebUtils.cachedWget(new URL(
+            DebUtils.cachedWget(new URL(
                     "http://www.fuin.org/images/smiley.gif"), targetDir);
         } finally {
             logger.detachAppender(mockAppender);
@@ -185,13 +186,13 @@ public class FuinDebUtilsTest {
         // PREPARE
         final File expectedFile = new File(Utils4J.getTempDir(),
                 "test-smiley.gif");
-        FuinDebUtils
+        DebUtils
                 .copyResourceToFile(getClass(), "/smiley.gif", expectedFile);
         final File file = new File(Utils4J.getTempDir(), "smiley.gif");
         FileUtils.deleteQuietly(file);
 
         // TEST
-        FuinDebUtils.wget(new URL("http://www.fuin.org/images/smiley.gif"),
+        DebUtils.wget(new URL("http://www.fuin.org/images/smiley.gif"),
                 Utils4J.getTempDir());
 
         // VERIFY
@@ -205,11 +206,11 @@ public class FuinDebUtilsTest {
         // PREPARE
         final File targetFile = new File(Utils4J.getTempDir(),
                 "test-dir.tar.gz");
-        FuinDebUtils.copyResourceToFile(getClass(), "/test-dir.tar.gz",
+        DebUtils.copyResourceToFile(getClass(), "/test-dir.tar.gz",
                 targetFile);
 
         // TEST
-        final String folderName = FuinDebUtils
+        final String folderName = DebUtils
                 .peekFirstTarGzFolderName(targetFile);
 
         // VERIFY
@@ -224,12 +225,12 @@ public class FuinDebUtilsTest {
         final File tarGzFile = new File(Utils4J.getTempDir(), "test-dir.tar.gz");
         FileUtils.deleteDirectory(new File(Utils4J.getTempDir(), "test-dir"));
         FileUtils.deleteQuietly(tarGzFile);
-        FuinDebUtils.copyResourceToFile(getClass(), "/test-dir.tar.gz",
+        DebUtils.copyResourceToFile(getClass(), "/test-dir.tar.gz",
                 tarGzFile);
 
         // TEST
-        FuinDebUtils.unTarGz(tarGzFile);
-        final File copy = FuinDebUtils.tarGz(Utils4J.getTempDir(), "test-dir");
+        DebUtils.unTarGz(tarGzFile);
+        final File copy = DebUtils.tarGz(Utils4J.getTempDir(), "test-dir");
 
         // VERIFY
         assertThat(tarGzFile).hasSameContentAs(copy);
@@ -243,13 +244,13 @@ public class FuinDebUtilsTest {
         final String filename = "write-replaced-resource.txt";
         final File file = new File(Utils4J.getTempDir(), filename);
         FileUtils.deleteQuietly(file);
-        FuinDebUtils.copyResourceToFile(getClass(), "/" + filename, file);
+        DebUtils.copyResourceToFile(getClass(), "/" + filename, file);
 
         final String expectedFilename = "write-replaced-resource-expected.txt";
         final File expectedFile = new File(Utils4J.getTempDir(),
                 expectedFilename);
         FileUtils.deleteQuietly(expectedFile);
-        FuinDebUtils.copyResourceToFile(getClass(), "/" + expectedFilename,
+        DebUtils.copyResourceToFile(getClass(), "/" + expectedFilename,
                 expectedFile);
 
         final Map<String, String> vars = new HashMap<>();
@@ -257,7 +258,7 @@ public class FuinDebUtilsTest {
         vars.put("b", "Def");
 
         // TEST
-        FuinDebUtils.writeReplacedResource(getClass(),
+        DebUtils.writeReplacedResource(getClass(),
                 "/write-replaced-resource.txt", Utils4J.getTempDir(), vars);
 
         // VERIFY
@@ -272,7 +273,7 @@ public class FuinDebUtilsTest {
         final String str = "abc\ndef\n\nghi";
 
         // TEST
-        final List<String> list = FuinDebUtils.asList(str);
+        final List<String> list = DebUtils.asList(str);
 
         // VERIFY
         assertThat(list).containsExactly("abc", "def", "", "ghi");

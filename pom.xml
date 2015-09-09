@@ -10,20 +10,19 @@
 		<version>1.1.0</version>
 	</parent>
 
-	<artifactId>fuin-deb</artifactId>
+	<artifactId>own-deb</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
-	<name>fuin-deb-commons</name>
-	<description>Creates company specific binary Debian packages.</description>
+	<description>Creates your own binary Debian packages.</description>
 
 	<scm>
-		<url>https://github.com/fuinorg/fuin-deb/</url>
-		<connection>scm:git:git://github.com/fuinorg/fuin-deb.git</connection>
-		<developerConnection>scm:git:git@github.com:fuinorg/fuin-deb.git</developerConnection>
+		<url>https://github.com/fuinorg/own-deb/</url>
+		<connection>scm:git:git://github.com/fuinorg/own-deb.git</connection>
+		<developerConnection>scm:git:git@github.com:fuinorg/own-deb.git</developerConnection>
 	</scm>
 
 	<issueManagement>
 		<system>GitHub Issues</system>
-		<url>https://github.com/fuinorg/fuin-deb/issues</url>
+		<url>https://github.com/fuinorg/own-deb/issues</url>
 	</issueManagement>
 
 	<dependencies>
@@ -160,8 +159,6 @@
 	</dependencies>
 
 	<build>
-
-		<finalName>fuin-deb-${artifactId}-${version}</finalName>
 
 		<plugins>
 

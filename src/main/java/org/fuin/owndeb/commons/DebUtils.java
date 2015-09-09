@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.deb.commons;
+package org.fuin.owndeb.commons;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -52,16 +52,16 @@ import org.vafer.jdeb.shaded.compress.io.IOUtils;
  * Provides utility methods for creating company specific binary Debian
  * packages.
  */
-public final class FuinDebUtils {
+public final class DebUtils {
 
     /** Prefix used for XML files. */
     public static final String XML_PREFIX = "<?xml version=\"1.0\" encoding=\"UTF-8\""
             + " standalone=\"yes\"?>";
 
     private static final Logger LOG = LoggerFactory
-            .getLogger(FuinDebUtils.class);
+            .getLogger(DebUtils.class);
 
-    private FuinDebUtils() {
+    private DebUtils() {
         throw new UnsupportedOperationException(
                 "Cannot create an instance of a utility class");
     }
