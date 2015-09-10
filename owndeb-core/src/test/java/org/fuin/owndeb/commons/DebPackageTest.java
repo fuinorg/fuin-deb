@@ -111,6 +111,8 @@ public class DebPackageTest {
                         XML_PREFIX
                                 + "<package name=\"abc\" version=\"1.2.3\" description=\"Aa Bb Cc\" "
                                 + "prefix=\"fuin-\" maintainer=\"michael@fuin.org\" arch=\"amd64\" "
+                                + "section=\"devel\" "
+                                + "priority=\"low\" "
                                 + "installation-path=\"/opt\">"
                                 + "    <dependency name=\"def\"/>"
                                 + "    <dependency name=\"ghi\"/>"

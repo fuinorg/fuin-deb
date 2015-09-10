@@ -90,8 +90,8 @@ public class DebConfigTest {
                                 + "<owndeb-config>"
                                 + "<modules version=\"1.2.3\" description=\"Aa Bb Cc\" "
                                 + "prefix=\"fuin-\" maintainer=\"michael@fuin.org\" arch=\"amd64\" "
+                                + "section=\"devel\" " + "priority=\"low\" "
                                 + "installation-path=\"/opt\">"
-                                + "section=\"devel\">" + "priority=\"low\">"
                                 + "<moduleA/>" + "</modules>"
                                 + "</owndeb-config>", xml);
 
