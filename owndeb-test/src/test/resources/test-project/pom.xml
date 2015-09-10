@@ -34,6 +34,7 @@
 				<artifactId>owndeb-mojo</artifactId>
 				<version>1.0.0-SNAPSHOT</version>
 				<configuration>
+				    <config-file>./test-config.xml</config-file>
 					<module-classes>
 						<param>org.fuin.owndeb.modules.example.ExampleModule</param>
 					</module-classes>

@@ -50,14 +50,17 @@ public class OwnDebMojoTest {
         // PREPARE
         final List<String> goals = new ArrayList<String>();
         goals.add("clean");
-        goals.add("verify");
+        goals.add("owndeb:create");
 
         // TEST
         verifier.executeGoals(goals);
 
         // VERIFY
         verifier.verifyErrorFreeLog();
-        verifier.verifyTextInLog("Dowloading archive:");
+        verifier.assertFilePresent("target/abc-p1_1.2.3_amd64.changes");
+        verifier.assertFilePresent("target/abc-p1_1.2.3_amd64.deb");
+        verifier.assertFilePresent("target/abc-p2_1.2.3_amd64.changes");
+        verifier.assertFilePresent("target/abc-p2_1.2.3_amd64.deb");
 
     }
 

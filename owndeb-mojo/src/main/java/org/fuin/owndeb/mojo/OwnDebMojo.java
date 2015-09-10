@@ -36,7 +36,7 @@ import org.slf4j.impl.StaticLoggerBinder;
  * Reads an XML configuration file and creates a number of binary Debian
  * packages using it.
  */
-@Mojo(name = "create", defaultPhase = LifecyclePhase.PRE_INTEGRATION_TEST, requiresProject = false)
+@Mojo(name = "create", requiresProject = false)
 public final class OwnDebMojo extends AbstractMojo {
 
     private static final Logger LOG = LoggerFactory.getLogger(OwnDebMojo.class);
