@@ -142,7 +142,7 @@ public final class JdkModule extends DebModule {
         for (final DebPackage pkg : debPackages) {
 
             final DebPackage debPackage = new DebPackage(pkg);
-            debPackage.copyPackageIfNotAlreadySet(this);
+            debPackage.applyPackageDefaults(this);
 
             LOG.info("Creating package: {}", debPackage.getPrefixedName());
 

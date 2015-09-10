@@ -91,8 +91,8 @@ public abstract class AbstractPackage extends AbstractBase {
      * @param other
      *            Object to copy values from.
      */
-    public final void copyPackageIfNotAlreadySet(final AbstractPackage other) {
-        copyBaseIfNotAlreadySet(other);
+    public final void applyPackageDefaults(final AbstractPackage other) {
+        applyBaseDefaults(other);
         if (version == null) {
             this.version = other.version;
         }

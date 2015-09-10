@@ -117,7 +117,7 @@ public abstract class AbstractBase {
      * @param other
      *            Object to copy values from.
      */
-    public final void copyBaseIfNotAlreadySet(final AbstractBase other) {
+    public final void applyBaseDefaults(final AbstractBase other) {
 
         if (prefix == null) {
             this.prefix = other.prefix;

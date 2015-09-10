@@ -17,6 +17,7 @@
  */
 package org.fuin.owndeb.commons;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -58,6 +59,15 @@ public final class DebConfig {
      */
     public final DebModules getModules() {
         return modules;
+    }
+
+    /**
+     * Called after the configuration was unmarshalled using JAXB.
+     */
+    public final void afterUnmarshal(final Unmarshaller unmarshaller, final Object parent) {
+        if (modules != null) {
+            modules.applyDefaults();
+        }
     }
 
 }

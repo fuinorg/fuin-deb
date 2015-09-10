@@ -113,6 +113,20 @@ public abstract class DebModule extends AbstractPackage {
     }
 
     /**
+     * Applies the default settings to all packages.
+     * 
+     * @param debPkg Default values to use.
+     */
+    public final void applyModuleDefaults(final AbstractPackage debPkg) {
+        applyPackageDefaults(debPkg);
+        if (packages != null) {
+            for (final DebPackage pkg : packages) {
+                pkg.applyPackageDefaults(this);
+            }
+        }
+    }
+    
+    /**
      * Returns the unique name of the module.
      * 
      * @return Module name.

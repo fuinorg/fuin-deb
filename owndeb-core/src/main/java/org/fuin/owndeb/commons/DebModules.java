@@ -113,4 +113,15 @@ public final class DebModules extends AbstractPackage {
         return Collections.unmodifiableList(modules);
     }
 
+    /**
+     * Applies the default settings to all modules.
+     */
+    public final void applyDefaults() {
+        if (modules != null) {
+            for (final DebModule module : modules) {
+                module.applyPackageDefaults(this);
+            }
+        }        
+    }
+
 }

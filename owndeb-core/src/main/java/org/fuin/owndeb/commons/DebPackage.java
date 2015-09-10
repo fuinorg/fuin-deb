@@ -140,7 +140,7 @@ public final class DebPackage extends AbstractPackage {
     public DebPackage(@NotNull final DebPackage other) {
         super();
         Contract.requireArgNotNull("other", other);
-        copyPackageIfNotAlreadySet(other);
+        applyPackageDefaults(other);
         this.name = other.name;
         if (other.dependencies == null) {
             this.dependencies = null;
