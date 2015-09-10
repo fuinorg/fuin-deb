@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<own-deb-config>
+<owndeb-config>
 
 	<!-- The 'modules' section defines standards that are inherited by all childs -->
 	<modules prefix="fuin-" maintainer="michael@fuin.org" arch="amd64"
@@ -58,4 +58,4 @@
 
 	</modules>
 
-</own-deb-config>
+</owndeb-config>
