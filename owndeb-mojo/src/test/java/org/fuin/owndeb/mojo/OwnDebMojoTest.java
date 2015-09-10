@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2015 Michael Schnell. All rights reserved. 
- * <http://www.fuin.org/>
+ * http://www.fuin.org/
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,13 +13,17 @@
  * details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library. If not, see <http://www.gnu.org/licenses/>.
+ * along with this library. If not, see http://www.gnu.org/licenses/.
  */
 package org.fuin.owndeb.mojo;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
+import java.io.File;
+
 import org.apache.maven.plugin.MojoExecutionException;
+import org.fuin.owndeb.commons.DebUtils;
+import org.fuin.owndeb.modules.example.ExampleModule;
 import org.junit.Test;
 
 /**
@@ -33,13 +37,31 @@ public class OwnDebMojoTest {
     public void testExecute() throws MojoExecutionException {
 
         // PREPARE
+        final File buildDir = new File("./target");
+        final File file = new File("./target/test-config.xml");
+        file.delete();
+        DebUtils.copyResourceToFile(this.getClass(), "/test-config.xml", file);
         final OwnDebMojo testee = new OwnDebMojo();
+        testee.setConfigFile(file);
+        testee.setTargetDir(buildDir);
+        testee.setModuleClasses(new String[]{ ExampleModule.class.getName() });
 
         // TEST
         testee.execute();
 
         // VERIFY
-        assertThat(true).isTrue();
+
+        final File changesFile1 = new File(buildDir,
+                "abc-p1_1.2.3_amd64.changes");
+        final File debFile1 = new File(buildDir, "abc-p1_1.2.3_amd64.deb");
+        assertThat(changesFile1).exists();
+        assertThat(debFile1).exists();
+
+        final File changesFile2 = new File(buildDir,
+                "abc-p2_1.2.3_amd64.changes");
+        final File debFile2 = new File(buildDir, "abc-p2_1.2.3_amd64.deb");
+        assertThat(changesFile1).exists();
+        assertThat(debFile1).exists();
 
     }
 

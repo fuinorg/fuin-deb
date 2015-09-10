@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2015 Michael Schnell. All rights reserved. 
- * <http://www.fuin.org/>
+ * http://www.fuin.org/
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,17 +13,21 @@
  * details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library. If not, see <http://www.gnu.org/licenses/>.
+ * along with this library. If not, see http://www.gnu.org/licenses/.
  */
 package org.fuin.owndeb.mojo;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.fuin.owndeb.OwnDeb;
+import org.fuin.owndeb.commons.DebConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.StaticLoggerBinder;
@@ -40,6 +44,33 @@ public final class OwnDebMojo extends AbstractMojo {
     /** Location of the XML configuration file. */
     @Parameter(name = "config-file")
     private File configFile;
+
+    /** The target build directory. */
+    @Parameter(name = "target-dir", property = "project.build.directory")
+    private File targetDir = new File("./target");
+
+    /** A list of module classes to be bound to the JAXB context. */
+    @Parameter(name = "module-classes")
+    private String[] moduleClasses;
+
+    /**
+     * Returns the list of module classes to be bound to the JAXB context.
+     * 
+     * @return Full qualified module class names.
+     */
+    public final String[] getModuleClasses() {
+        return moduleClasses;
+    }
+
+    /**
+     * Sets the list of module classes to be bound to the JAXB context.
+     * 
+     * @param moduleClasses
+     *            Full qualified module class names.
+     */
+    public final void setModuleClasses(final String[] moduleClasses) {
+        this.moduleClasses = moduleClasses;
+    }
 
     /**
      * Checks if a variable is not <code>null</code> and throws an
@@ -60,11 +91,75 @@ public final class OwnDebMojo extends AbstractMojo {
         }
     }
 
+    /**
+     * Returns the configuration file.
+     * 
+     * @return XML config to load.
+     */
+    public final File getConfigFile() {
+        return configFile;
+    }
+
+    /**
+     * Sets the configuration file.
+     * 
+     * @param configFile
+     *            XML config file to load.
+     */
+    public final void setConfigFile(final File configFile) {
+        this.configFile = configFile;
+    }
+
+    /**
+     * Returns the target directory.
+     * 
+     * @return Target directory.
+     */
+    public final File getTargetDir() {
+        return targetDir;
+    }
+
+    /**
+     * Sets the target directory.
+     * 
+     * @param targetDir
+     *            Target directory to set.
+     */
+    public final void setTargetDir(final File targetDir) {
+        this.targetDir = targetDir;
+    }
+
     @Override
     public final void execute() throws MojoExecutionException {
         StaticLoggerBinder.getSingleton().setMavenLog(getLog());
-        LOG.info("config-file={}", configFile);
 
+        LOG.info("config-file={}", configFile);
+        LOG.debug("target-dir={}", targetDir);
+
+        checkNotNull("config-file", configFile);
+        checkNotNull("target-dir", targetDir);
+
+        new OwnDeb(configFile, targetDir, getJaxbContextClasses(this.getClass()
+                .getClassLoader())).execute();
+    }
+
+    private Class<?>[] getJaxbContextClasses(final ClassLoader classLoader)
+            throws MojoExecutionException {
+        final Set<Class<?>> classes = new HashSet<Class<?>>();
+        classes.add(DebConfig.class);
+        if ((moduleClasses != null) && (moduleClasses.length > 0)) {
+            for (final String name : moduleClasses) {
+                try {
+                    final Class<?> clasz = classLoader.loadClass(name);
+                    classes.add(clasz);
+                } catch (final ClassNotFoundException ex) {
+                    throw new MojoExecutionException(
+                            "Class to add to JAXB context not found: " + name,
+                            ex);
+                }
+            }
+        }
+        return classes.toArray(new Class<?>[classes.size()]);
     }
 
 }
