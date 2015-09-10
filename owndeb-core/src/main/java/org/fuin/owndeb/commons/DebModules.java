@@ -99,7 +99,7 @@ public final class DebModules extends AbstractPackage {
         Contract.requireArgNotNull("modules", modules);
         if (modules.isEmpty()) {
             throw new ContractViolationException(
-                    "The list 'modules' cannot be ampty");
+                    "The list 'modules' cannot be empty");
         }
         this.modules = modules;
     }
