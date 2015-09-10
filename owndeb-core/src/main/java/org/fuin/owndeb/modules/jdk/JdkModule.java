@@ -25,12 +25,12 @@ import static org.fuin.owndeb.commons.DebUtils.writeReplacedResource;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.tools.ant.Project;
@@ -38,6 +38,7 @@ import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Nullable;
 import org.fuin.owndeb.commons.DebModule;
 import org.fuin.owndeb.commons.DebPackage;
+import org.fuin.owndeb.commons.DebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vafer.jdeb.ant.Data;
@@ -47,6 +48,7 @@ import org.vafer.jdeb.ant.Mapper;
 /**
  * Downloads and Oracle JDK and creates a binary Debian package from it.
  */
+@XmlRootElement(name = "jdk-module")
 public final class JdkModule extends DebModule {
 
     private static final Logger LOG = LoggerFactory.getLogger(JdkModule.class);
@@ -76,6 +78,10 @@ public final class JdkModule extends DebModule {
      *            Architecture identifier like "amd64".
      * @param installationPath
      *            Installation path like "/opt".
+     * @param section
+     *            Section like "devel".
+     * @param priority
+     *            Priority like "low".
      * @param jdkUrl
      *            URL with "tar.gz" JDK file.
      * @param packages
@@ -85,9 +91,10 @@ public final class JdkModule extends DebModule {
             @Nullable final String description, @Nullable final String prefix,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
+            @Nullable final String section, @Nullable final String priority,
             @NotNull final String jdkUrl, @NotNull final DebPackage... packages) {
         super(version, description, prefix, maintainer, arch, installationPath,
-                packages);
+                section, priority, packages);
         Contract.requireArgNotNull("jdkUrl", jdkUrl);
         this.urlStr = jdkUrl;
     }
@@ -107,6 +114,10 @@ public final class JdkModule extends DebModule {
      *            Architecture identifier like "amd64".
      * @param installationPath
      *            Installation path like "/opt".
+     * @param section
+     *            Section like "devel".
+     * @param priority
+     *            Priority like "low".
      * @param jdkUrl
      *            URL with "tar.gz" JDK file.
      * @param packages
@@ -116,17 +127,18 @@ public final class JdkModule extends DebModule {
             @Nullable final String description, @Nullable final String prefix,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
+            @Nullable final String section, @Nullable final String priority,
             @NotNull final String jdkUrl,
             @NotNull final List<DebPackage> packages) {
         super(version, description, prefix, maintainer, arch, installationPath,
-                packages);
+                section, priority, packages);
         Contract.requireArgNotNull("jdkUrl", jdkUrl);
         this.urlStr = jdkUrl;
     }
 
     @Override
     public final String getModuleName() {
-        return "jdk";
+        return "jdk-module";
     }
 
     @Override
@@ -148,7 +160,8 @@ public final class JdkModule extends DebModule {
 
             final File packageDir = new File(buildDirectory,
                     debPackage.getPrefixedName());
-            final File controlDir = new File(buildDirectory, "control");
+            final File controlDir = new File(buildDirectory,
+                    debPackage.getPrefixedName() + "-control");
 
             LOG.debug("packageDir: {}", packageDir);
             LOG.debug("controlDir: {}", controlDir);
@@ -198,27 +211,8 @@ public final class JdkModule extends DebModule {
     private static void copyControlFiles(final DebPackage debPackage,
             final String moduleName, final File controlDir) {
 
-        final Map<String, String> vars = new HashMap<>();
-        vars.put("package", debPackage.getPrefixedName());
-        vars.put("version", debPackage.getVersion());
-        vars.put("arch", debPackage.getArch());
-        vars.put("description", debPackage.getDescription());
-        vars.put("maintainer", debPackage.getMaintainer());
-        vars.put("fullInstallationPath", debPackage.getInstallationPath() + "/"
-                + debPackage.getPrefixedName());
-        vars.put("depends", debPackage.getDependenciesAsControlString());
-
-        if (!controlDir.exists()) {
-            final boolean ok = controlDir.mkdirs();
-            if (!ok) {
-                throw new RuntimeException("Couldn't create directory: "
-                        + controlDir);
-            }
-            LOG.debug("Created control directory: {}", controlDir);
-        } else {
-            LOG.debug("Control directory already exist: {}", controlDir);
-        }
-
+        DebUtils.mkdirs(controlDir);
+        final Map<String, String> vars = debPackage.getVariables();
         writeReplacedResource(JdkModule.class, "/" + moduleName + "/control",
                 controlDir, vars);
         writeReplacedResource(JdkModule.class, "/" + moduleName + "/postinst",

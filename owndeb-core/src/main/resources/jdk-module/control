@@ -1,7 +1,7 @@
 Package: ${package}
 Version: ${version}
-Section: devel
-Priority: low
+Section: ${section}
+Priority: ${priority}
 Architecture: ${arch}
 Description: ${description}
 Maintainer: ${maintainer}

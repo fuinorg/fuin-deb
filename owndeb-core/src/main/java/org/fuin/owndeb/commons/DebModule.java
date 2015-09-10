@@ -61,14 +61,19 @@ public abstract class DebModule extends AbstractPackage {
      *            Installation path like "/opt".
      * @param packages
      *            Array of packages to create.
+     * @param section
+     *            Section like "devel".
+     * @param priority
+     *            Priority like "low".
      */
     public DebModule(@Nullable final String version,
             @Nullable final String description, @Nullable final String prefix,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
+            @Nullable final String section, @Nullable final String priority,
             @NotNull final DebPackage... packages) {
         this(version, description, prefix, maintainer, arch, installationPath,
-                Arrays.asList(packages));
+                section, priority, Arrays.asList(packages));
     }
 
     /**
@@ -86,6 +91,10 @@ public abstract class DebModule extends AbstractPackage {
      *            Architecture identifier like "amd64".
      * @param installationPath
      *            Installation path like "/opt".
+     * @param section
+     *            Section like "devel".
+     * @param priority
+     *            Priority like "low".
      * @param packages
      *            List of packages to create.
      */
@@ -93,8 +102,10 @@ public abstract class DebModule extends AbstractPackage {
             @Nullable final String description, @Nullable final String prefix,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
+            @Nullable final String section, @Nullable final String priority,
             @NotNull final List<DebPackage> packages) {
-        super(version, description, prefix, maintainer, arch, installationPath);
+        super(version, description, prefix, maintainer, arch, installationPath,
+                section, priority);
         Contract.requireArgNotNull("packages", packages);
         if (packages.isEmpty()) {
             throw new ContractViolationException(
@@ -115,7 +126,8 @@ public abstract class DebModule extends AbstractPackage {
     /**
      * Applies the default settings to all packages.
      * 
-     * @param debPkg Default values to use.
+     * @param debPkg
+     *            Default values to use.
      */
     public final void applyModuleDefaults(final AbstractPackage debPkg) {
         applyPackageDefaults(debPkg);
@@ -125,7 +137,7 @@ public abstract class DebModule extends AbstractPackage {
             }
         }
     }
-    
+
     /**
      * Returns the unique name of the module.
      * 

@@ -59,7 +59,8 @@ public class OwnDebTest {
     @Before
     public void setup() {
         final DebModules modules = new DebModules("1.2.3", "Whatever", "abc-",
-                "your-name@mydomain.tld", "amd64", "/opt", module1, module2);
+                "your-name@mydomain.tld", "amd64", "/opt", "devel", "low",
+                module1, module2);
         final DebConfig config = new DebConfig(modules);
         testee = new OwnDeb(config, TARGET_DIR);
     }

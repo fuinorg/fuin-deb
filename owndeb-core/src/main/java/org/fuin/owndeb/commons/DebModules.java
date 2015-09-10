@@ -60,6 +60,10 @@ public final class DebModules extends AbstractPackage {
      *            Architecture identifier like "amd64".
      * @param installationPath
      *            Installation path like "/opt".
+     * @param section
+     *            Section like "devel".
+     * @param priority
+     *            Priority like "low".
      * @param modules
      *            Array of modules to create.
      */
@@ -67,9 +71,10 @@ public final class DebModules extends AbstractPackage {
             @Nullable final String description, @Nullable final String prefix,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
+            @Nullable final String section, @Nullable final String priority,
             @NotNull final DebModule... modules) {
         this(version, description, prefix, maintainer, arch, installationPath,
-                Arrays.asList(modules));
+                section, priority, Arrays.asList(modules));
     }
 
     /**
@@ -87,6 +92,10 @@ public final class DebModules extends AbstractPackage {
      *            Architecture identifier like "amd64".
      * @param installationPath
      *            Installation path like "/opt".
+     * @param section
+     *            Section like "devel".
+     * @param priority
+     *            Priority like "low".
      * @param modules
      *            List of modules to create.
      */
@@ -94,8 +103,10 @@ public final class DebModules extends AbstractPackage {
             @Nullable final String description, @Nullable final String prefix,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
+            @Nullable final String section, @Nullable final String priority,
             @NotNull final List<DebModule> modules) {
-        super(version, description, prefix, maintainer, arch, installationPath);
+        super(version, description, prefix, maintainer, arch, installationPath,
+                section, priority);
         Contract.requireArgNotNull("modules", modules);
         if (modules.isEmpty()) {
             throw new ContractViolationException(
@@ -121,7 +132,7 @@ public final class DebModules extends AbstractPackage {
             for (final DebModule module : modules) {
                 module.applyPackageDefaults(this);
             }
-        }        
+        }
     }
 
 }

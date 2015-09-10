@@ -92,10 +92,13 @@ public class DebPackageTest {
         final String maintainer = "michael@fuin.org";
         final String arch = "amd64";
         final String installationPath = "/opt";
+        final String section = "devel";
+        final String priority = "low";
         final DebDependency depDef = new DebDependency("def");
         final DebDependency depGhi = new DebDependency("ghi");
         final DebPackage original = new DebPackage(name, version, description,
-                prefix, maintainer, arch, installationPath, depDef, depGhi);
+                prefix, maintainer, arch, installationPath, section, priority,
+                depDef, depGhi);
 
         // TEST
         final String xml = marshal(original, createXmlAdapter(),
@@ -121,6 +124,8 @@ public class DebPackageTest {
         assertThat(copy.getMaintainer()).isEqualTo("michael@fuin.org");
         assertThat(copy.getArch()).isEqualTo("amd64");
         assertThat(copy.getInstallationPath()).isEqualTo("/opt");
+        assertThat(copy.getSection()).isEqualTo("devel");
+        assertThat(copy.getPriority()).isEqualTo("low");
         assertThat(copy.getDependencies()).containsOnly(depDef, depGhi);
         assertThat(copy.getDebFilename()).isEqualTo("fuin-abc_1.2.3_amd64.deb");
         assertThat(copy.getPrefixedName()).isEqualTo("fuin-abc");

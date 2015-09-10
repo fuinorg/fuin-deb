@@ -19,6 +19,8 @@ package org.fuin.owndeb.commons;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
@@ -41,6 +43,12 @@ public abstract class AbstractBase {
     @XmlAttribute(name = "installation-path")
     private String installationPath;
 
+    @XmlAttribute(name = "section")
+    private String section;
+
+    @XmlAttribute(name = "priority")
+    private String priority;
+
     /**
      * Default constructor.
      */
@@ -59,15 +67,22 @@ public abstract class AbstractBase {
      *            Architecture identifier like "amd64".
      * @param installationPath
      *            Installation path like "/opt".
+     * @param section
+     *            Section like "devel".
+     * @param priority
+     *            Priority like "low".
      */
     public AbstractBase(@Nullable final String prefix,
             @Nullable final String maintainer, @Nullable final String arch,
-            @Nullable final String installationPath) {
+            @Nullable final String installationPath,
+            @Nullable final String section, @Nullable final String priority) {
         super();
         this.prefix = prefix;
         this.maintainer = maintainer;
         this.arch = arch;
         this.installationPath = installationPath;
+        this.section = section;
+        this.priority = priority;
     }
 
     /**
@@ -111,6 +126,26 @@ public abstract class AbstractBase {
     }
 
     /**
+     * Returns the section.
+     * 
+     * @return Section like "devel".
+     */
+    @Nullable
+    public final String getSection() {
+        return section;
+    }
+
+    /**
+     * Returns the priority.
+     * 
+     * @return Priority like "low".
+     */
+    @Nullable
+    public final String getPriority() {
+        return priority;
+    }
+
+    /**
      * Copy all attributes from the given object if the field is
      * <code>null</code>.
      * 
@@ -134,7 +169,27 @@ public abstract class AbstractBase {
         if (installationPath == null) {
             this.installationPath = other.installationPath;
         }
+        if (section == null) {
+            this.section = other.section;
+        }
+        if (priority == null) {
+            this.priority = other.priority;
+        }
 
+    }
+
+    /**
+     * Returns control file relevant properties.
+     * 
+     * @return Variables for the control files.
+     */
+    public final Map<String, String> getBaseVariables() {
+        final Map<String, String> vars = new HashMap<>();
+        vars.put("arch", getArch());
+        vars.put("maintainer", getMaintainer());
+        vars.put("section", getSection());
+        vars.put("priority", getPriority());
+        return vars;
     }
 
     /**

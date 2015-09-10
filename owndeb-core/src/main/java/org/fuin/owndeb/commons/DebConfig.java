@@ -64,7 +64,8 @@ public final class DebConfig {
     /**
      * Called after the configuration was unmarshalled using JAXB.
      */
-    public final void afterUnmarshal(final Unmarshaller unmarshaller, final Object parent) {
+    public final void afterUnmarshal(final Unmarshaller unmarshaller,
+            final Object parent) {
         if (modules != null) {
             modules.applyDefaults();
         }

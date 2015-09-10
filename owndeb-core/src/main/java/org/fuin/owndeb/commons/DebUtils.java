@@ -355,4 +355,24 @@ public final class DebUtils {
         }
     }
 
+    /**
+     * Creates a directory (and all of it's parent directories) if it does not
+     * exist. The method logs the process and throws a runtime exception if the
+     * standard Java 'mkdirs' method returns false.
+     * 
+     * @param dir
+     *            Directory to create.
+     */
+    public static void mkdirs(final File dir) {
+        if (!dir.exists()) {
+            final boolean ok = dir.mkdirs();
+            if (!ok) {
+                throw new RuntimeException("Couldn't create directory: " + dir);
+            }
+            LOG.debug("Created directory: {}", dir);
+        } else {
+            LOG.debug("Directory already exist: {}", dir);
+        }
+    }
+
 }

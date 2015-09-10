@@ -20,7 +20,9 @@ package org.fuin.owndeb.commons;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -80,6 +82,10 @@ public final class DebPackage extends AbstractPackage {
      *            Architecture identifier like "amd64".
      * @param installationPath
      *            Installation path like "/opt".
+     * @param section
+     *            Section like "devel".
+     * @param priority
+     *            Priority like "low".
      * @param dependencies
      *            Array of dependencies.
      */
@@ -88,8 +94,10 @@ public final class DebPackage extends AbstractPackage {
             @Nullable final String prefix, @Nullable final String maintainer,
             @Nullable final String arch,
             @Nullable final String installationPath,
+            @Nullable final String section, @Nullable final String priority,
             @Nullable final DebDependency... dependencies) {
-        super(version, description, prefix, maintainer, arch, installationPath);
+        super(version, description, prefix, maintainer, arch, installationPath,
+                section, priority);
         Contract.requireArgNotEmpty("name", name);
         this.name = name;
         if (dependencies == null) {
@@ -112,6 +120,10 @@ public final class DebPackage extends AbstractPackage {
      *            Architecture identifier like "amd64".
      * @param installationPath
      *            Installation path like "/opt".
+     * @param section
+     *            Section like "devel".
+     * @param priority
+     *            Priority like "low".
      * @param version
      *            Package version.
      * @param description
@@ -123,9 +135,11 @@ public final class DebPackage extends AbstractPackage {
             @Nullable final String prefix, @Nullable final String maintainer,
             @Nullable final String arch,
             @Nullable final String installationPath,
+            @Nullable final String section, @Nullable final String priority,
             @Nullable final String version, @Nullable final String description,
             @Nullable final List<DebDependency> dependencies) {
-        super(prefix, maintainer, arch, installationPath, version, description);
+        super(prefix, maintainer, arch, installationPath, section, priority,
+                version, description);
         Contract.requireArgNotEmpty("name", name);
         this.name = name;
         this.dependencies = dependencies;
@@ -214,6 +228,30 @@ public final class DebPackage extends AbstractPackage {
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * Returns the installation path and the prefixed name.
+     * 
+     * @return Full installation path.
+     */
+    public final String getFullInstallationPath() {
+        return getInstallationPath() + "/" + getPrefixedName();
+    }
+
+    /**
+     * Returns control file relevant properties (including properties from
+     * {@link AbstractBase} and {@link AbstractPackage}).
+     * 
+     * @return Variables for the control files.
+     */
+    public final Map<String, String> getVariables() {
+        final Map<String, String> vars = new HashMap<>();
+        vars.putAll(getPackageVariables());
+        vars.put("package", getPrefixedName());
+        vars.put("fullInstallationPath", getFullInstallationPath());
+        vars.put("depends", getDependenciesAsControlString());
+        return vars;
     }
 
     @Override

@@ -17,6 +17,9 @@
  */
 package org.fuin.owndeb.commons;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.bind.annotation.XmlAttribute;
 
 import org.fuin.objects4j.common.Nullable;
@@ -54,12 +57,17 @@ public abstract class AbstractPackage extends AbstractBase {
      *            Architecture identifier like "amd64".
      * @param installationPath
      *            Installation path like "/opt".
+     * @param section
+     *            Section like "devel".
+     * @param priority
+     *            Priority like "low".
      */
     public AbstractPackage(@Nullable final String version,
             @Nullable final String description, @Nullable final String prefix,
             @Nullable final String maintainer, @Nullable final String arch,
-            @Nullable final String installationPath) {
-        super(prefix, maintainer, arch, installationPath);
+            @Nullable final String installationPath,
+            @Nullable final String section, @Nullable final String priority) {
+        super(prefix, maintainer, arch, installationPath, section, priority);
         this.version = version;
         this.description = description;
     }
@@ -99,6 +107,20 @@ public abstract class AbstractPackage extends AbstractBase {
         if (description == null) {
             this.description = other.description;
         }
+    }
+
+    /**
+     * Returns control file relevant properties (including properties from
+     * {@link AbstractBase}).
+     * 
+     * @return Variables for the control files.
+     */
+    public final Map<String, String> getPackageVariables() {
+        final Map<String, String> vars = new HashMap<>();
+        vars.putAll(getBaseVariables());
+        vars.put("version", version);
+        vars.put("description", description);
+        return vars;
     }
 
 }

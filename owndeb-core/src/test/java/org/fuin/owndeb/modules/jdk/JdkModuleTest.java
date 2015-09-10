@@ -22,7 +22,6 @@ import static org.fest.assertions.Assertions.assertThat;
 import java.io.File;
 
 import org.fuin.owndeb.commons.DebPackage;
-import org.fuin.owndeb.modules.jdk.JdkModule;
 import org.junit.Test;
 
 /**
@@ -41,10 +40,13 @@ public final class JdkModuleTest {
         final String prefix = "fuin-";
         final String arch = "amd64";
         final String installationPath = "/opt";
+        final String section = "devel";
+        final String priority = "low";
         final String jdkUrl = "http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jdk-8u60-linux-x64.tar.gz";
         final DebPackage pkg = new DebPackage("jdk8");
         final JdkModule testee = new JdkModule(version, description, prefix,
-                maintainer, arch, installationPath, jdkUrl, pkg);
+                maintainer, arch, installationPath, section, priority, jdkUrl,
+                pkg);
 
         final File buildDir = new File("./target");
 

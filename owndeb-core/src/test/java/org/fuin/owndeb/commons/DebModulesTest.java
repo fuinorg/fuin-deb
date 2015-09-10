@@ -44,10 +44,13 @@ public class DebModulesTest {
         final String maintainer = "michael@fuin.org";
         final String arch = "amd64";
         final String installationPath = "/opt";
+        final String section = "devel";
+        final String priority = "low";
         final DebModule module1 = new DebModule1();
         final DebModule module2 = new DebModule2();
         final DebModules original = new DebModules(version, description,
-                prefix, maintainer, arch, installationPath, module1, module2);
+                prefix, maintainer, arch, installationPath, section, priority,
+                module1, module2);
 
         // TEST
         final String xml = marshal(original, createXmlAdapter(),
@@ -70,6 +73,8 @@ public class DebModulesTest {
         assertThat(copy.getMaintainer()).isEqualTo("michael@fuin.org");
         assertThat(copy.getArch()).isEqualTo("amd64");
         assertThat(copy.getInstallationPath()).isEqualTo("/opt");
+        assertThat(copy.getSection()).isEqualTo("devel");
+        assertThat(copy.getPriority()).isEqualTo("low");
         assertThat(copy.getModules()).hasSize(2);
         assertThat(copy.getModules().get(0).getClass()).isEqualTo(
                 DebModule1.class);

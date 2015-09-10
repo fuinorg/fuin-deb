@@ -48,8 +48,11 @@ public class DebConfigTest {
         final String maintainer = "michael@fuin.org";
         final String arch = "amd64";
         final String installationPath = "/opt";
+        final String section = "devel";
+        final String priority = "low";
         final DebModules modules = new DebModules(version, description, prefix,
-                maintainer, arch, installationPath, new DebModuleA());
+                maintainer, arch, installationPath, section, priority,
+                new DebModuleA());
         testee = new DebConfig(modules);
     }
 
@@ -87,8 +90,10 @@ public class DebConfigTest {
                                 + "<owndeb-config>"
                                 + "<modules version=\"1.2.3\" description=\"Aa Bb Cc\" "
                                 + "prefix=\"fuin-\" maintainer=\"michael@fuin.org\" arch=\"amd64\" "
-                                + "installation-path=\"/opt\">" + "<moduleA/>"
-                                + "</modules>" + "</owndeb-config>", xml);
+                                + "installation-path=\"/opt\">"
+                                + "section=\"devel\">" + "priority=\"low\">"
+                                + "<moduleA/>" + "</modules>"
+                                + "</owndeb-config>", xml);
 
     }
 
@@ -113,6 +118,8 @@ public class DebConfigTest {
         assertThat(modules.getMaintainer()).isEqualTo("michael@fuin.org");
         assertThat(modules.getArch()).isEqualTo("amd64");
         assertThat(modules.getInstallationPath()).isEqualTo("/opt");
+        assertThat(modules.getSection()).isEqualTo("devel");
+        assertThat(modules.getPriority()).isEqualTo("low");
         assertThat(modules.getModules()).hasSize(1);
         assertThat(modules.getModules().get(0).getClass()).isEqualTo(
                 DebModuleA.class);
