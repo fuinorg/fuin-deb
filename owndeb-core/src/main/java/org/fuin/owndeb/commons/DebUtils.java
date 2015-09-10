@@ -260,6 +260,10 @@ public final class DebUtils {
         final File outFile = new File(outDir, FilenameUtils.getName(resource));
         try {
             final InputStream inStream = clasz.getResourceAsStream(resource);
+            if (inStream == null) {
+                throw new IllegalArgumentException(
+                        "Unable to locate resource: " + resource);
+            }
             try {
                 final String inStr = IOUtils.toString(inStream);
                 final String outStr = Utils4J.replaceVars(inStr, vars);
