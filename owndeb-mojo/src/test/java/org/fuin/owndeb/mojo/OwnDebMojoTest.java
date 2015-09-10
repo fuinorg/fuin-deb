@@ -22,7 +22,6 @@ import static org.assertj.core.api.StrictAssertions.assertThat;
 import java.io.File;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.fuin.owndeb.commons.DebUtils;
 import org.fuin.owndeb.modules.example.ExampleModule;
 import org.junit.Test;
 
@@ -38,13 +37,12 @@ public class OwnDebMojoTest {
 
         // PREPARE
         final File buildDir = new File("./target");
-        final File file = new File("./target/test-config.xml");
-        file.delete();
-        DebUtils.copyResourceToFile(this.getClass(), "/test-config.xml", file);
+        File file = new File(this.getClass().getResource("/test-config.xml")
+                .getFile());
         final OwnDebMojo testee = new OwnDebMojo();
         testee.setConfigFile(file);
         testee.setTargetDir(buildDir);
-        testee.setModuleClasses(new String[]{ ExampleModule.class.getName() });
+        testee.setModuleClasses(new String[] { ExampleModule.class.getName() });
 
         // TEST
         testee.execute();
