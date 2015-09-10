@@ -111,7 +111,7 @@ public class OwnDebTest {
     @Test
     public void testNullConfigFile() {
         try {
-            new OwnDeb((File) null, TARGET_DIR);
+            new OwnDeb((File) null, TARGET_DIR, DebConfig.class);
             fail();
         } catch (final ContractViolationException ex) {
             assertThat(ex.getMessage()).isEqualTo(

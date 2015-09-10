@@ -70,10 +70,12 @@ public final class OwnDeb {
      *            XML file.
      * @param targetDir
      *            Directory to create the packages inside.
+     * @param jaxbClasses
+     *            Classes to bind to the JAXB context.
      */
-    public OwnDeb(@NotNull final File configFile, @NotNull final File targetDir) {
-        this(unmarshal(configFile, DebConfig.class, DebModules.class,
-                DebModule.class, JdkModule.class), targetDir);
+    public OwnDeb(@NotNull final File configFile,
+            @NotNull final File targetDir, final Class<?>...jaxbClasses) {
+        this(unmarshal(configFile, jaxbClasses), targetDir);
     }
 
     /**
@@ -94,7 +96,7 @@ public final class OwnDeb {
      * 
      * @param configFile
      *            XML file to read.
-     * @param classesToBeBound
+     * @param jaxbClasses
      *            Classes to add to the context.
      * 
      * @return Data.
@@ -104,10 +106,10 @@ public final class OwnDeb {
      */
     @SuppressWarnings("unchecked")
     private static <T> T unmarshal(final File configFile,
-            final Class<?>... classesToBeBound) {
+            final Class<?>... jaxbClasses) {
         Contract.requireArgNotNull("configFile", configFile);
         try {
-            final JAXBContext ctx = JAXBContext.newInstance(classesToBeBound);
+            final JAXBContext ctx = JAXBContext.newInstance(jaxbClasses);
             final Unmarshaller unmarshaller = ctx.createUnmarshaller();
             unmarshaller.setEventHandler(new ValidationEventHandler() {
                 @Override

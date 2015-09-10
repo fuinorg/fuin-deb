@@ -130,10 +130,6 @@ public class ExampleModule extends DebModule {
         Contract.requireArgNotNull("buildDirectory", buildDirectory);
         LOG.info("Creating module in: {}", buildDirectory);
 
-        final File helloFile = new File(buildDirectory, "hello.txt");
-        DebUtils.copyResourceToFile(this.getClass(), "/" + getModuleName()
-                + "/hello.txt", helloFile);
-
         final List<DebPackage> debPackages = getPackages();
         for (final DebPackage pkg : debPackages) {
 
@@ -146,13 +142,16 @@ public class ExampleModule extends DebModule {
                     debPackage.getPrefixedName());
             final File controlDir = new File(buildDirectory,
                     debPackage.getPrefixedName() + "-control");
+            final File helloFile = new File(packageDir, "hello.txt");
+            DebUtils.copyResourceToFile(this.getClass(), "/" + getModuleName()
+                    + "/hello.txt", helloFile);
 
             LOG.debug("packageDir: {}", packageDir);
             LOG.debug("controlDir: {}", controlDir);
 
             copyControlFiles(debPackage, getModuleName(), controlDir);
-            createDebianPackage(debPackage, buildDirectory, packageDir,
-                    controlDir, helloFile);
+            createDebianPackage(debPackage, buildDirectory, controlDir,
+                    packageDir);
 
         }
 
@@ -169,8 +168,8 @@ public class ExampleModule extends DebModule {
     }
 
     private static void createDebianPackage(final DebPackage debPackage,
-            final File buildDirectory, final File packageDir,
-            final File controlDir, final File file) {
+            final File buildDirectory, final File controlDir,
+            final File packageDir) {
 
         LOG.info("Start creating Debian package");
 
@@ -189,11 +188,12 @@ public class ExampleModule extends DebModule {
         task.setControl(controlDir);
 
         final Data data = new Data();
-        data.setSrc(file);
-        data.setType("file");
+        data.setSrc(packageDir);
+        data.setType("directory");
         final Mapper mapper = new Mapper();
         mapper.setType("perm");
-        mapper.setPrefix(debPackage.getInstallationPath());
+        mapper.setPrefix(debPackage.getInstallationPath() + "/"
+                + packageDir.getName());
         mapper.setUser("root");
         mapper.setGroup("developer");
         data.addMapper(mapper);

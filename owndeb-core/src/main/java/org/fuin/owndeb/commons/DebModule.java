@@ -34,7 +34,7 @@ import org.fuin.objects4j.common.Nullable;
  */
 public abstract class DebModule extends AbstractPackage {
 
-    @XmlElement
+    @XmlElement(name = "package")
     private List<DebPackage> packages;
 
     /**
