@@ -11,13 +11,13 @@
 		installation-path="/opt">
 
 		<!-- Every module can override the inherited properties -->
-		<jdk version="1.8.0.60" description="Java SE Development Kit 8"
+		<jdk-module version="1.8.0.60" description="Java SE Development Kit 8"
 			url="http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jdk-8u60-linux-x64.tar.gz">
 
 			<!-- The full name of the package is 'fuin-jdk8' (prefix+name) -->
 			<package name="${prefix}jdk8" />
 
-		</jdk>
+		</jdk-module>
 
 		<eclipse version="4.4" description="Eclipse Luna IDE for Java EE Developers"
 			url="http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/luna/SR2/eclipse-jee-luna-SR2-linux-gtk-x86_64.tar.gz">
