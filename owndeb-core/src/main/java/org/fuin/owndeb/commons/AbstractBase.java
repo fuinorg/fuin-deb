@@ -17,20 +17,24 @@
  */
 package org.fuin.owndeb.commons;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 
+import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Nullable;
 import org.fuin.utils4j.Utils4J;
+import org.fuin.utils4j.VariableResolver;
 
 /**
  * Provides default configuration for sub classes.
  */
-public abstract class AbstractBase {
+public abstract class AbstractBase implements VariablesContainer {
 
     @XmlAttribute(name = "maintainer")
     private String maintainer;
@@ -46,6 +50,11 @@ public abstract class AbstractBase {
 
     @XmlAttribute(name = "priority")
     private String priority;
+
+    @XmlElement(name = "variable")
+    private List<Variable> variables;
+
+    private transient VariablesContainer parent;
 
     /**
      * Default constructor.
@@ -78,6 +87,28 @@ public abstract class AbstractBase {
         this.installationPath = installationPath;
         this.section = section;
         this.priority = priority;
+    }
+
+    /**
+     * Copy constructor.
+     * 
+     * @param other
+     *            Object to copy.
+     */
+    public AbstractBase(@NotNull final AbstractBase other) {
+        super();
+        Contract.requireArgNotNull("other", other);
+        this.maintainer = other.maintainer;
+        this.arch = other.arch;
+        this.installationPath = other.installationPath;
+        this.section = other.section;
+        this.priority = other.priority;
+        if (other.variables == null) {
+            this.variables = null;
+        } else {
+            this.variables = new ArrayList<>(other.variables);
+        }
+        this.parent = other.parent;
     }
 
     /**
@@ -130,57 +161,104 @@ public abstract class AbstractBase {
         return priority;
     }
 
-    /**
-     * Copy all attributes from the given object if the field is
-     * <code>null</code>.
-     * 
-     * @param other
-     *            Object to copy values from.
-     */
-    public final void applyBaseDefaults(final AbstractBase other) {
+    @Override
+    public final List<Variable> getVariables() {
+        if (variables == null) {
+            return null;
+        }
+        return Collections.unmodifiableList(variables);
+    }
 
-        if (maintainer == null) {
-            this.maintainer = other.maintainer;
+    @Override
+    public final String variableValue(final String name) {
+        if (variables == null) {
+            return null;
         }
-
-        if (arch == null) {
-            this.arch = other.arch;
+        final int idx = variables.indexOf(new Variable(name, ""));
+        if (idx < 0) {
+            return null;
         }
-
-        if (installationPath == null) {
-            this.installationPath = other.installationPath;
-        }
-        if (section == null) {
-            this.section = other.section;
-        }
-        if (priority == null) {
-            this.priority = other.priority;
-        }
-
+        return variables.get(idx).getValue();
     }
 
     /**
-     * Returns control file relevant properties.
+     * Returns the parent.
      * 
-     * @return Variables for the control files.
+     * @return Current parent.
      */
-    public final Map<String, String> getBaseVariables() {
-        final Map<String, String> vars = new HashMap<>();
-        vars.put("maintainer", getMaintainer());
-        vars.put("arch", getArch());
-        vars.put("section", getSection());
-        vars.put("priority", getPriority());
-        return vars;
+    @Nullable
+    public final VariablesContainer getParent() {
+        return parent;
+    }
+
+    /**
+     * Adds a variable and fails with an {@link IllegalStateException} if it
+     * already exists.
+     * 
+     * @param varToAdd
+     *            Variable to add.
+     */
+    protected final void addVariable(@NotNull final Variable varToAdd) {
+        Contract.requireArgNotNull("varToAdd", varToAdd);
+        if (variables == null) {
+            variables = new ArrayList<>();
+        } else {
+            if (variables.contains(varToAdd)) {
+                throw new IllegalStateException("Variable '"
+                        + varToAdd.getName() + "' already exists: " + this);
+            }
+        }
+        variables.add(varToAdd);
+    }
+
+    /**
+     * Add some variables and ignores duplicates.
+     * 
+     * @param varsToAdd
+     *            Variables that will only be added if they are not in the list
+     *            yet.
+     */
+    protected final void addNonExistingVariables(@Nullable final List<Variable> varsToAdd) {
+        if (varsToAdd != null) {
+            if (variables == null) {
+                variables = new ArrayList<>();
+            }
+            for (final Variable var : varsToAdd) {
+                if (!variables.contains(var)) {
+                    variables.add(var);
+                }
+            }
+        }
+    }
+
+    /**
+     * Adds the properties defined in this class as variables. If any of them
+     * already exist, an {@link IllegalStateException} is thrown.
+     */
+    private void addVariables() {
+        if (maintainer != null) {
+            addVariable(new Variable("maintainer", maintainer));
+        }
+        if (arch != null) {
+            addVariable(new Variable("arch", arch));
+        }
+        if (installationPath != null) {
+            addVariable(new Variable("installation-path", installationPath));
+        }
+        if (section != null) {
+            addVariable(new Variable("section", section));
+        }
+        if (priority != null) {
+            addVariable(new Variable("priority", priority));
+        }
     }
 
     /**
      * Replaces variables in the base properties.
-     * 
-     * @param vars
-     *            Variables to use.
      */
-    public final void replaceBaseVariables(
-            @Nullable final Map<String, String> vars) {
+    private void replaceVariables() {
+        final Map<String, String> vars = new VariableResolver(
+                DebUtils.asMap(variables)).getResolved();
         installationPath = Utils4J.replaceVars(installationPath, vars);
         arch = Utils4J.replaceVars(arch, vars);
         maintainer = Utils4J.replaceVars(maintainer, vars);
@@ -189,20 +267,43 @@ public abstract class AbstractBase {
     }
 
     /**
-     * Converts a string into an URL and wraps a possible malformed URL
-     * exception into a runtime exception.
+     * Copy all attributes from the given object if the field is
+     * <code>null</code>.
      * 
-     * @param url
-     *            String to convert into an URL.
-     * 
-     * @return String as URL.
+     * @param other
+     *            Object to copy values from.
      */
-    protected static URL url(final String url) {
-        try {
-            return new URL(url);
-        } catch (final MalformedURLException ex) {
-            throw new RuntimeException(ex);
+    private void applyDefaults(final VariablesContainer other) {
+        if (parent != null) {
+            if (maintainer == null) {
+                this.maintainer = other.variableValue("maintainer");
+            }
+            if (arch == null) {
+                this.arch = other.variableValue("arch");
+            }
+            if (installationPath == null) {
+                this.installationPath = other.variableValue("installationPath");
+            }
+            if (section == null) {
+                this.section = other.variableValue("section");
+            }
+            if (priority == null) {
+                this.priority = other.variableValue("priority");
+            }
         }
+    }
+
+    /**
+     * Initialize base stuff.
+     * 
+     * @param parent
+     *            Parent to set.
+     */
+    public final void initBase(@Nullable final VariablesContainer parent) {
+        this.parent = parent;
+        applyDefaults(parent);
+        addVariables();
+        replaceVariables();
     }
 
 }

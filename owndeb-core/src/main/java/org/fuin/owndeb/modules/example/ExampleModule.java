@@ -30,6 +30,7 @@ import org.apache.tools.ant.Project;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Nullable;
 import org.fuin.owndeb.commons.DebModule;
+import org.fuin.owndeb.commons.DebModules;
 import org.fuin.owndeb.commons.DebPackage;
 import org.fuin.owndeb.commons.DebUtils;
 import org.slf4j.Logger;
@@ -130,7 +131,7 @@ public class ExampleModule extends DebModule {
         for (final DebPackage pkg : debPackages) {
 
             final DebPackage debPackage = new DebPackage(pkg);
-            debPackage.applyPackageDefaults(this);
+            debPackage.init(this);
 
             LOG.info("Creating package: {}", debPackage.getName());
 
@@ -154,15 +155,19 @@ public class ExampleModule extends DebModule {
     }
 
     @Override
-    public final void replaceVariables(final Map<String, String> vars) {
-        replaceModuleVariables(vars);
+    public final void init(@Nullable final DebModules parent) {
+        initModule(parent);
+        if (parent != null) {
+            addNonExistingVariables(parent.getVariables());
+        }
     }
 
     private static void copyControlFiles(final DebPackage debPackage,
             final String moduleName, final File controlDir) {
 
         DebUtils.mkdirs(controlDir);
-        final Map<String, String> vars = debPackage.getVariables();
+        final Map<String, String> vars = DebUtils.asMap(debPackage
+                .getVariables());
         writeReplacedResource(ExampleModule.class, "/" + moduleName
                 + "/control", controlDir, vars);
 

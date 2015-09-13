@@ -105,7 +105,7 @@ public class DebModulesTest {
         }
 
         @Override
-        public final void replaceVariables(final Map<String, String> vars) {
+        public final void init(final DebModules parent) {
             // Do nothing
         }
 
@@ -128,7 +128,7 @@ public class DebModulesTest {
         }
 
         @Override
-        public final void replaceVariables(final Map<String, String> vars) {
+        public final void init(final DebModules parent) {
             // Do nothing
         }
 

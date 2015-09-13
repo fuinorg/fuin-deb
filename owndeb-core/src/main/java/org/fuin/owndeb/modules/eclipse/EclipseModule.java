@@ -24,13 +24,17 @@ import java.util.List;
 import java.util.Map;
 
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.objects4j.common.Nullable;
-import org.fuin.owndeb.commons.DebDependency;
+import org.fuin.owndeb.commons.DebModules;
 import org.fuin.owndeb.commons.DebPackage;
+import org.fuin.owndeb.commons.DebUtils;
+import org.fuin.owndeb.commons.Variable;
 import org.fuin.owndeb.modules.base.AbstractDownloadTarGzModule;
-import org.fuin.owndeb.modules.jdk.JdkModule;
+import org.fuin.utils4j.Utils4J;
+import org.fuin.utils4j.VariableResolver;
 
 /**
  * Downloads Eclipse and creates a binary Debian package from it.
@@ -40,6 +44,12 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
 
     /** Name of the module. */
     public static final String NAME = "eclipse-module";
+
+    @XmlAttribute(name = "vm")
+    private String vm;
+
+    @XmlAttribute(name = "vmargs")
+    private String vmArgs;
 
     /**
      * Default constructor for JAXB.
@@ -117,36 +127,77 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
         return NAME;
     }
 
-    @Override
-    public final void replaceVariables(final Map<String, String> vars) {
-        replaceDownloadTarGzModuleVariables(vars);
+    /**
+     * Returns the VM settings.
+     * 
+     * @return VM or <code>null</code>.
+     */
+    @Nullable
+    public final String getVm() {
+        return vm;
+    }
+
+    /**
+     * Returns the VM arguments.
+     * 
+     * @return VM arguments or <code>null</code>.
+     */
+    @Nullable
+    public final String getVmArgs() {
+        return vmArgs;
+    }
+
+    /**
+     * Replaces variables in the properties.
+     * 
+     * @param vars
+     *            Variables to use.
+     */
+    private void replaceVariables() {
+        final Map<String, String> vars = new VariableResolver(
+                DebUtils.asMap(getVariables())).getResolved();
+        vm = Utils4J.replaceVars(vm, vars);
+        vmArgs = Utils4J.replaceVars(vmArgs, vars);
+    }
+
+    /**
+     * Adds the properties defined in this class as variables. If any of them
+     * already exist, an {@link IllegalStateException} will be thrown.
+     */
+    private final void addVariables() {
+        if (vm != null) {
+            addVariable(new Variable("vm", vm));
+        }
+        if (vmArgs != null) {
+            addVariable(new Variable("vmargs", vmArgs));
+        }
     }
 
     @Override
     protected final void applyModifications(final DebPackage debPackage,
             final File packageDir) {
 
-        final String path = jdkFullInstallationPath(debPackage);
-        System.out.println(path);
-
     }
 
-    private String jdkFullInstallationPath(final DebPackage debPackage) {
-        final List<DebDependency> dependencies = debPackage.getDependencies();
-        for (DebDependency dependency : dependencies) {
-            final DebPackage pkg = dependency.getResolvedDependency();
-            if (pkg != null && pkg.getParent() != null
-                    && pkg.getParent().getModuleName().equals(JdkModule.NAME)) {
-                return pkg.getFullInstallationPath();
-            }
+    /**
+     * Initializes the instance and it's childs.
+     * 
+     * @param parent
+     *            Current parent.
+     */
+    public final void init(@Nullable final DebModules parent) {
+        initDownloadTarGzModule(parent);
+        addVariables();
+        if (parent != null) {
+            addNonExistingVariables(parent.getVariables());
         }
-        return null;
+        replaceVariables();
     }
 
     @Override
     protected final void copyControlFiles(final DebPackage debPackage,
             final File controlDir) {
-        final Map<String, String> vars = debPackage.getVariables();
+        final Map<String, String> vars = DebUtils.asMap(debPackage.getVariables());
         writeReplacedResource(EclipseModule.class, "/" + getModuleName()
                 + "/control", controlDir, vars);
         writeReplacedResource(EclipseModule.class, "/" + getModuleName()

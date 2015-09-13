@@ -21,6 +21,7 @@ import static org.fuin.owndeb.commons.DebUtils.cachedDownload;
 import static org.fuin.owndeb.commons.DebUtils.peekFirstTarGzFolderName;
 import static org.fuin.owndeb.commons.DebUtils.tarGz;
 import static org.fuin.owndeb.commons.DebUtils.unTarGz;
+import static org.fuin.utils4j.Utils4J.url;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,9 +37,13 @@ import org.apache.tools.ant.Project;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Nullable;
 import org.fuin.owndeb.commons.DebModule;
+import org.fuin.owndeb.commons.DebModules;
 import org.fuin.owndeb.commons.DebPackage;
 import org.fuin.owndeb.commons.DebUtils;
+import org.fuin.owndeb.commons.Variable;
+import org.fuin.owndeb.commons.VariablesContainer;
 import org.fuin.utils4j.Utils4J;
+import org.fuin.utils4j.VariableResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vafer.jdeb.ant.Data;
@@ -143,7 +148,7 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
         for (final DebPackage pkg : debPackages) {
 
             final DebPackage debPackage = new DebPackage(pkg);
-            debPackage.applyPackageDefaults(this);
+            debPackage.init(this);
 
             LOG.info("Creating package: {}", debPackage.getName());
 
@@ -175,15 +180,49 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
     }
 
     /**
-     * Replaces variables the properties.
+     * Copy all attributes from the given object if the field is
+     * <code>null</code>.
+     * 
+     * @param other
+     *            Object to copy values from.
+     */
+    private void applyDefaults(final VariablesContainer parent) {
+        // No defaults from parent wanted
+    }
+
+    /**
+     * Replaces variables in the properties.
      * 
      * @param vars
      *            Variables to use.
      */
-    public final void replaceDownloadTarGzModuleVariables(
-            final Map<String, String> vars) {
-        replaceModuleVariables(vars);
+    private void replaceVariables() {
+        final Map<String, String> vars = new VariableResolver(
+                DebUtils.asMap(getVariables())).getResolved();
         urlStr = Utils4J.replaceVars(urlStr, vars);
+    }
+
+    /**
+     * Adds the properties defined in this class as variables. If any of them
+     * already exist, an {@link IllegalStateException} will be thrown.
+     */
+    private final void addVariables() {
+        if (urlStr != null) {
+            addVariable(new Variable("url", urlStr));
+        }
+    }
+
+    /**
+     * Initialize base stuff.
+     * 
+     * @param parent
+     *            Parent to set.
+     */
+    protected final void initDownloadTarGzModule(final DebModules parent) {
+        initModule(parent);
+        applyDefaults(parent);
+        addVariables();
+        replaceVariables();
     }
 
     /**

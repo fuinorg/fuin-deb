@@ -1,4 +1,4 @@
-Package: ${package}
+Package: ${name}
 Version: ${version}
 Section: ${section}
 Priority: ${priority}

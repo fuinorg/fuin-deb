@@ -27,8 +27,13 @@ import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.objects4j.common.Nullable;
+import org.fuin.owndeb.commons.DebModules;
 import org.fuin.owndeb.commons.DebPackage;
+import org.fuin.owndeb.commons.DebUtils;
+import org.fuin.owndeb.commons.Variable;
 import org.fuin.owndeb.modules.base.AbstractDownloadTarGzModule;
+import org.fuin.utils4j.Utils4J;
+import org.fuin.utils4j.VariableResolver;
 
 /**
  * Downloads and Oracle JDK and creates a binary Debian package from it.
@@ -117,10 +122,13 @@ public final class JdkModule extends AbstractDownloadTarGzModule {
     }
 
     @Override
-    public final void replaceVariables(final Map<String, String> vars) {
-        replaceDownloadTarGzModuleVariables(vars);
+    public final void init(@Nullable final DebModules parent) {
+        initDownloadTarGzModule(parent);
+        if (parent != null) {
+            addNonExistingVariables(parent.getVariables());
+        }
     }
-
+    
     @Override
     protected final void applyModifications(final DebPackage debPackage,
             final File packageDir) {
@@ -130,7 +138,7 @@ public final class JdkModule extends AbstractDownloadTarGzModule {
     @Override
     protected final void copyControlFiles(final DebPackage debPackage,
             final File controlDir) {
-        final Map<String, String> vars = debPackage.getVariables();
+        final Map<String, String> vars = DebUtils.asMap(getParent().getVariables());
         writeReplacedResource(JdkModule.class, "/" + getModuleName()
                 + "/control", controlDir, vars);
         writeReplacedResource(JdkModule.class, "/" + getModuleName()

@@ -21,7 +21,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
@@ -37,8 +36,6 @@ public abstract class DebModule extends AbstractPackage {
 
     @XmlElement(name = "package")
     private List<DebPackage> packages;
-
-    private transient DebModules parent;
 
     /**
      * Default constructor.
@@ -123,37 +120,6 @@ public abstract class DebModule extends AbstractPackage {
     }
 
     /**
-     * Applies the default settings to all packages.
-     * 
-     * @param debPkg
-     *            Default values to use.
-     */
-    public final void applyModuleDefaults(final AbstractPackage debPkg) {
-        applyPackageDefaults(debPkg);
-        if (packages != null) {
-            for (final DebPackage pkg : packages) {
-                pkg.applyPackageDefaults(this);
-            }
-        }
-    }
-
-    /**
-     * Replaces variables in the base, package and module properties.
-     * 
-     * @param vars
-     *            Variables to use.
-     */
-    public final void replaceModuleVariables(
-            @Nullable final Map<String, String> vars) {
-        replacePackageVariables(vars);
-        if (packages != null) {
-            for (final DebPackage pkg : packages) {
-                pkg.replaceVariables(vars);
-            }
-        }
-    }
-
-    /**
      * Locates a package by it's name.
      * 
      * @param packageName
@@ -187,23 +153,14 @@ public abstract class DebModule extends AbstractPackage {
         }
     }
 
-    /**
-     * Returns the parent.
-     * 
-     * @return Current parent.
-     */
-    public final DebModules getParent() {
-        return parent;
-    }
-
-    /**
-     * Initializes the instance and it's childs.
+        /**
+     * Initialize the module.
      * 
      * @param parent
-     *            Current parent.
+     *            Parent to set.
      */
-    public final void init(@Nullable final DebModules parent) {
-        this.parent = parent;
+    public final void initModule(final DebModules parent) {
+        initPackage(parent);
         if (packages != null) {
             for (final DebPackage pkg : packages) {
                 pkg.init(this);
@@ -227,11 +184,11 @@ public abstract class DebModule extends AbstractPackage {
     public abstract void create(@NotNull File buildDirectory);
 
     /**
-     * Replaces variables in all properties.
+     * Initializes the module.
      * 
-     * @param vars
-     *            Variables to use.
+     * @param parent
+     *            Parent.
      */
-    public abstract void replaceVariables(@Nullable Map<String, String> vars);
+    public abstract void init(@Nullable DebModules parent);
 
 }

@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.Unmarshaller;
@@ -31,13 +30,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Nullable;
-import org.fuin.utils4j.VariableResolver;
 
 /**
  * Configuration for OwnDeb.
  */
 @XmlRootElement(name = "owndeb-config")
-public final class DebConfig {
+public final class DebConfig implements VariablesContainer {
 
     @XmlElementWrapper(name = "variables")
     @XmlElement(name = "variable")
@@ -108,14 +106,24 @@ public final class DebConfig {
         return modules;
     }
 
-    /**
-     * Returns the list of variables.
-     * 
-     * @return Unmodifiable list.
-     */
-    @Nullable
+    @Override
     public final List<Variable> getVariables() {
+        if (variables == null) {
+            return null;
+        }
         return Collections.unmodifiableList(variables);
+    }
+
+    @Override
+    public final String variableValue(final String name) {
+        if (variables == null) {
+            return null;
+        }
+        final int idx = variables.indexOf(new Variable(name, ""));
+        if (idx < 0) {
+            return null;
+        }
+        return variables.get(idx).getValue();
     }
 
     /**
@@ -128,17 +136,8 @@ public final class DebConfig {
      */
     public final void afterUnmarshal(final Unmarshaller unmarshaller,
             final Object parent) {
-        final Map<String, String> resolved = new VariableResolver(
-                DebUtils.asMap(variables)).getResolved();
-        if (variables != null) {
-            for (final Variable variable : variables) {
-                variable.init(resolved);
-            }
-        }
         if (modules != null) {
-            modules.init(this, resolved);
-            modules.replaceModuleVariables(resolved);
-            modules.applyModuleDefaults();
+            modules.init(this);
             modules.resolveDependencies();
         }
     }

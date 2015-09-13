@@ -20,7 +20,6 @@ package org.fuin.owndeb.commons;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +32,7 @@ import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.NotEmpty;
 import org.fuin.objects4j.common.Nullable;
 import org.fuin.utils4j.Utils4J;
+import org.fuin.utils4j.VariableResolver;
 
 /**
  * A binary Debian package to create. Equals and hash code are based on the
@@ -46,8 +46,6 @@ public final class DebPackage extends AbstractPackage {
 
     @XmlElement(name = "dependency")
     private List<DebDependency> dependencies;
-
-    private transient DebModule parent;
 
     /**
      * Default constructor for JAXB.
@@ -169,16 +167,13 @@ public final class DebPackage extends AbstractPackage {
      *            Package to copy.
      */
     public DebPackage(@NotNull final DebPackage other) {
-        super();
-        Contract.requireArgNotNull("other", other);
-        applyBaseDefaults(other);
+        super(other);
         this.name = other.name;
         if (other.dependencies == null) {
             this.dependencies = null;
         } else {
             this.dependencies = new ArrayList<>(other.dependencies);
         }
-        this.parent = other.parent;
     }
 
     /**
@@ -248,18 +243,13 @@ public final class DebPackage extends AbstractPackage {
     }
 
     /**
-     * Returns control file relevant properties (including properties from
-     * {@link AbstractBase} and {@link AbstractPackage}).
-     * 
-     * @return Variables for the control files.
+     * Adds the properties defined in this class as variables. If any of them
+     * already exist, an {@link IllegalStateException} will be thrown.
      */
-    public final Map<String, String> getVariables() {
-        final Map<String, String> vars = new HashMap<>();
-        vars.putAll(getPackageVariables());
-        vars.put("package", getName());
-        vars.put("fullInstallationPath", getFullInstallationPath());
-        vars.put("depends", getDependenciesAsControlString());
-        return vars;
+    private final void addVariables() {
+        if (name != null) {
+            addVariable(new Variable("name", name));
+        }
     }
 
     /**
@@ -268,14 +258,10 @@ public final class DebPackage extends AbstractPackage {
      * @param vars
      *            Variables to use.
      */
-    public final void replaceVariables(@Nullable final Map<String, String> vars) {
-        replacePackageVariables(vars);
+    private final void replaceVariables() {
+        final Map<String, String> vars = new VariableResolver(
+                DebUtils.asMap(getVariables())).getResolved();
         name = Utils4J.replaceVars(name, vars);
-        if (dependencies != null) {
-            for (final DebDependency dependency : dependencies) {
-                dependency.replaceVariables(vars);
-            }
-        }
     }
 
     /**
@@ -297,22 +283,18 @@ public final class DebPackage extends AbstractPackage {
     }
 
     /**
-     * Returns the parent.
-     * 
-     * @return Current parent.
-     */
-    public final DebModule getParent() {
-        return parent;
-    }
-
-    /**
      * Initializes the instance and it's childs.
      * 
      * @param parent
      *            Current parent.
      */
     public final void init(@Nullable final DebModule parent) {
-        this.parent = parent;
+        initPackage(parent);
+        addVariables();
+        replaceVariables();
+        if (parent != null) {
+            addNonExistingVariables(parent.getVariables());
+        }
         if (dependencies != null) {
             for (final DebDependency dependency : dependencies) {
                 dependency.init(this);

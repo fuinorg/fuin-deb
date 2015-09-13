@@ -74,7 +74,6 @@ public final class EclipseModuleTest {
                 "Java SE Development Kit 8", "michael@fuin.org", "amd64",
                 "/opt", "devel", "low", "", jdk8);
         jdk8.init(jdkModule);
-        jdk8.applyPackageDefaults(jdkModule);
         final DebDependency dependency = new DebDependency("jdk8");
         dependency.init(jdk8);
         dependency.resolve(new DebPackageResolver() {

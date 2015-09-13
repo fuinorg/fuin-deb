@@ -156,6 +156,8 @@ public class DebConfigTest {
         final EclipseModule lunaModule = (EclipseModule) config.getModules().getModules().get(1);        
         assertThat(lunaModule.getVersion()).isEqualTo("4.4");
         assertThat(lunaModule.getDescription()).isEqualTo("Eclipse Luna IDE for Java EE Developers");
+        assertThat(lunaModule.getVm()).isEqualTo("/opt/fuin-jdk8/bin/java");
+        assertThat(lunaModule.getVmArgs()).isEqualTo("-Dosgi.requiredJavaVersion=1.6 -XX:MaxPermSize=256m -Xms128m -Xmx1024m");
 
         final EclipseModule marsModule = (EclipseModule) config.getModules().getModules().get(2);        
         assertThat(marsModule.getVersion()).isEqualTo("4.5");
@@ -186,7 +188,7 @@ public class DebConfigTest {
         }
 
         @Override
-        public final void replaceVariables(final Map<String, String> vars) {
+        public final void init(final DebModules parent) {
             // Do nothing
         }
 

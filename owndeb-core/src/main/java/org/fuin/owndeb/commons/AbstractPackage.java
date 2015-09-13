@@ -17,13 +17,14 @@
  */
 package org.fuin.owndeb.commons;
 
-import java.util.HashMap;
 import java.util.Map;
 
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
 
 import org.fuin.objects4j.common.Nullable;
 import org.fuin.utils4j.Utils4J;
+import org.fuin.utils4j.VariableResolver;
 
 /**
  * Provides default configuration for sub classes.
@@ -72,6 +73,18 @@ public abstract class AbstractPackage extends AbstractBase {
     }
 
     /**
+     * Copy constructor.
+     * 
+     * @param other
+     *            Package to copy.
+     */
+    public AbstractPackage(@NotNull final AbstractPackage other) {
+        super(other);
+        this.version = other.version;
+        this.description = other.description;
+    }    
+    
+    /**
      * Returns the package version.
      * 
      * @return Version.
@@ -98,41 +111,54 @@ public abstract class AbstractPackage extends AbstractBase {
      * @param other
      *            Object to copy values from.
      */
-    public final void applyPackageDefaults(final AbstractPackage other) {
-        applyBaseDefaults(other);
-        if (version == null) {
-            this.version = other.version;
-        }
-        if (description == null) {
-            this.description = other.description;
+    private void applyDefaults(final VariablesContainer parent) {
+        if (parent != null) {
+            if (version == null) {
+                this.version = parent.variableValue("version");
+            }
+            if (description == null) {
+                this.description = parent.variableValue("description");
+            }
         }
     }
 
     /**
-     * Returns control file relevant properties (including properties from
-     * {@link AbstractBase}).
-     * 
-     * @return Variables for the control files.
-     */
-    public final Map<String, String> getPackageVariables() {
-        final Map<String, String> vars = new HashMap<>();
-        vars.putAll(getBaseVariables());
-        vars.put("version", version);
-        vars.put("description", description);
-        return vars;
-    }
-
-    /**
-     * Replaces variables in the base and package properties.
+     * Replaces variables in the properties.
      * 
      * @param vars
      *            Variables to use.
      */
-    public final void replacePackageVariables(
-            @Nullable final Map<String, String> vars) {
-        replaceBaseVariables(vars);
+    private void replaceVariables() {
+        final Map<String, String> vars = new VariableResolver(
+                DebUtils.asMap(getVariables())).getResolved();
         version = Utils4J.replaceVars(version, vars);
         description = Utils4J.replaceVars(description, vars);
+    }
+
+    /**
+     * Adds the properties defined in this class as variables. If any of them
+     * already exist, an {@link IllegalStateException} will be thrown.
+     */
+    private final void addVariables() {
+        if (version != null) {
+            addVariable(new Variable("version", version));
+        }
+        if (description != null) {
+            addVariable(new Variable("description", description));
+        }
+    }
+
+    /**
+     * Initialize base stuff.
+     * 
+     * @param parent
+     *            Parent to set.
+     */
+    public final void initPackage(final VariablesContainer parent) {
+        initBase(parent);
+        applyDefaults(parent);
+        addVariables();
+        replaceVariables();
     }
 
 }
