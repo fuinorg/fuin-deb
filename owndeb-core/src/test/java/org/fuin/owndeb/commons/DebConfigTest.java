@@ -33,6 +33,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.fuin.objects4j.common.ContractViolationException;
+import org.fuin.owndeb.modules.eclipse.EclipseModule;
 import org.fuin.owndeb.modules.jdk.JdkModule;
 import org.fuin.utils4j.Utils4J;
 import org.junit.After;
@@ -134,13 +135,14 @@ public class DebConfigTest {
         final String xml = Utils4J.readAsString(url, "utf-8", 1024);
         
         // TEST
-        final DebConfig config = unmarshal(xml, createXmlAdapter(), DebConfig.class, JdkModule.class);
+        final DebConfig config = unmarshal(xml, createXmlAdapter(), DebConfig.class, JdkModule.class, EclipseModule.class);
         
         // VERIFY
         assertThat(config).isNotNull();
         assertThat(config.getModules()).isNotNull();
         assertThat(config.getModules().getModules()).isNotNull();
-        assertThat(config.getModules().getModules()).hasSize(1);
+        assertThat(config.getModules().getModules()).hasSize(3);
+
         final JdkModule jdkModule = (JdkModule) config.getModules().getModules().get(0);
         assertThat(jdkModule.getVersion()).isEqualTo("1.8.0.60");
         assertThat(jdkModule.getDescription()).isEqualTo("Java SE Development Kit 8");
@@ -150,6 +152,14 @@ public class DebConfigTest {
         assertThat(jdkModule.getSection()).isEqualTo("devel");
         assertThat(jdkModule.getPriority()).isEqualTo("low");
         assertThat(jdkModule.getUrlStr()).isEqualTo("http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jdk-8u60-linux-x64.tar.gz");
+        
+        final EclipseModule lunaModule = (EclipseModule) config.getModules().getModules().get(1);        
+        assertThat(lunaModule.getVersion()).isEqualTo("4.4");
+        assertThat(lunaModule.getDescription()).isEqualTo("Eclipse Luna IDE for Java EE Developers");
+
+        final EclipseModule marsModule = (EclipseModule) config.getModules().getModules().get(2);        
+        assertThat(marsModule.getVersion()).isEqualTo("4.5");
+        assertThat(marsModule.getDescription()).isEqualTo("Eclipse Mars IDE for Java EE Developers");
         
     }
     
@@ -171,7 +181,7 @@ public class DebConfigTest {
         }
 
         @Override
-        public final void create(final File buildDirectory) {
+        public final void create(final DebPackageResolver resolver, final File buildDirectory) {
             // Do nothing
         }
 

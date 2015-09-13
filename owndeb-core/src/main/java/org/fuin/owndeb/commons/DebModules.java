@@ -34,7 +34,8 @@ import org.fuin.objects4j.common.Nullable;
  * Provides default settings for the modules it contains.
  */
 @XmlRootElement(name = "modules")
-public final class DebModules extends AbstractPackage {
+public final class DebModules extends AbstractPackage implements
+        DebPackageResolver {
 
     @XmlAnyElement(lax = true)
     private List<DebModule> modules;
@@ -146,6 +147,19 @@ public final class DebModules extends AbstractPackage {
                 module.replaceVariables(vars);
             }
         }
+    }
+
+    @Override
+    public final DebPackage resolve(final String packageName) {
+        if (modules != null) {
+            for (final DebModule module : modules) {
+                final DebPackage pkg = module.findPackageByName(packageName);
+                if (pkg != null) {
+                    return pkg;
+                }
+            }
+        }
+        return null;
     }
 
 }

@@ -37,6 +37,7 @@ import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Nullable;
 import org.fuin.owndeb.commons.DebModule;
 import org.fuin.owndeb.commons.DebPackage;
+import org.fuin.owndeb.commons.DebPackageResolver;
 import org.fuin.owndeb.commons.DebUtils;
 import org.fuin.utils4j.Utils4J;
 import org.slf4j.Logger;
@@ -132,10 +133,11 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
     }
 
     @Override
-    public final void create(final File buildDirectory) {
+    public final void create(final DebPackageResolver resolver, final File buildDirectory) {
 
+        Contract.requireArgNotNull("resolver", resolver);
         Contract.requireArgNotNull("buildDirectory", buildDirectory);
-        LOG.info("Creating module in: {}", buildDirectory);
+        LOG.info("Creating module '{}' in: {}", getModuleName(), buildDirectory);
 
         final File archiveFile = cachedDownload(url(urlStr), buildDirectory);
 

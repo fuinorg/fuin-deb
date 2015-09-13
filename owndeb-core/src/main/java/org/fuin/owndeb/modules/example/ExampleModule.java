@@ -31,6 +31,7 @@ import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Nullable;
 import org.fuin.owndeb.commons.DebModule;
 import org.fuin.owndeb.commons.DebPackage;
+import org.fuin.owndeb.commons.DebPackageResolver;
 import org.fuin.owndeb.commons.DebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,7 +122,7 @@ public class ExampleModule extends DebModule {
     }
 
     @Override
-    public final void create(final File buildDirectory) {
+    public final void create(final DebPackageResolver resolver, final File buildDirectory) {
 
         Contract.requireArgNotNull("buildDirectory", buildDirectory);
         LOG.info("Creating module in: {}", buildDirectory);

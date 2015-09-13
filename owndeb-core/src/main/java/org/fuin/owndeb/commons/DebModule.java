@@ -152,6 +152,26 @@ public abstract class DebModule extends AbstractPackage {
     }
 
     /**
+     * Locates a package by it's name.
+     * 
+     * @param packageName
+     *            Name of the package to find.
+     * 
+     * @return Package or <code>null</code> if no package with the given name
+     *         was found.
+     */
+    public final DebPackage findPackageByName(final String packageName) {
+        if (packages != null) {
+            for (final DebPackage pkg : packages) {
+                if (pkg.getName().equals(packageName)) {
+                    return pkg;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Returns the unique name of the module.
      * 
      * @return Module name.
@@ -161,10 +181,13 @@ public abstract class DebModule extends AbstractPackage {
     /**
      * Creates all packages of the module.
      * 
+     * @param resolver
+     *            Knows all packages.
      * @param buildDirectory
      *            Directory to create the packages inside.
      */
-    public abstract void create(@NotNull File buildDirectory);
+    public abstract void create(@NotNull DebPackageResolver resolver,
+            @NotNull File buildDirectory);
 
     /**
      * Replaces variables in all properties.

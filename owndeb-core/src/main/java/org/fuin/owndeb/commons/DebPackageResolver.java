@@ -36,4 +36,14 @@ public interface DebPackageResolver {
     @Nullable
     public DebPackage resolve(String packageName);
 
+    /**
+     * Resolver that always returns <code>null</code>.
+     */
+    public static final DebPackageResolver NONE = new DebPackageResolver() {
+        @Override
+        public final DebPackage resolve(final String packageName) {
+            return null;
+        }
+    };
+
 }

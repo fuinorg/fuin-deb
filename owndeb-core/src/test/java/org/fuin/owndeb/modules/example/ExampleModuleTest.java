@@ -22,6 +22,7 @@ import static org.fest.assertions.Assertions.assertThat;
 import java.io.File;
 
 import org.fuin.owndeb.commons.DebPackage;
+import org.fuin.owndeb.commons.DebPackageResolver;
 import org.junit.Test;
 
 /**
@@ -48,7 +49,7 @@ public final class ExampleModuleTest {
         final File buildDir = new File("./target");
 
         // TEST
-        testee.create(buildDir);
+        testee.create(DebPackageResolver.NONE, buildDir);
 
         // VERIFY
         final File changesFile = new File(buildDir,
