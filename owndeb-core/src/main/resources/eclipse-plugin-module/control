@@ -1,0 +1,8 @@
+Package: ${name}
+Version: ${version}
+Section: ${section}
+Priority: ${priority}
+Architecture: ${arch}
+Description: ${description}
+Maintainer: ${maintainer}
+Depends: ${depends}

@@ -1,0 +1,7 @@
+#!/bin/sh
+#
+if [ "$1" = "configure" ]; then
+    ${eclipsePath}/eclipse -application org.eclipse.equinox.p2.director -noSplash -repository ${repository} -installIUs ${installIUs}
+    chown -R root:developer ${fullInstallationPath}/
+    chmod -R g+rwx ${fullInstallationPath}/
+fi

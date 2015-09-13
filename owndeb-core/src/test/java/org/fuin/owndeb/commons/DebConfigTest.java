@@ -34,6 +34,7 @@ import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.fuin.objects4j.common.ContractViolationException;
 import org.fuin.owndeb.modules.eclipse.EclipseModule;
+import org.fuin.owndeb.modules.eclipseplugin.EclipsePluginModule;
 import org.fuin.owndeb.modules.jdk.JdkModule;
 import org.fuin.utils4j.Utils4J;
 import org.junit.After;
@@ -88,15 +89,12 @@ public class DebConfigTest {
 
         // VERIFY
         XMLUnit.setIgnoreWhitespace(true);
-        XMLAssert
-                .assertXMLEqual(
-                        XML_PREFIX
-                                + "<owndeb-config>"
-                                + "<modules version=\"1.2.3\" description=\"Aa Bb Cc\" "
-                                + "maintainer=\"michael@fuin.org\" arch=\"amd64\" "
-                                + "section=\"devel\" " + "priority=\"low\" "
-                                + "installation-path=\"/opt\">" + "<moduleA/>"
-                                + "</modules>" + "</owndeb-config>", xml);
+        XMLAssert.assertXMLEqual(XML_PREFIX + "<owndeb-config>"
+                + "<modules version=\"1.2.3\" description=\"Aa Bb Cc\" "
+                + "maintainer=\"michael@fuin.org\" arch=\"amd64\" "
+                + "section=\"devel\" " + "priority=\"low\" "
+                + "installation-path=\"/opt\">" + "<moduleA/>" + "</modules>"
+                + "</owndeb-config>", xml);
 
     }
 
@@ -129,43 +127,54 @@ public class DebConfigTest {
 
     @Test
     public final void testUnmarshalFile() {
-        
+
         // PREPARE
         final URL url = Utils4J.url("classpath:owndeb-config.xml");
         final String xml = Utils4J.readAsString(url, "utf-8", 1024);
-        
+
         // TEST
-        final DebConfig config = unmarshal(xml, createXmlAdapter(), DebConfig.class, JdkModule.class, EclipseModule.class);
-        
+        final DebConfig config = unmarshal(xml, createXmlAdapter(),
+                DebConfig.class, JdkModule.class, EclipseModule.class,
+                EclipsePluginModule.class);
+
         // VERIFY
         assertThat(config).isNotNull();
         assertThat(config.getModules()).isNotNull();
         assertThat(config.getModules().getModules()).isNotNull();
         assertThat(config.getModules().getModules()).hasSize(3);
 
-        final JdkModule jdkModule = (JdkModule) config.getModules().getModules().get(0);
+        final JdkModule jdkModule = (JdkModule) config.getModules()
+                .getModules().get(0);
         assertThat(jdkModule.getVersion()).isEqualTo("1.8.0.60");
-        assertThat(jdkModule.getDescription()).isEqualTo("Java SE Development Kit 8");
+        assertThat(jdkModule.getDescription()).isEqualTo(
+                "Java SE Development Kit 8");
         assertThat(jdkModule.getMaintainer()).isEqualTo("michael@fuin.org");
         assertThat(jdkModule.getArch()).isEqualTo("amd64");
         assertThat(jdkModule.getInstallationPath()).isEqualTo("/opt");
         assertThat(jdkModule.getSection()).isEqualTo("devel");
         assertThat(jdkModule.getPriority()).isEqualTo("low");
-        assertThat(jdkModule.getUrlStr()).isEqualTo("http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jdk-8u60-linux-x64.tar.gz");
-        
-        final EclipseModule lunaModule = (EclipseModule) config.getModules().getModules().get(1);        
-        assertThat(lunaModule.getVersion()).isEqualTo("4.4");
-        assertThat(lunaModule.getDescription()).isEqualTo("Eclipse Luna IDE for Java EE Developers");
-        assertThat(lunaModule.getVm()).isEqualTo("/opt/fuin-jdk8/bin/java");
-        assertThat(lunaModule.getVmArgs()).isEqualTo("-Dosgi.requiredJavaVersion=1.6 -XX:MaxPermSize=256m -Xms128m -Xmx1024m");
+        assertThat(jdkModule.getUrlStr())
+                .isEqualTo(
+                        "http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jdk-8u60-linux-x64.tar.gz");
 
-        final EclipseModule marsModule = (EclipseModule) config.getModules().getModules().get(2);        
+        final EclipseModule lunaModule = (EclipseModule) config.getModules()
+                .getModules().get(1);
+        assertThat(lunaModule.getVersion()).isEqualTo("4.4");
+        assertThat(lunaModule.getDescription()).isEqualTo(
+                "Eclipse Luna IDE for Java EE Developers");
+        assertThat(lunaModule.getVm()).isEqualTo("/opt/fuin-jdk8/bin/java");
+        assertThat(lunaModule.getVmArgs())
+                .isEqualTo(
+                        "-Dosgi.requiredJavaVersion=1.6 -XX:MaxPermSize=256m -Xms128m -Xmx1024m");
+
+        final EclipseModule marsModule = (EclipseModule) config.getModules()
+                .getModules().get(2);
         assertThat(marsModule.getVersion()).isEqualTo("4.5");
-        assertThat(marsModule.getDescription()).isEqualTo("Eclipse Mars IDE for Java EE Developers");
-        
+        assertThat(marsModule.getDescription()).isEqualTo(
+                "Eclipse Mars IDE for Java EE Developers");
+
     }
-    
-    
+
     private XmlAdapter<?, ?>[] createXmlAdapter() {
         // Not necessary now - Add XML adapter if needed later on...
         return new XmlAdapter[] {};

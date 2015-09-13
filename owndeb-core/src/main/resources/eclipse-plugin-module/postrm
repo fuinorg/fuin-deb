@@ -1,0 +1,5 @@
+#!/bin/sh
+#
+if [ "$1" = "remove" ]; then
+    ${eclipsePath}/eclipse -application org.eclipse.equinox.p2.director -noSplash -uninstallIU ${installIUs}
+fi

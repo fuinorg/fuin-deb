@@ -291,6 +291,9 @@ public final class DebUtils {
         LOG.info("Copy resource '{}' to file: {}", resource, targetFile);
         try {
             final InputStream in = clasz.getResourceAsStream(resource);
+            if (in == null) {
+                throw new IllegalArgumentException("Resource not found: " + resource);
+            }
             try {
                 FileUtils.copyInputStreamToFile(in, targetFile);
             } finally {
