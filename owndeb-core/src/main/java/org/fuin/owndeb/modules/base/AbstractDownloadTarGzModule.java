@@ -148,7 +148,6 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
         for (final DebPackage pkg : debPackages) {
 
             final DebPackage debPackage = new DebPackage(pkg);
-            debPackage.init(this);
 
             LOG.info("Creating package: {}", debPackage.getName());
 

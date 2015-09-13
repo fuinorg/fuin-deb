@@ -247,9 +247,9 @@ public final class DebPackage extends AbstractPackage {
      * already exist, an {@link IllegalStateException} will be thrown.
      */
     private final void addVariables() {
-        if (name != null) {
-            addVariable(new Variable("name", name));
-        }
+        addVariable(new Variable("name", name));
+        addVariable(new Variable("depends", getDependenciesAsControlString()));
+        addVariable(new Variable("fullInstallationPath", getFullInstallationPath()));
     }
 
     /**
