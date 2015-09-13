@@ -8,7 +8,7 @@
 
 	<!-- The 'modules' section defines standards that are inherited by all childs -->
 	<modules maintainer="michael@fuin.org" arch="amd64"
-		installation-path="/opt">
+		installation-path="/opt" section="devel" priority="low">
 
 		<!-- Every module can override the inherited properties -->
 		<jdk-module version="1.8.0.60" description="Java SE Development Kit 8"
