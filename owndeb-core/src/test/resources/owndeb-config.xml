@@ -45,6 +45,25 @@
 
 		</eclipse-module>
 
+		<eclipse-plugin-module version="6.5.0"
+			repository="http://eclipse-cs.sourceforge.net/update/" installIUs="net.sf.eclipsecs.feature.group">
+
+			<!-- Creates two binary packages with different names, descriptions and dependencies -->
+
+			<!-- Requires Eclipse Luna to be installed -->
+			<package name="${prefix}eclipse-jee-luna-plugins-checkstyle"
+				description="Eclipse Luna Checkstyle Plugin">
+				<dependency name="${prefix}eclipse-jee-luna" />
+			</package>
+
+			<!-- Requires Eclipse Mars to be installed -->
+			<package name="${prefix}eclipse-jee-mars-plugins-checkstyle"
+				description="Eclipse Mars Checkstyle Plugin">
+				<dependency name="${prefix}eclipse-jee-mars" />
+			</package>
+
+		</eclipse-plugin-module>
+
 	</modules>
 
 </owndeb-config>
