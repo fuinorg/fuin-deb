@@ -24,6 +24,7 @@ import static org.fuin.utils4j.JaxbUtils.unmarshal;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -32,6 +33,8 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.fuin.objects4j.common.ContractViolationException;
+import org.fuin.owndeb.modules.jdk.JdkModule;
+import org.fuin.utils4j.Utils4J;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -123,6 +126,34 @@ public class DebConfigTest {
                 DebModuleA.class);
     }
 
+    @Test
+    public final void testUnmarshalFile() {
+        
+        // PREPARE
+        final URL url = Utils4J.url("classpath:owndeb-config.xml");
+        final String xml = Utils4J.readAsString(url, "utf-8", 1024);
+        
+        // TEST
+        final DebConfig config = unmarshal(xml, createXmlAdapter(), DebConfig.class, JdkModule.class);
+        
+        // VERIFY
+        assertThat(config).isNotNull();
+        assertThat(config.getModules()).isNotNull();
+        assertThat(config.getModules().getModules()).isNotNull();
+        assertThat(config.getModules().getModules()).hasSize(1);
+        final JdkModule jdkModule = (JdkModule) config.getModules().getModules().get(0);
+        assertThat(jdkModule.getVersion()).isEqualTo("1.8.0.60");
+        assertThat(jdkModule.getDescription()).isEqualTo("Java SE Development Kit 8");
+        assertThat(jdkModule.getMaintainer()).isEqualTo("michael@fuin.org");
+        assertThat(jdkModule.getArch()).isEqualTo("amd64");
+        assertThat(jdkModule.getInstallationPath()).isEqualTo("/opt");
+        assertThat(jdkModule.getSection()).isEqualTo("devel");
+        assertThat(jdkModule.getPriority()).isEqualTo("low");
+        assertThat(jdkModule.getUrlStr()).isEqualTo("http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jdk-8u60-linux-x64.tar.gz");
+        
+    }
+    
+    
     private XmlAdapter<?, ?>[] createXmlAdapter() {
         // Not necessary now - Add XML adapter if needed later on...
         return new XmlAdapter[] {};
