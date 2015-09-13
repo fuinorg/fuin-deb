@@ -185,6 +185,15 @@ public final class JdkModule extends DebModule {
         urlStr = Utils4J.replaceVars(urlStr, vars);        
     }
 
+    /**
+     * Returns the URL.
+     * 
+     * @return URL.
+     */
+    public final String getUrlStr() {
+        return urlStr;
+    }
+    
     private static void renameJdkToPackageDir(final File srcDir,
             final File packageDir) {
         if (packageDir.exists()) {
