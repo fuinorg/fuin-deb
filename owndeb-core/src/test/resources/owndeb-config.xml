@@ -19,7 +19,7 @@
 
 		</jdk-module>
 
-		<eclipse version="4.4" description="Eclipse Luna IDE for Java EE Developers"
+		<eclipse-module version="4.4" description="Eclipse Luna IDE for Java EE Developers"
 			url="http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/luna/SR2/eclipse-jee-luna-SR2-linux-gtk-x86_64.tar.gz">
 
 			<!-- The full name of the package is 'fuin-eclipse-jee-luna' (prefix+name) -->
@@ -28,9 +28,9 @@
 				<dependency name="${prefix}jdk8" />
 			</package>
 
-		</eclipse>
+		</eclipse-module>
 
-		<eclipse version="4.5" description="Eclipse Mars IDE for Java EE Developers"
+		<eclipse-module version="4.5" description="Eclipse Mars IDE for Java EE Developers"
 			url="http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/mars/R/eclipse-jee-mars-R-linux-gtk-x86_64.tar.gz">
 
 			<!-- The full name of the package is 'fuin-eclipse-jee-mars' (prefix+name) -->
@@ -39,9 +39,9 @@
 				<dependency name="${prefix}jdk8" />
 			</package>
 
-		</eclipse>
+		</eclipse-module>
 
-		<eclipse-plugin version="6.5.0"
+		<eclipse-plugin-module version="6.5.0"
 			repository="http://eclipse-cs.sourceforge.net/update/" installIUs="net.sf.eclipsecs.feature.group">
 
 			<!-- Creates two binary packages with different names, descriptions and 
@@ -59,7 +59,7 @@
 				<dependency name="${prefix}eclipse-jee-mars" />
 			</package>
 
-		</eclipse-plugin>
+		</eclipse-plugin-module>
 
 	</modules>
 
