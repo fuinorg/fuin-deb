@@ -121,7 +121,7 @@ public class DebDependencyTest {
         final DebPackage pkg = new DebPackage(NAME);
         final DebPackageResolver resolver = new DebPackageResolver() {
             @Override
-            public DebPackage resolve(final String packageName) {
+            public DebPackage findDebPackage(final String packageName) {
                 return pkg;
             }
         };
@@ -141,7 +141,7 @@ public class DebDependencyTest {
         // PREPARE
         final DebPackageResolver resolver = new DebPackageResolver() {
             @Override
-            public DebPackage resolve(final String packageName) {
+            public DebPackage findDebPackage(final String packageName) {
                 return null;
             }
         };

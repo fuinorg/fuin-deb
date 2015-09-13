@@ -17,6 +17,8 @@
  */
 package org.fuin.owndeb.commons;
 
+import javax.validation.constraints.NotNull;
+
 import org.fuin.objects4j.common.Nullable;
 
 /**
@@ -34,16 +36,6 @@ public interface DebPackageResolver {
      *         exists.
      */
     @Nullable
-    public DebPackage resolve(String packageName);
-
-    /**
-     * Resolver that always returns <code>null</code>.
-     */
-    public static final DebPackageResolver NONE = new DebPackageResolver() {
-        @Override
-        public final DebPackage resolve(final String packageName) {
-            return null;
-        }
-    };
+    public DebPackage findDebPackage(@NotNull String packageName);
 
 }

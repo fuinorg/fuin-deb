@@ -89,7 +89,7 @@ public final class DebDependency {
      */
     public final boolean resolve(@NotNull final DebPackageResolver resolver) {
         Contract.requireArgNotNull("resolver", resolver);
-        resolvedDependency = resolver.resolve(name);
+        resolvedDependency = resolver.findDebPackage(name);
         return resolvedDependency != null;
     }
 

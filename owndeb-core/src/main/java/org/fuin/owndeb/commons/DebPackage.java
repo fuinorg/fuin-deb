@@ -255,6 +255,24 @@ public final class DebPackage extends AbstractPackage {
         }
     }
 
+    /**
+     * Updates the package references for all dependencies.
+     * 
+     * @param resolver
+     *            Knows all packages.
+     */
+    public final void resolveDependencies(final DebPackageResolver resolver) {
+        if (dependencies != null) {
+            for (final DebDependency dependency : dependencies) {
+                if (!dependency.resolve(resolver)) {
+                    throw new IllegalStateException(
+                            "Unresolved dependency from package '" + name + "' to '"
+                                    + dependency.getName() + "'");
+                }
+            }
+        }
+    }
+
     @Override
     public final int hashCode() {
         return name.hashCode();

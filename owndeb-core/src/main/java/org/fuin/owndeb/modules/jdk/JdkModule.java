@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.objects4j.common.Nullable;
 import org.fuin.owndeb.commons.DebPackage;
+import org.fuin.owndeb.commons.DebPackageResolver;
 import org.fuin.owndeb.modules.base.AbstractDownloadTarGzModule;
 
 /**
@@ -119,10 +120,11 @@ public final class JdkModule extends AbstractDownloadTarGzModule {
     }
 
     @Override
-    protected final void applyModifications(final File packageDir) {
+    protected final void applyModifications(final DebPackage debPackage,
+            final File packageDir) {
         // No modifications
     }
-    
+
     @Override
     protected final void copyControlFiles(final DebPackage debPackage,
             final File controlDir) {

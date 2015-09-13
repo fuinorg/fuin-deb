@@ -22,7 +22,6 @@ import static org.fest.assertions.Assertions.assertThat;
 import java.io.File;
 
 import org.fuin.owndeb.commons.DebPackage;
-import org.fuin.owndeb.commons.DebPackageResolver;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -52,7 +51,7 @@ public final class EclipseModuleTest {
         final File buildDir = new File("./target");
 
         // TEST
-        testee.create(DebPackageResolver.NONE, buildDir);
+        testee.create(buildDir);
 
         // VERIFY
         final File changesFile = new File(buildDir,

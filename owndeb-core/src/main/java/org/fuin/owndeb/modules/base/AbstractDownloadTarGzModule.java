@@ -37,7 +37,6 @@ import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Nullable;
 import org.fuin.owndeb.commons.DebModule;
 import org.fuin.owndeb.commons.DebPackage;
-import org.fuin.owndeb.commons.DebPackageResolver;
 import org.fuin.owndeb.commons.DebUtils;
 import org.fuin.utils4j.Utils4J;
 import org.slf4j.Logger;
@@ -133,9 +132,8 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
     }
 
     @Override
-    public final void create(final DebPackageResolver resolver, final File buildDirectory) {
+    public final void create(final File buildDirectory) {
 
-        Contract.requireArgNotNull("resolver", resolver);
         Contract.requireArgNotNull("buildDirectory", buildDirectory);
         LOG.info("Creating module '{}' in: {}", getModuleName(), buildDirectory);
 
@@ -164,7 +162,7 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
             }
             unTarGz(archiveFile);
             renameOriginalToPackageDir(srcDir, packageDir);
-            applyModifications(packageDir);
+            applyModifications(pkg, packageDir);
 
             final File tarFile = tarGz(buildDirectory, debPackage.getName());
             DebUtils.mkdirs(controlDir);
@@ -272,10 +270,13 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
     /**
      * Modifies the original package content.
      * 
+     * @param debPackage
+     *            Current package.
      * @param packageDir
      *            Directory that contains the package content.
      */
-    protected abstract void applyModifications(File packageDir);
+    protected abstract void applyModifications(@NotNull DebPackage debPackage,
+            @NotNull File packageDir);
 
     /**
      * Copies the control files for the given package and module into the
@@ -286,7 +287,7 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
      * @param controlDir
      *            Target control directory.
      */
-    protected abstract void copyControlFiles(DebPackage debPackage,
-            File controlDir);
+    protected abstract void copyControlFiles(@NotNull DebPackage debPackage,
+            @NotNull File controlDir);
 
 }

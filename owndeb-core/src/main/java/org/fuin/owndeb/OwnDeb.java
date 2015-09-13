@@ -86,7 +86,7 @@ public final class OwnDeb {
         final List<DebModule> modules = config.getModules().getModules();
         for (final DebModule module : modules) {
             LOG.info("Creating module: {}", module.getModuleName());
-            module.create(config, targetDir);
+            module.create(targetDir);
         }
         LOG.info("Finished creating packages");
     }

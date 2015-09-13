@@ -37,7 +37,7 @@ import org.fuin.utils4j.VariableResolver;
  * Configuration for OwnDeb.
  */
 @XmlRootElement(name = "owndeb-config")
-public final class DebConfig implements DebPackageResolver {
+public final class DebConfig {
 
     @XmlElementWrapper(name = "variables")
     @XmlElement(name = "variable")
@@ -108,14 +108,6 @@ public final class DebConfig implements DebPackageResolver {
         return modules;
     }
 
-    @Override
-    public final DebPackage resolve(final String packageName) {
-        if (modules != null) {
-            return modules.resolve(packageName);
-        }
-        return null;
-    }
-    
     /**
      * Returns the list of variables.
      * 
@@ -145,7 +137,8 @@ public final class DebConfig implements DebPackageResolver {
         }
         if (modules != null) {
             modules.replaceModuleVariables(resolved);
-            modules.applyModuleDefaults();          
+            modules.applyModuleDefaults();
+            modules.resolveDependencies();
         }
     }
 

@@ -150,7 +150,7 @@ public final class DebModules extends AbstractPackage implements
     }
 
     @Override
-    public final DebPackage resolve(final String packageName) {
+    public final DebPackage findDebPackage(final String packageName) {
         if (modules != null) {
             for (final DebModule module : modules) {
                 final DebPackage pkg = module.findPackageByName(packageName);
@@ -160,6 +160,17 @@ public final class DebModules extends AbstractPackage implements
             }
         }
         return null;
+    }
+
+    /**
+     * Updates the package references for all dependencies.
+     */
+    public final void resolveDependencies() {
+        if (modules != null) {
+            for (final DebModule module : modules) {
+                module.resolveDependencies(this);
+            }
+        }
     }
 
 }

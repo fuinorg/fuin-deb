@@ -100,7 +100,7 @@ public class DebModulesTest {
         }
 
         @Override
-        public final void create(final DebPackageResolver resolver, final File buildDirectory) {
+        public final void create(final File buildDirectory) {
             // Do nothing
         }
 
@@ -123,7 +123,7 @@ public class DebModulesTest {
         }
 
         @Override
-        public final void create(final DebPackageResolver resolver, final File buildDirectory) {
+        public final void create(final File buildDirectory) {
             // Do nothing
         }
 

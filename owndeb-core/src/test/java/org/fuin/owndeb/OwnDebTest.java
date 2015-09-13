@@ -27,7 +27,6 @@ import org.fuin.objects4j.common.ContractViolationException;
 import org.fuin.owndeb.commons.DebConfig;
 import org.fuin.owndeb.commons.DebModule;
 import org.fuin.owndeb.commons.DebModules;
-import org.fuin.owndeb.commons.DebPackageResolver;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -80,9 +79,9 @@ public class OwnDebTest {
         testee.execute();
 
         // VERIFY
-        verify(module1).create(ArgumentCaptor.forClass(DebPackageResolver.class).capture(), arg1.capture());
+        verify(module1).create(arg1.capture());
         assertThat(arg1.getValue()).isEqualTo(TARGET_DIR);
-        verify(module2).create(ArgumentCaptor.forClass(DebPackageResolver.class).capture(), arg2.capture());
+        verify(module2).create(arg2.capture());
         assertThat(arg2.getValue()).isEqualTo(TARGET_DIR);
 
     }

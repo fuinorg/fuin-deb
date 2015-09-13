@@ -102,8 +102,7 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
-            @NotNull final String url,
-            @NotNull final List<DebPackage> packages) {
+            @NotNull final String url, @NotNull final List<DebPackage> packages) {
         super(version, description, maintainer, arch, installationPath,
                 section, priority, url, packages);
     }
@@ -119,10 +118,11 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
     }
 
     @Override
-    protected final void applyModifications(final File packageDir) {
-        // TODO Auto-generated method stub
+    protected final void applyModifications(final DebPackage debPackage,
+            final File packageDir) {
+                
     }
-    
+
     @Override
     protected final void copyControlFiles(final DebPackage debPackage,
             final File controlDir) {

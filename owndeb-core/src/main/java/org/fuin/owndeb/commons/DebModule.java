@@ -172,6 +172,20 @@ public abstract class DebModule extends AbstractPackage {
     }
 
     /**
+     * Updates the package references for all dependencies.
+     * 
+     * @param resolver
+     *            Knows all packages.
+     */
+    public final void resolveDependencies(final DebPackageResolver resolver) {
+        if (packages != null) {
+            for (final DebPackage pkg : packages) {
+                pkg.resolveDependencies(resolver);
+            }
+        }
+    }
+
+    /**
      * Returns the unique name of the module.
      * 
      * @return Module name.
@@ -181,13 +195,10 @@ public abstract class DebModule extends AbstractPackage {
     /**
      * Creates all packages of the module.
      * 
-     * @param resolver
-     *            Knows all packages.
      * @param buildDirectory
      *            Directory to create the packages inside.
      */
-    public abstract void create(@NotNull DebPackageResolver resolver,
-            @NotNull File buildDirectory);
+    public abstract void create(@NotNull File buildDirectory);
 
     /**
      * Replaces variables in all properties.
