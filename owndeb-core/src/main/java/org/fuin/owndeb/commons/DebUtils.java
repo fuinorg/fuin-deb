@@ -28,6 +28,7 @@ import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,10 +57,6 @@ import org.vafer.jdeb.shaded.compress.io.IOUtils;
  */
 public final class DebUtils {
 
-    /** Prefix used for XML files. */
-    public static final String XML_PREFIX = "<?xml version=\"1.0\" encoding=\"UTF-8\""
-            + " standalone=\"yes\"?>";
-
     private static final Logger LOG = LoggerFactory.getLogger(DebUtils.class);
 
     private DebUtils() {
@@ -87,7 +84,7 @@ public final class DebUtils {
         Contract.requireArgNotNull("url", url);
         Contract.requireArgNotNull("dir", dir);
 
-        LOG.info("cachedWget: {}", url);
+        LOG.info("cachedDownload: {}", url);
 
         final File targetFile = new File(dir, FilenameUtils.getName(url
                 .getFile()));
@@ -377,6 +374,25 @@ public final class DebUtils {
         } else {
             LOG.debug("Directory already exist: {}", dir);
         }
+    }
+
+    /**
+     * Returns a list of variables as map.
+     * 
+     * @param vars
+     *            Variables.
+     * 
+     * @return Same content as map.
+     */
+    public static Map<String, String> asMap(final List<Variable> vars) {
+        if (vars == null) {
+            return null;
+        }
+        final Map<String, String> map = new HashMap<>();
+        for (final Variable var : vars) {
+            map.put(var.getName(), var.getValue());
+        }
+        return map;
     }
 
 }

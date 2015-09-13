@@ -18,11 +18,12 @@
 package org.fuin.owndeb.commons;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.fuin.owndeb.commons.DebUtils.XML_PREFIX;
-import static org.fuin.units4j.Units4JUtils.marshal;
-import static org.fuin.units4j.Units4JUtils.unmarshal;
+import static org.fuin.utils4j.JaxbUtils.XML_PREFIX;
+import static org.fuin.utils4j.JaxbUtils.marshal;
+import static org.fuin.utils4j.JaxbUtils.unmarshal;
 
 import java.io.File;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
@@ -40,7 +41,6 @@ public class DebModulesTest {
         // PREPARE
         final String version = "1.2.3";
         final String description = "Aa Bb Cc";
-        final String prefix = "fuin-";
         final String maintainer = "michael@fuin.org";
         final String arch = "amd64";
         final String installationPath = "/opt";
@@ -49,8 +49,8 @@ public class DebModulesTest {
         final DebModule module1 = new DebModule1();
         final DebModule module2 = new DebModule2();
         final DebModules original = new DebModules(version, description,
-                prefix, maintainer, arch, installationPath, section, priority,
-                module1, module2);
+                maintainer, arch, installationPath, section, priority, module1,
+                module2);
 
         // TEST
         final String xml = marshal(original, createXmlAdapter(),
@@ -62,7 +62,7 @@ public class DebModulesTest {
                 .assertXMLEqual(
                         XML_PREFIX
                                 + "<modules version=\"1.2.3\" description=\"Aa Bb Cc\" "
-                                + "prefix=\"fuin-\" maintainer=\"michael@fuin.org\" arch=\"amd64\" "
+                                + "maintainer=\"michael@fuin.org\" arch=\"amd64\" "
                                 + "section=\"devel\" " + "priority=\"low\" "
                                 + "installation-path=\"/opt\">"
                                 + "<module1/> <module2/>" + "</modules>", xml);
@@ -70,7 +70,6 @@ public class DebModulesTest {
                 DebModules.class, DebModule1.class, DebModule2.class);
         assertThat(copy.getVersion()).isEqualTo("1.2.3");
         assertThat(copy.getDescription()).isEqualTo("Aa Bb Cc");
-        assertThat(copy.getPrefix()).isEqualTo("fuin-");
         assertThat(copy.getMaintainer()).isEqualTo("michael@fuin.org");
         assertThat(copy.getArch()).isEqualTo("amd64");
         assertThat(copy.getInstallationPath()).isEqualTo("/opt");
@@ -105,6 +104,11 @@ public class DebModulesTest {
             // Do nothing
         }
 
+        @Override
+        public final void replaceVariables(final Map<String, String> vars) {
+            // Do nothing
+        }
+
     }
 
     /**
@@ -120,6 +124,11 @@ public class DebModulesTest {
 
         @Override
         public final void create(final File buildDirectory) {
+            // Do nothing
+        }
+
+        @Override
+        public final void replaceVariables(final Map<String, String> vars) {
             // Do nothing
         }
 

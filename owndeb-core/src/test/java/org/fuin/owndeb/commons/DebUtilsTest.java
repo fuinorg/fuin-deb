@@ -79,7 +79,7 @@ public class DebUtilsTest {
 
         assertThat(events.get(0).getLevel(), is(Level.INFO));
         assertThat(events.get(0).getFormattedMessage(),
-                is("cachedWget: http://www.fuin.org/images/smiley.gif"));
+                is("cachedDownload: http://www.fuin.org/images/smiley.gif"));
 
         assertThat(events.get(1).getLevel(), is(Level.INFO));
         assertThat(events.get(1).getFormattedMessage(),
@@ -117,7 +117,7 @@ public class DebUtilsTest {
 
         assertThat(events.get(0).getLevel(), is(Level.INFO));
         assertThat(events.get(0).getFormattedMessage(),
-                is("cachedWget: http://www.fuin.org/images/smiley.gif"));
+                is("cachedDownload: http://www.fuin.org/images/smiley.gif"));
 
         assertThat(events.get(1).getLevel(), is(Level.INFO));
         assertThat(events.get(1).getFormattedMessage(),
@@ -159,7 +159,7 @@ public class DebUtilsTest {
 
         assertThat(events.get(0).getLevel(), is(Level.INFO));
         assertThat(events.get(0).getFormattedMessage(),
-                is("cachedWget: http://www.fuin.org/images/smiley.gif"));
+                is("cachedDownload: http://www.fuin.org/images/smiley.gif"));
 
         assertThat(events.get(1).getLevel(), is(Level.INFO));
         assertThat(events.get(1).getFormattedMessage(),

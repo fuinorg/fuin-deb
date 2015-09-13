@@ -20,6 +20,7 @@ package org.fuin.owndeb.commons;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAnyElement;
@@ -52,8 +53,6 @@ public final class DebModules extends AbstractPackage {
      *            Package version.
      * @param description
      *            Package description.
-     * @param prefix
-     *            Prefix used to build the package like "fuin-".
      * @param maintainer
      *            Maintainer of the package.
      * @param arch
@@ -68,13 +67,13 @@ public final class DebModules extends AbstractPackage {
      *            Array of modules to create.
      */
     public DebModules(@Nullable final String version,
-            @Nullable final String description, @Nullable final String prefix,
+            @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
             @NotNull final DebModule... modules) {
-        this(version, description, prefix, maintainer, arch, installationPath,
-                section, priority, Arrays.asList(modules));
+        this(version, description, maintainer, arch, installationPath, section,
+                priority, Arrays.asList(modules));
     }
 
     /**
@@ -84,8 +83,6 @@ public final class DebModules extends AbstractPackage {
      *            Package version.
      * @param description
      *            Package description.
-     * @param prefix
-     *            Prefix used to build the package like "fuin-".
      * @param maintainer
      *            Maintainer of the package.
      * @param arch
@@ -100,12 +97,12 @@ public final class DebModules extends AbstractPackage {
      *            List of modules to create.
      */
     public DebModules(@Nullable final String version,
-            @Nullable final String description, @Nullable final String prefix,
+            @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
             @NotNull final List<DebModule> modules) {
-        super(version, description, prefix, maintainer, arch, installationPath,
+        super(version, description, maintainer, arch, installationPath,
                 section, priority);
         Contract.requireArgNotNull("modules", modules);
         if (modules.isEmpty()) {
@@ -127,10 +124,26 @@ public final class DebModules extends AbstractPackage {
     /**
      * Applies the default settings to all modules.
      */
-    public final void applyDefaults() {
+    public final void applyModuleDefaults() {
         if (modules != null) {
             for (final DebModule module : modules) {
                 module.applyPackageDefaults(this);
+            }
+        }
+    }
+
+    /**
+     * Replaces variables in the base and package properties.
+     * 
+     * @param vars
+     *            Variables to use.
+     */
+    public final void replaceModuleVariables(
+            @Nullable final Map<String, String> vars) {
+        replacePackageVariables(vars);
+        if (modules != null) {
+            for (final DebModule module : modules) {
+                module.replaceVariables(vars);
             }
         }
     }

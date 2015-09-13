@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
@@ -51,8 +52,6 @@ public abstract class DebModule extends AbstractPackage {
      *            Package version.
      * @param description
      *            Package description.
-     * @param prefix
-     *            Prefix used to build the package like "fuin-".
      * @param maintainer
      *            Maintainer of the package.
      * @param arch
@@ -67,13 +66,13 @@ public abstract class DebModule extends AbstractPackage {
      *            Priority like "low".
      */
     public DebModule(@Nullable final String version,
-            @Nullable final String description, @Nullable final String prefix,
+            @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
             @NotNull final DebPackage... packages) {
-        this(version, description, prefix, maintainer, arch, installationPath,
-                section, priority, Arrays.asList(packages));
+        this(version, description, maintainer, arch, installationPath, section,
+                priority, Arrays.asList(packages));
     }
 
     /**
@@ -83,8 +82,6 @@ public abstract class DebModule extends AbstractPackage {
      *            Package version.
      * @param description
      *            Package description.
-     * @param prefix
-     *            Prefix used to build the package like "fuin-".
      * @param maintainer
      *            Maintainer of the package.
      * @param arch
@@ -99,12 +96,12 @@ public abstract class DebModule extends AbstractPackage {
      *            List of packages to create.
      */
     public DebModule(@Nullable final String version,
-            @Nullable final String description, @Nullable final String prefix,
+            @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
             @NotNull final List<DebPackage> packages) {
-        super(version, description, prefix, maintainer, arch, installationPath,
+        super(version, description, maintainer, arch, installationPath,
                 section, priority);
         Contract.requireArgNotNull("packages", packages);
         if (packages.isEmpty()) {
@@ -139,6 +136,22 @@ public abstract class DebModule extends AbstractPackage {
     }
 
     /**
+     * Replaces variables in the base, package and module properties.
+     * 
+     * @param vars
+     *            Variables to use.
+     */
+    public final void replaceModuleVariables(
+            @Nullable final Map<String, String> vars) {
+        replacePackageVariables(vars);
+        if (packages != null) {
+            for (final DebPackage pkg : packages) {
+                pkg.replaceVariables(vars);
+            }
+        }
+    }
+
+    /**
      * Returns the unique name of the module.
      * 
      * @return Module name.
@@ -152,5 +165,13 @@ public abstract class DebModule extends AbstractPackage {
      *            Directory to create the packages inside.
      */
     public abstract void create(@NotNull File buildDirectory);
+
+    /**
+     * Replaces variables in all properties.
+     * 
+     * @param vars
+     *            Variables to use.
+     */
+    public abstract void replaceVariables(@Nullable Map<String, String> vars);
 
 }

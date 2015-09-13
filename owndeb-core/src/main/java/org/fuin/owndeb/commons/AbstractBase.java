@@ -25,14 +25,12 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlAttribute;
 
 import org.fuin.objects4j.common.Nullable;
+import org.fuin.utils4j.Utils4J;
 
 /**
  * Provides default configuration for sub classes.
  */
 public abstract class AbstractBase {
-
-    @XmlAttribute(name = "prefix")
-    private String prefix;
 
     @XmlAttribute(name = "maintainer")
     private String maintainer;
@@ -59,8 +57,6 @@ public abstract class AbstractBase {
     /**
      * Constructor with all data.
      * 
-     * @param prefix
-     *            Prefix used to build the package like "fuin-".
      * @param maintainer
      *            Maintainer of the package.
      * @param arch
@@ -72,27 +68,16 @@ public abstract class AbstractBase {
      * @param priority
      *            Priority like "low".
      */
-    public AbstractBase(@Nullable final String prefix,
-            @Nullable final String maintainer, @Nullable final String arch,
+    public AbstractBase(@Nullable final String maintainer,
+            @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority) {
         super();
-        this.prefix = prefix;
         this.maintainer = maintainer;
         this.arch = arch;
         this.installationPath = installationPath;
         this.section = section;
         this.priority = priority;
-    }
-
-    /**
-     * Returns the prefix used to build the package.
-     * 
-     * @return Prefix like "fuin-".
-     */
-    @Nullable
-    public final String getPrefix() {
-        return prefix;
     }
 
     /**
@@ -154,10 +139,6 @@ public abstract class AbstractBase {
      */
     public final void applyBaseDefaults(final AbstractBase other) {
 
-        if (prefix == null) {
-            this.prefix = other.prefix;
-        }
-
         if (maintainer == null) {
             this.maintainer = other.maintainer;
         }
@@ -185,11 +166,26 @@ public abstract class AbstractBase {
      */
     public final Map<String, String> getBaseVariables() {
         final Map<String, String> vars = new HashMap<>();
-        vars.put("arch", getArch());
         vars.put("maintainer", getMaintainer());
+        vars.put("arch", getArch());
         vars.put("section", getSection());
         vars.put("priority", getPriority());
         return vars;
+    }
+
+    /**
+     * Replaces variables in the base properties.
+     * 
+     * @param vars
+     *            Variables to use.
+     */
+    public final void replaceBaseVariables(
+            @Nullable final Map<String, String> vars) {
+        installationPath = Utils4J.replaceVars(installationPath, vars);
+        arch = Utils4J.replaceVars(arch, vars);
+        maintainer = Utils4J.replaceVars(maintainer, vars);
+        section = Utils4J.replaceVars(section, vars);
+        priority = Utils4J.replaceVars(priority, vars);
     }
 
     /**

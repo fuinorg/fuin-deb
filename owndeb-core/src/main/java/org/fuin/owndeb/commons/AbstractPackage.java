@@ -23,6 +23,7 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlAttribute;
 
 import org.fuin.objects4j.common.Nullable;
+import org.fuin.utils4j.Utils4J;
 
 /**
  * Provides default configuration for sub classes.
@@ -49,8 +50,6 @@ public abstract class AbstractPackage extends AbstractBase {
      *            Package version.
      * @param description
      *            Package description.
-     * @param prefix
-     *            Prefix used to build the package like "fuin-".
      * @param maintainer
      *            Maintainer of the package.
      * @param arch
@@ -63,11 +62,11 @@ public abstract class AbstractPackage extends AbstractBase {
      *            Priority like "low".
      */
     public AbstractPackage(@Nullable final String version,
-            @Nullable final String description, @Nullable final String prefix,
+            @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority) {
-        super(prefix, maintainer, arch, installationPath, section, priority);
+        super(maintainer, arch, installationPath, section, priority);
         this.version = version;
         this.description = description;
     }
@@ -121,6 +120,19 @@ public abstract class AbstractPackage extends AbstractBase {
         vars.put("version", version);
         vars.put("description", description);
         return vars;
+    }
+
+    /**
+     * Replaces variables in the base and package properties.
+     * 
+     * @param vars
+     *            Variables to use.
+     */
+    public final void replacePackageVariables(
+            @Nullable final Map<String, String> vars) {
+        replaceBaseVariables(vars);
+        version = Utils4J.replaceVars(version, vars);
+        description = Utils4J.replaceVars(description, vars);
     }
 
 }

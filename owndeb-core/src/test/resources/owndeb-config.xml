@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <owndeb-config>
 
+	<!-- Variables can be used in all properties. -->
+	<variables>
+		<variable name="prefix" value="fuin-" />
+	</variables>
+
 	<!-- The 'modules' section defines standards that are inherited by all childs -->
-	<modules prefix="fuin-" maintainer="michael@fuin.org" arch="amd64"
+	<modules maintainer="michael@fuin.org" arch="amd64"
 		installation-path="/opt">
 
 		<!-- Every module can override the inherited properties -->
@@ -10,7 +15,7 @@
 			url="http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jdk-8u60-linux-x64.tar.gz">
 
 			<!-- The full name of the package is 'fuin-jdk8' (prefix+name) -->
-			<package name="jdk8" />
+			<package name="${prefix}jdk8" />
 
 		</jdk>
 
@@ -18,9 +23,9 @@
 			url="http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/luna/SR2/eclipse-jee-luna-SR2-linux-gtk-x86_64.tar.gz">
 
 			<!-- The full name of the package is 'fuin-eclipse-jee-luna' (prefix+name) -->
-			<package name="eclipse-jee-luna">
+			<package name="${prefix}eclipse-jee-luna">
 				<!-- Requires the module jdk8 to be installed -->
-				<dependency name="jdk8" />
+				<dependency name="${prefix}jdk8" />
 			</package>
 
 		</eclipse>
@@ -29,9 +34,9 @@
 			url="http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/mars/R/eclipse-jee-mars-R-linux-gtk-x86_64.tar.gz">
 
 			<!-- The full name of the package is 'fuin-eclipse-jee-mars' (prefix+name) -->
-			<package name="eclipse-jee-mars">
+			<package name="${prefix}eclipse-jee-mars">
 				<!-- Requires the module jdk8 to be installed -->
-				<dependency name="jdk8" />
+				<dependency name="${prefix}jdk8" />
 			</package>
 
 		</eclipse>
@@ -43,15 +48,15 @@
 				dependencies -->
 
 			<!-- Requires Eclipse Luna to be installed -->
-			<package name="eclipse-jee-luna-plugins-checkstyle"
+			<package name="${prefix}eclipse-jee-luna-plugins-checkstyle"
 				description="Eclipse Luna Checkstyle Plugin">
-				<dependency name="eclipse-jee-luna" />
+				<dependency name="${prefix}eclipse-jee-luna" />
 			</package>
 
 			<!-- Requires Eclipse Mars to be installed -->
-			<package name="eclipse-jee-mars-plugins-checkstyle"
+			<package name="${prefix}eclipse-jee-mars-plugins-checkstyle"
 				description="Eclipse Mars Checkstyle Plugin">
-				<dependency name="eclipse-jee-mars" />
+				<dependency name="${prefix}eclipse-jee-mars" />
 			</package>
 
 		</eclipse-plugin>

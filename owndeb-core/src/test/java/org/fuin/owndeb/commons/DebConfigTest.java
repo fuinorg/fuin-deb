@@ -18,12 +18,13 @@
 package org.fuin.owndeb.commons;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.fuin.owndeb.commons.DebUtils.XML_PREFIX;
-import static org.fuin.units4j.Units4JUtils.marshal;
-import static org.fuin.units4j.Units4JUtils.unmarshal;
+import static org.fuin.utils4j.JaxbUtils.XML_PREFIX;
+import static org.fuin.utils4j.JaxbUtils.marshal;
+import static org.fuin.utils4j.JaxbUtils.unmarshal;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
@@ -44,13 +45,12 @@ public class DebConfigTest {
     public void setup() {
         final String version = "1.2.3";
         final String description = "Aa Bb Cc";
-        final String prefix = "fuin-";
         final String maintainer = "michael@fuin.org";
         final String arch = "amd64";
         final String installationPath = "/opt";
         final String section = "devel";
         final String priority = "low";
-        final DebModules modules = new DebModules(version, description, prefix,
+        final DebModules modules = new DebModules(version, description,
                 maintainer, arch, installationPath, section, priority,
                 new DebModuleA());
         testee = new DebConfig(modules);
@@ -89,11 +89,10 @@ public class DebConfigTest {
                         XML_PREFIX
                                 + "<owndeb-config>"
                                 + "<modules version=\"1.2.3\" description=\"Aa Bb Cc\" "
-                                + "prefix=\"fuin-\" maintainer=\"michael@fuin.org\" arch=\"amd64\" "
+                                + "maintainer=\"michael@fuin.org\" arch=\"amd64\" "
                                 + "section=\"devel\" " + "priority=\"low\" "
-                                + "installation-path=\"/opt\">"
-                                + "<moduleA/>" + "</modules>"
-                                + "</owndeb-config>", xml);
+                                + "installation-path=\"/opt\">" + "<moduleA/>"
+                                + "</modules>" + "</owndeb-config>", xml);
 
     }
 
@@ -114,7 +113,6 @@ public class DebConfigTest {
         final DebModules modules = copy.getModules();
         assertThat(modules.getVersion()).isEqualTo("1.2.3");
         assertThat(modules.getDescription()).isEqualTo("Aa Bb Cc");
-        assertThat(modules.getPrefix()).isEqualTo("fuin-");
         assertThat(modules.getMaintainer()).isEqualTo("michael@fuin.org");
         assertThat(modules.getArch()).isEqualTo("amd64");
         assertThat(modules.getInstallationPath()).isEqualTo("/opt");
@@ -143,6 +141,11 @@ public class DebConfigTest {
 
         @Override
         public final void create(final File buildDirectory) {
+            // Do nothing
+        }
+
+        @Override
+        public final void replaceVariables(final Map<String, String> vars) {
             // Do nothing
         }
 

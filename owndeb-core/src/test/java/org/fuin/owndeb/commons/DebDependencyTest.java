@@ -18,9 +18,9 @@
 package org.fuin.owndeb.commons;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.fuin.owndeb.commons.DebUtils.XML_PREFIX;
-import static org.fuin.units4j.Units4JUtils.marshal;
-import static org.fuin.units4j.Units4JUtils.unmarshal;
+import static org.fuin.utils4j.JaxbUtils.XML_PREFIX;
+import static org.fuin.utils4j.JaxbUtils.marshal;
+import static org.fuin.utils4j.JaxbUtils.unmarshal;
 import static org.junit.Assert.fail;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;

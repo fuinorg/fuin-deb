@@ -37,15 +37,13 @@ public final class ExampleModuleTest {
         final String version = "1.0.0";
         final String description = "Example Module 1";
         final String maintainer = "michael@fuin.org";
-        final String prefix = "fuin-";
         final String arch = "amd64";
         final String installationPath = "/opt";
         final String section = "devel";
         final String priority = "low";
         final DebPackage pkg = new DebPackage("example1");
         final ExampleModule testee = new ExampleModule(version, description,
-                prefix, maintainer, arch, installationPath, section, priority,
-                pkg);
+                maintainer, arch, installationPath, section, priority, pkg);
 
         final File buildDir = new File("./target");
 
@@ -54,8 +52,8 @@ public final class ExampleModuleTest {
 
         // VERIFY
         final File changesFile = new File(buildDir,
-                "fuin-example1_1.0.0_amd64.changes");
-        final File debFile = new File(buildDir, "fuin-example1_1.0.0_amd64.deb");
+                "example1_1.0.0_amd64.changes");
+        final File debFile = new File(buildDir, "example1_1.0.0_amd64.deb");
         assertThat(changesFile).exists();
         assertThat(debFile).exists();
 

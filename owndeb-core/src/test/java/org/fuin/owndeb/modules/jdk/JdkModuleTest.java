@@ -39,14 +39,13 @@ public final class JdkModuleTest {
         final String version = "1.8.0.60";
         final String description = "Java SE Development Kit 8";
         final String maintainer = "michael@fuin.org";
-        final String prefix = "fuin-";
         final String arch = "amd64";
         final String installationPath = "/opt";
         final String section = "devel";
         final String priority = "low";
         final String jdkUrl = "http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jdk-8u60-linux-x64.tar.gz";
         final DebPackage pkg = new DebPackage("jdk8");
-        final JdkModule testee = new JdkModule(version, description, prefix,
+        final JdkModule testee = new JdkModule(version, description,
                 maintainer, arch, installationPath, section, priority, jdkUrl,
                 pkg);
 
@@ -57,8 +56,8 @@ public final class JdkModuleTest {
 
         // VERIFY
         final File changesFile = new File(buildDir,
-                "fuin-jdk8_1.8.0.60_amd64.changes");
-        final File debFile = new File(buildDir, "fuin-jdk8_1.8.0.60_amd64.deb");
+                "jdk8_1.8.0.60_amd64.changes");
+        final File debFile = new File(buildDir, "jdk8_1.8.0.60_amd64.deb");
         assertThat(changesFile).exists();
         assertThat(debFile).exists();
 

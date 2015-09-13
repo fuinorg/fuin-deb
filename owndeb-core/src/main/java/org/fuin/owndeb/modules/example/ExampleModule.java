@@ -62,8 +62,6 @@ public class ExampleModule extends DebModule {
      *            Package version.
      * @param description
      *            Package description.
-     * @param prefix
-     *            Prefix used to build the package like "fuin-".
      * @param maintainer
      *            Maintainer of the package.
      * @param arch
@@ -78,12 +76,12 @@ public class ExampleModule extends DebModule {
      *            Array of packages to create.
      */
     public ExampleModule(@Nullable final String version,
-            @Nullable final String description, @Nullable final String prefix,
+            @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
             @NotNull final DebPackage... packages) {
-        super(version, description, prefix, maintainer, arch, installationPath,
+        super(version, description, maintainer, arch, installationPath,
                 section, priority, packages);
     }
 
@@ -94,8 +92,6 @@ public class ExampleModule extends DebModule {
      *            Package version.
      * @param description
      *            Package description.
-     * @param prefix
-     *            Prefix used to build the package like "fuin-".
      * @param maintainer
      *            Maintainer of the package.
      * @param arch
@@ -110,12 +106,12 @@ public class ExampleModule extends DebModule {
      *            List of packages to create.
      */
     public ExampleModule(@Nullable final String version,
-            @Nullable final String description, @Nullable final String prefix,
+            @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
             @NotNull final List<DebPackage> packages) {
-        super(version, description, prefix, maintainer, arch, installationPath,
+        super(version, description, maintainer, arch, installationPath,
                 section, priority, packages);
     }
 
@@ -136,12 +132,12 @@ public class ExampleModule extends DebModule {
             final DebPackage debPackage = new DebPackage(pkg);
             debPackage.applyPackageDefaults(this);
 
-            LOG.info("Creating package: {}", debPackage.getPrefixedName());
+            LOG.info("Creating package: {}", debPackage.getName());
 
             final File packageDir = new File(buildDirectory,
-                    debPackage.getPrefixedName());
+                    debPackage.getName());
             final File controlDir = new File(buildDirectory,
-                    debPackage.getPrefixedName() + "-control");
+                    debPackage.getName() + "-control");
             final File helloFile = new File(packageDir, "hello.txt");
             DebUtils.copyResourceToFile(this.getClass(), "/" + getModuleName()
                     + "/hello.txt", helloFile);
@@ -155,6 +151,11 @@ public class ExampleModule extends DebModule {
 
         }
 
+    }
+
+    @Override
+    public final void replaceVariables(final Map<String, String> vars) {
+        replaceModuleVariables(vars);
     }
 
     private static void copyControlFiles(final DebPackage debPackage,

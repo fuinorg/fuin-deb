@@ -32,6 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.NotEmpty;
 import org.fuin.objects4j.common.Nullable;
+import org.fuin.utils4j.Utils4J;
 
 /**
  * A binary Debian package to create. Equals and hash code are based on the
@@ -74,8 +75,6 @@ public final class DebPackage extends AbstractPackage {
      *            Package version.
      * @param description
      *            Package description.
-     * @param prefix
-     *            Prefix used to build the package like "fuin-".
      * @param maintainer
      *            Maintainer of the package.
      * @param arch
@@ -91,12 +90,11 @@ public final class DebPackage extends AbstractPackage {
      */
     public DebPackage(@NotEmpty final String name,
             @Nullable final String version, @Nullable final String description,
-            @Nullable final String prefix, @Nullable final String maintainer,
-            @Nullable final String arch,
+            @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
             @Nullable final DebDependency... dependencies) {
-        super(version, description, prefix, maintainer, arch, installationPath,
+        super(version, description, maintainer, arch, installationPath,
                 section, priority);
         Contract.requireArgNotEmpty("name", name);
         this.name = name;
@@ -112,8 +110,6 @@ public final class DebPackage extends AbstractPackage {
      * 
      * @param name
      *            Unique package name.
-     * @param prefix
-     *            Prefix used to build the package like "fuin-".
      * @param maintainer
      *            Maintainer of the package.
      * @param arch
@@ -132,14 +128,13 @@ public final class DebPackage extends AbstractPackage {
      *            List of dependencies.
      */
     public DebPackage(@NotEmpty final String name,
-            @Nullable final String prefix, @Nullable final String maintainer,
-            @Nullable final String arch,
+            @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
             @Nullable final String version, @Nullable final String description,
             @Nullable final List<DebDependency> dependencies) {
-        super(prefix, maintainer, arch, installationPath, section, priority,
-                version, description);
+        super(maintainer, arch, installationPath, section, priority, version,
+                description);
         Contract.requireArgNotEmpty("name", name);
         this.name = name;
         this.dependencies = dependencies;
@@ -154,7 +149,7 @@ public final class DebPackage extends AbstractPackage {
     public DebPackage(@NotNull final DebPackage other) {
         super();
         Contract.requireArgNotNull("other", other);
-        applyPackageDefaults(other);
+        applyBaseDefaults(other);
         this.name = other.name;
         if (other.dependencies == null) {
             this.dependencies = null;
@@ -173,22 +168,12 @@ public final class DebPackage extends AbstractPackage {
     }
 
     /**
-     * Returns the prefixed package name.
-     * 
-     * @return Unique prefixed package name.
-     */
-    public final String getPrefixedName() {
-        return getPrefix() + name;
-    }
-
-    /**
      * Returns the Debian filename.
      * 
      * @return Filename of the package.
      */
     public final String getDebFilename() {
-        return getPrefixedName() + "_" + getVersion() + "_" + getArch()
-                + ".deb";
+        return getName() + "_" + getVersion() + "_" + getArch() + ".deb";
     }
 
     /**
@@ -224,19 +209,19 @@ public final class DebPackage extends AbstractPackage {
                     throw new IllegalStateException("Unresolved dependency: "
                             + dependency.getName());
                 }
-                sb.append(debPackage.getPrefixedName());
+                sb.append(debPackage.getName());
             }
         }
         return sb.toString();
     }
 
     /**
-     * Returns the installation path and the prefixed name.
+     * Returns the installation path and the name.
      * 
      * @return Full installation path.
      */
     public final String getFullInstallationPath() {
-        return getInstallationPath() + "/" + getPrefixedName();
+        return getInstallationPath() + "/" + getName();
     }
 
     /**
@@ -248,10 +233,26 @@ public final class DebPackage extends AbstractPackage {
     public final Map<String, String> getVariables() {
         final Map<String, String> vars = new HashMap<>();
         vars.putAll(getPackageVariables());
-        vars.put("package", getPrefixedName());
+        vars.put("package", getName());
         vars.put("fullInstallationPath", getFullInstallationPath());
         vars.put("depends", getDependenciesAsControlString());
         return vars;
+    }
+
+    /**
+     * Replaces variables in all properties.
+     * 
+     * @param vars
+     *            Variables to use.
+     */
+    public final void replaceVariables(@Nullable final Map<String, String> vars) {
+        replacePackageVariables(vars);
+        name = Utils4J.replaceVars(name, vars);
+        if (dependencies != null) {
+            for (final DebDependency dependency : dependencies) {
+                dependency.replaceVariables(vars);
+            }
+        }
     }
 
     @Override

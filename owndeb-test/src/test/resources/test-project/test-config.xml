@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <owndeb-config>
 
-	<modules prefix="abc-" maintainer="you@your.tld" arch="amd64" installation-path="/opt">
+	<variables>
+		<variable name="prefix" value="abc-" />
+	</variables>
+
+	<modules maintainer="you@your.tld" arch="amd64"
+		installation-path="/opt">
 
 		<example-module version="1.2.3">
-			<package name="p1" description="My Package 1" />
-            <package name="p2" description="My Package 2" />
+			<package name="${prefix}p1" description="My Package 1" />
+			<package name="${prefix}p2" description="My Package 2" />
 		</example-module>
 
 	</modules>

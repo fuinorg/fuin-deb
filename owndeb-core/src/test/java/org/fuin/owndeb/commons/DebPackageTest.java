@@ -18,9 +18,9 @@
 package org.fuin.owndeb.commons;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.fuin.owndeb.commons.DebUtils.XML_PREFIX;
-import static org.fuin.units4j.Units4JUtils.marshal;
-import static org.fuin.units4j.Units4JUtils.unmarshal;
+import static org.fuin.utils4j.JaxbUtils.XML_PREFIX;
+import static org.fuin.utils4j.JaxbUtils.marshal;
+import static org.fuin.utils4j.JaxbUtils.unmarshal;
 import static org.junit.Assert.fail;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
@@ -88,7 +88,6 @@ public class DebPackageTest {
         final String name = "abc";
         final String version = "1.2.3";
         final String description = "Aa Bb Cc";
-        final String prefix = "fuin-";
         final String maintainer = "michael@fuin.org";
         final String arch = "amd64";
         final String installationPath = "/opt";
@@ -97,8 +96,8 @@ public class DebPackageTest {
         final DebDependency depDef = new DebDependency("def");
         final DebDependency depGhi = new DebDependency("ghi");
         final DebPackage original = new DebPackage(name, version, description,
-                prefix, maintainer, arch, installationPath, section, priority,
-                depDef, depGhi);
+                maintainer, arch, installationPath, section, priority, depDef,
+                depGhi);
 
         // TEST
         final String xml = marshal(original, createXmlAdapter(),
@@ -110,9 +109,8 @@ public class DebPackageTest {
                 .assertXMLEqual(
                         XML_PREFIX
                                 + "<package name=\"abc\" version=\"1.2.3\" description=\"Aa Bb Cc\" "
-                                + "prefix=\"fuin-\" maintainer=\"michael@fuin.org\" arch=\"amd64\" "
-                                + "section=\"devel\" "
-                                + "priority=\"low\" "
+                                + "maintainer=\"michael@fuin.org\" arch=\"amd64\" "
+                                + "section=\"devel\" " + "priority=\"low\" "
                                 + "installation-path=\"/opt\">"
                                 + "    <dependency name=\"def\"/>"
                                 + "    <dependency name=\"ghi\"/>"
@@ -122,15 +120,13 @@ public class DebPackageTest {
         assertThat(copy.getName()).isEqualTo("abc");
         assertThat(copy.getVersion()).isEqualTo("1.2.3");
         assertThat(copy.getDescription()).isEqualTo("Aa Bb Cc");
-        assertThat(copy.getPrefix()).isEqualTo("fuin-");
         assertThat(copy.getMaintainer()).isEqualTo("michael@fuin.org");
         assertThat(copy.getArch()).isEqualTo("amd64");
         assertThat(copy.getInstallationPath()).isEqualTo("/opt");
         assertThat(copy.getSection()).isEqualTo("devel");
         assertThat(copy.getPriority()).isEqualTo("low");
         assertThat(copy.getDependencies()).containsOnly(depDef, depGhi);
-        assertThat(copy.getDebFilename()).isEqualTo("fuin-abc_1.2.3_amd64.deb");
-        assertThat(copy.getPrefixedName()).isEqualTo("fuin-abc");
+        assertThat(copy.getDebFilename()).isEqualTo("abc_1.2.3_amd64.deb");
     }
 
     @Test

@@ -17,6 +17,8 @@
  */
 package org.fuin.owndeb.commons;
 
+import java.util.Map;
+
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -24,6 +26,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.NotEmpty;
 import org.fuin.objects4j.common.Nullable;
+import org.fuin.utils4j.Utils4J;
 
 /**
  * Dependency to a package. Redefines equals and hash code based on the name.
@@ -90,6 +93,16 @@ public final class DebDependency {
         return resolvedDependency != null;
     }
 
+    /**
+     * Replaces variables in the properties.
+     * 
+     * @param vars
+     *            Variables to use.
+     */
+    public final void replaceVariables(@Nullable final Map<String, String> vars) {
+        name = Utils4J.replaceVars(name, vars);
+    }
+    
     @Override
     public final int hashCode() {
         return name.hashCode();
