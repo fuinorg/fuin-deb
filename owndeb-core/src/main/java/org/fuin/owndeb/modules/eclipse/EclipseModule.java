@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.owndeb.modules.jdk;
+package org.fuin.owndeb.modules.eclipse;
 
 import static org.fuin.owndeb.commons.DebUtils.writeReplacedResource;
 
@@ -31,15 +31,15 @@ import org.fuin.owndeb.commons.DebPackage;
 import org.fuin.owndeb.modules.base.AbstractDownloadTarGzModule;
 
 /**
- * Downloads and Oracle JDK and creates a binary Debian package from it.
+ * Downloads Eclipse and creates a binary Debian package from it.
  */
-@XmlRootElement(name = "jdk-module")
-public final class JdkModule extends AbstractDownloadTarGzModule {
+@XmlRootElement(name = "eclipse-module")
+public final class EclipseModule extends AbstractDownloadTarGzModule {
 
     /**
      * Default constructor for JAXB.
      */
-    protected JdkModule() {
+    protected EclipseModule() {
         super();
     }
 
@@ -60,19 +60,19 @@ public final class JdkModule extends AbstractDownloadTarGzModule {
      *            Section like "devel".
      * @param priority
      *            Priority like "low".
-     * @param jdkUrl
-     *            URL with "tar.gz" JDK file.
+     * @param url
+     *            URL with "tar.gz" file.
      * @param packages
      *            Array of packages to create.
      */
-    public JdkModule(@Nullable final String version,
+    public EclipseModule(@Nullable final String version,
             @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
-            @NotNull final String jdkUrl, @NotNull final DebPackage... packages) {
+            @NotNull final String url, @NotNull final DebPackage... packages) {
         super(version, description, maintainer, arch, installationPath,
-                section, priority, jdkUrl, packages);
+                section, priority, url, packages);
     }
 
     /**
@@ -92,25 +92,25 @@ public final class JdkModule extends AbstractDownloadTarGzModule {
      *            Section like "devel".
      * @param priority
      *            Priority like "low".
-     * @param jdkUrl
-     *            URL with "tar.gz" JDK file.
+     * @param url
+     *            URL with "tar.gz" file.
      * @param packages
      *            List of packages to create.
      */
-    public JdkModule(@Nullable final String version,
+    public EclipseModule(@Nullable final String version,
             @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
-            @NotNull final String jdkUrl,
+            @NotNull final String url,
             @NotNull final List<DebPackage> packages) {
         super(version, description, maintainer, arch, installationPath,
-                section, priority, jdkUrl, packages);
+                section, priority, url, packages);
     }
 
     @Override
     public final String getModuleName() {
-        return "jdk-module";
+        return "eclipse-module";
     }
 
     @Override
@@ -120,16 +120,16 @@ public final class JdkModule extends AbstractDownloadTarGzModule {
 
     @Override
     protected final void applyModifications(final File packageDir) {
-        // No modifications
+        // TODO Auto-generated method stub
     }
     
     @Override
     protected final void copyControlFiles(final DebPackage debPackage,
             final File controlDir) {
         final Map<String, String> vars = debPackage.getVariables();
-        writeReplacedResource(JdkModule.class, "/" + getModuleName()
+        writeReplacedResource(EclipseModule.class, "/" + getModuleName()
                 + "/control", controlDir, vars);
-        writeReplacedResource(JdkModule.class, "/" + getModuleName()
+        writeReplacedResource(EclipseModule.class, "/" + getModuleName()
                 + "/postinst", controlDir, vars);
     }
 

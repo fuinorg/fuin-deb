@@ -21,7 +21,7 @@
 
 		<eclipse-module version="4.4"
 			description="Eclipse Luna IDE for Java EE Developers"
-			url="http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/luna/SR2/eclipse-jee-luna-SR2-linux-gtk-x86_64.tar.gz">
+			url="http://ftp.halifax.rwth-aachen.de/eclipse/technology/epp/downloads/release/luna/SR2/eclipse-jee-luna-SR2-linux-gtk-x86_64.tar.gz">
 
 			<!-- The full name of the package is 'fuin-eclipse-jee-luna' (prefix+name) -->
 			<package name="${prefix}eclipse-jee-luna">
@@ -33,7 +33,7 @@
 
 		<eclipse-module version="4.5"
 			description="Eclipse Mars IDE for Java EE Developers"
-			url="http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/mars/R/eclipse-jee-mars-R-linux-gtk-x86_64.tar.gz">
+			url="http://ftp.halifax.rwth-aachen.de/eclipse/technology/epp/downloads/release/mars/R/eclipse-jee-mars-R-linux-gtk-x86_64.tar.gz">
 
 			<!-- The full name of the package is 'fuin-eclipse-jee-mars' (prefix+name) -->
 			<package name="${prefix}eclipse-jee-mars">
