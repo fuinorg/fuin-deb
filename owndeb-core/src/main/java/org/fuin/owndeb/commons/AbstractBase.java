@@ -282,7 +282,7 @@ public abstract class AbstractBase implements VariablesContainer {
                 this.arch = other.variableValue("arch");
             }
             if (installationPath == null) {
-                this.installationPath = other.variableValue("installationPath");
+                this.installationPath = other.variableValue("installation-path");
             }
             if (section == null) {
                 this.section = other.variableValue("section");
