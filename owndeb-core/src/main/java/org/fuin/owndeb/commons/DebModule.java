@@ -38,6 +38,8 @@ public abstract class DebModule extends AbstractPackage {
     @XmlElement(name = "package")
     private List<DebPackage> packages;
 
+    private transient DebModules parent;
+
     /**
      * Default constructor.
      */
@@ -181,6 +183,30 @@ public abstract class DebModule extends AbstractPackage {
         if (packages != null) {
             for (final DebPackage pkg : packages) {
                 pkg.resolveDependencies(resolver);
+            }
+        }
+    }
+
+    /**
+     * Returns the parent.
+     * 
+     * @return Current parent.
+     */
+    public final DebModules getParent() {
+        return parent;
+    }
+
+    /**
+     * Initializes the instance and it's childs.
+     * 
+     * @param parent
+     *            Current parent.
+     */
+    public final void init(@Nullable final DebModules parent) {
+        this.parent = parent;
+        if (packages != null) {
+            for (final DebPackage pkg : packages) {
+                pkg.init(this);
             }
         }
     }

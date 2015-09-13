@@ -28,7 +28,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.objects4j.common.Nullable;
 import org.fuin.owndeb.commons.DebPackage;
-import org.fuin.owndeb.commons.DebPackageResolver;
 import org.fuin.owndeb.modules.base.AbstractDownloadTarGzModule;
 
 /**
@@ -36,6 +35,9 @@ import org.fuin.owndeb.modules.base.AbstractDownloadTarGzModule;
  */
 @XmlRootElement(name = "jdk-module")
 public final class JdkModule extends AbstractDownloadTarGzModule {
+
+    /** Name of the module. */
+    public static final String NAME = "jdk-module";
 
     /**
      * Default constructor for JAXB.
@@ -111,7 +113,7 @@ public final class JdkModule extends AbstractDownloadTarGzModule {
 
     @Override
     public final String getModuleName() {
-        return "jdk-module";
+        return NAME;
     }
 
     @Override
@@ -133,6 +135,11 @@ public final class JdkModule extends AbstractDownloadTarGzModule {
                 + "/control", controlDir, vars);
         writeReplacedResource(JdkModule.class, "/" + getModuleName()
                 + "/postinst", controlDir, vars);
+    }
+
+    @Override
+    public final String toString() {
+        return getModuleName();
     }
 
 }

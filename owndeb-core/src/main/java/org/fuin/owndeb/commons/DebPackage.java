@@ -47,6 +47,8 @@ public final class DebPackage extends AbstractPackage {
     @XmlElement(name = "dependency")
     private List<DebDependency> dependencies;
 
+    private transient DebModule parent;
+
     /**
      * Default constructor for JAXB.
      */
@@ -64,6 +66,26 @@ public final class DebPackage extends AbstractPackage {
         super();
         Contract.requireArgNotEmpty("name", name);
         this.name = name;
+    }
+
+    /**
+     * Constructor with name and package array.
+     * 
+     * @param name
+     *            Unique package name.
+     * @param dependencies
+     *            Array of dependencies.
+     */
+    public DebPackage(@NotEmpty final String name,
+            @Nullable final DebDependency... dependencies) {
+        super();
+        Contract.requireArgNotEmpty("name", name);
+        this.name = name;
+        if (dependencies == null) {
+            this.dependencies = null;
+        } else {
+            this.dependencies = Arrays.asList(dependencies);
+        }
     }
 
     /**
@@ -110,6 +132,10 @@ public final class DebPackage extends AbstractPackage {
      * 
      * @param name
      *            Unique package name.
+     * @param version
+     *            Package version.
+     * @param description
+     *            Package description.
      * @param maintainer
      *            Maintainer of the package.
      * @param arch
@@ -120,18 +146,14 @@ public final class DebPackage extends AbstractPackage {
      *            Section like "devel".
      * @param priority
      *            Priority like "low".
-     * @param version
-     *            Package version.
-     * @param description
-     *            Package description.
      * @param dependencies
      *            List of dependencies.
      */
     public DebPackage(@NotEmpty final String name,
+            @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
-            @Nullable final String version, @Nullable final String description,
             @Nullable final List<DebDependency> dependencies) {
         super(maintainer, arch, installationPath, section, priority, version,
                 description);
@@ -156,6 +178,7 @@ public final class DebPackage extends AbstractPackage {
         } else {
             this.dependencies = new ArrayList<>(other.dependencies);
         }
+        this.parent = other.parent;
     }
 
     /**
@@ -266,9 +289,33 @@ public final class DebPackage extends AbstractPackage {
             for (final DebDependency dependency : dependencies) {
                 if (!dependency.resolve(resolver)) {
                     throw new IllegalStateException(
-                            "Unresolved dependency from package '" + name + "' to '"
-                                    + dependency.getName() + "'");
+                            "Unresolved dependency from package '" + name
+                                    + "' to '" + dependency.getName() + "'");
                 }
+            }
+        }
+    }
+
+    /**
+     * Returns the parent.
+     * 
+     * @return Current parent.
+     */
+    public final DebModule getParent() {
+        return parent;
+    }
+
+    /**
+     * Initializes the instance and it's childs.
+     * 
+     * @param parent
+     *            Current parent.
+     */
+    public final void init(@Nullable final DebModule parent) {
+        this.parent = parent;
+        if (dependencies != null) {
+            for (final DebDependency dependency : dependencies) {
+                dependency.init(this);
             }
         }
     }

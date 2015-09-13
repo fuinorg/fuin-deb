@@ -40,6 +40,8 @@ public final class DebModules extends AbstractPackage implements
     @XmlAnyElement(lax = true)
     private List<DebModule> modules;
 
+    private transient DebConfig parent;
+
     /**
      * Default constructor.
      */
@@ -169,6 +171,34 @@ public final class DebModules extends AbstractPackage implements
         if (modules != null) {
             for (final DebModule module : modules) {
                 module.resolveDependencies(this);
+            }
+        }
+    }
+
+    /**
+     * Returns the parent for this instance.
+     * 
+     * @return Current parent.
+     */
+    @Nullable
+    public final DebConfig getParent() {
+        return parent;
+    }
+
+    /**
+     * Initializes the instance and it's childs.
+     * 
+     * @param parent
+     *            Current parent.
+     * @param resolved
+     *            Known variables.
+     */
+    public final void init(@Nullable final DebConfig parent,
+            @Nullable final Map<String, String> resolved) {
+        this.parent = parent;
+        if (modules != null) {
+            for (final DebModule module : modules) {
+                module.init(this);
             }
         }
     }

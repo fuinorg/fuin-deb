@@ -27,14 +27,19 @@ import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.objects4j.common.Nullable;
+import org.fuin.owndeb.commons.DebDependency;
 import org.fuin.owndeb.commons.DebPackage;
 import org.fuin.owndeb.modules.base.AbstractDownloadTarGzModule;
+import org.fuin.owndeb.modules.jdk.JdkModule;
 
 /**
  * Downloads Eclipse and creates a binary Debian package from it.
  */
 @XmlRootElement(name = "eclipse-module")
 public final class EclipseModule extends AbstractDownloadTarGzModule {
+
+    /** Name of the module. */
+    public static final String NAME = "eclipse-module";
 
     /**
      * Default constructor for JAXB.
@@ -109,7 +114,7 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
 
     @Override
     public final String getModuleName() {
-        return "eclipse-module";
+        return NAME;
     }
 
     @Override
@@ -120,7 +125,22 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
     @Override
     protected final void applyModifications(final DebPackage debPackage,
             final File packageDir) {
-                
+
+        final String path = jdkFullInstallationPath(debPackage);
+        System.out.println(path);
+
+    }
+
+    private String jdkFullInstallationPath(final DebPackage debPackage) {
+        final List<DebDependency> dependencies = debPackage.getDependencies();
+        for (DebDependency dependency : dependencies) {
+            final DebPackage pkg = dependency.getResolvedDependency();
+            if (pkg != null && pkg.getParent() != null
+                    && pkg.getParent().getModuleName().equals(JdkModule.NAME)) {
+                return pkg.getFullInstallationPath();
+            }
+        }
+        return null;
     }
 
     @Override
@@ -131,6 +151,11 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
                 + "/control", controlDir, vars);
         writeReplacedResource(EclipseModule.class, "/" + getModuleName()
                 + "/postinst", controlDir, vars);
+    }
+
+    @Override
+    public final String toString() {
+        return getModuleName();
     }
 
 }

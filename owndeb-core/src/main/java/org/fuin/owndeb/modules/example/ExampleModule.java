@@ -207,4 +207,9 @@ public class ExampleModule extends DebModule {
 
     }
 
+    @Override
+    public final String toString() {
+        return getModuleName();
+    }
+
 }

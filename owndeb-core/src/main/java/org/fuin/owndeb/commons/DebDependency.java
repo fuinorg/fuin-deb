@@ -39,6 +39,8 @@ public final class DebDependency {
 
     private transient DebPackage resolvedDependency;
 
+    private transient DebPackage parent;
+
     /**
      * Default constructor for JAXB.
      */
@@ -102,7 +104,26 @@ public final class DebDependency {
     public final void replaceVariables(@Nullable final Map<String, String> vars) {
         name = Utils4J.replaceVars(name, vars);
     }
-    
+
+    /**
+     * Returns the parent.
+     * 
+     * @return Current parent.
+     */
+    public final DebPackage getParent() {
+        return parent;
+    }
+
+    /**
+     * Initializes the instance and it's childs.
+     * 
+     * @param parent
+     *            Current parent.
+     */
+    public final void init(@Nullable final DebPackage parent) {
+        this.parent = parent;
+    }
+
     @Override
     public final int hashCode() {
         return name.hashCode();

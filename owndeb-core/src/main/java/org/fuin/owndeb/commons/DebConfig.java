@@ -136,6 +136,7 @@ public final class DebConfig {
             }
         }
         if (modules != null) {
+            modules.init(this, resolved);
             modules.replaceModuleVariables(resolved);
             modules.applyModuleDefaults();
             modules.resolveDependencies();

@@ -48,6 +48,7 @@ public final class JdkModuleTest {
         final JdkModule testee = new JdkModule(version, description,
                 maintainer, arch, installationPath, section, priority, jdkUrl,
                 pkg);
+        testee.init(null);
 
         final File buildDir = new File("./target");
 
