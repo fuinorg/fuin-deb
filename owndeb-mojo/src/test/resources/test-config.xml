@@ -5,14 +5,12 @@
         <variable name="prefix" value="abc-" />
     </variables>
 
-	<modules maintainer="you@your.tld" arch="amd64"
+	<packages maintainer="you@your.tld" arch="amd64"
 		installation-path="/opt" section="devel" priority="low">
 
-		<example-module version="1.2.3">
-			<package name="${prefix}p1" description="My Package 1" />
-			<package name="${prefix}p2" description="My Package 2" />
-		</example-module>
+		<example-package name="${prefix}p1" version="1.2.3" description="My Package 1" />
+        <example-package name="${prefix}p2" version="1.2.3" description="My Package 2" />
 
-	</modules>
+	</packages>
 
 </owndeb-config>

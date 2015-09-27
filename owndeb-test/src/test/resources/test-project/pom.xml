@@ -36,7 +36,7 @@
 				<configuration>
 				    <config-file>./test-config.xml</config-file>
 					<module-classes>
-						<param>org.fuin.owndeb.modules.example.ExampleModule</param>
+						<param>org.fuin.owndeb.pkg.example.ExampleModule</param>
 					</module-classes>
 				</configuration>
 				<executions>

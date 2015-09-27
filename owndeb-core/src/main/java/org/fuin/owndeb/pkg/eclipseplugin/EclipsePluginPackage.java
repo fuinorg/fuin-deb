@@ -20,6 +20,7 @@ package org.fuin.owndeb.pkg.eclipseplugin;
 import static org.fuin.owndeb.commons.DebUtils.writeReplacedResource;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +50,8 @@ public class EclipsePluginPackage extends DebPackage {
 
     private static final String INSTALLIUS = "installIUs";
 
+    private static final String ECLIPSE_PACKAGE = "eclipse-package";
+
     /** Name of the package. */
     public static final String NAME = "eclipse-plugin-package";
 
@@ -60,6 +63,9 @@ public class EclipsePluginPackage extends DebPackage {
 
     @XmlAttribute(name = INSTALLIUS)
     private String installIUs;
+
+    @XmlAttribute(name = ECLIPSE_PACKAGE)
+    private String eclipsePackage;
 
     /**
      * Default constructor for JAXB.
@@ -91,6 +97,8 @@ public class EclipsePluginPackage extends DebPackage {
      *            Eclipse P2 repsoitory URL.
      * @param installIUs
      *            List of units to install.
+     * @param eclipsePackage
+     *            Name of the Eclipse package.
      * @param dependencies
      *            Array of dependencies.
      */
@@ -99,14 +107,13 @@ public class EclipsePluginPackage extends DebPackage {
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
-            @NotNull final String repository, @NotNull final String installIUs,
+            @NotEmpty final String repository,
+            @NotEmpty final String installIUs,
+            @NotEmpty final String eclipsePackage,
             @Nullable final DebDependency... dependencies) {
-        super(name, version, description, maintainer, arch, installationPath,
-                section, priority, dependencies);
-        Contract.requireArgNotNull(REPOSITORY, repository);
-        Contract.requireArgNotNull(INSTALLIUS, installIUs);
-        this.repository = repository;
-        this.installIUs = installIUs;
+        this(name, version, description, maintainer, arch, installationPath,
+                section, priority, repository, installIUs, eclipsePackage,
+                dependencies == null ? null : Arrays.asList(dependencies));
     }
 
     /**
@@ -132,6 +139,8 @@ public class EclipsePluginPackage extends DebPackage {
      *            Eclipse P2 repsoitory URL.
      * @param installIUs
      *            List of units to install.
+     * @param eclipsePackage
+     *            Name of the Eclipse package.
      * @param dependencies
      *            List of dependencies.
      */
@@ -141,13 +150,16 @@ public class EclipsePluginPackage extends DebPackage {
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
             @NotNull final String repository, @NotNull final String installIUs,
+            @NotEmpty final String eclipsePackage,
             @Nullable final List<DebDependency> dependencies) {
         super(name, version, description, maintainer, arch, installationPath,
                 section, priority, dependencies);
-        Contract.requireArgNotNull(REPOSITORY, repository);
-        Contract.requireArgNotNull(INSTALLIUS, installIUs);
+        Contract.requireArgNotEmpty("repository", repository);
+        Contract.requireArgNotEmpty("installIUs", installIUs);
+        Contract.requireArgNotEmpty("eclipsePackage", eclipsePackage);
         this.repository = repository;
         this.installIUs = installIUs;
+        this.eclipsePackage = eclipsePackage;
     }
 
     /**
@@ -168,6 +180,16 @@ public class EclipsePluginPackage extends DebPackage {
     @NotNull
     public final String getInstallIUs() {
         return variableValue(INSTALLIUS);
+    }
+
+    /**
+     * Returns the Eclipse package.
+     * 
+     * @return Package name.
+     */
+    @NotNull
+    public final String getEclipsePackage() {
+        return variableValue(ECLIPSE_PACKAGE);
     }
 
     @Override
@@ -196,6 +218,7 @@ public class EclipsePluginPackage extends DebPackage {
         initPackage(parent);
         addOrReplaceVariable(REPOSITORY, repository);
         addOrReplaceVariable(INSTALLIUS, installIUs);
+        addOrReplaceVariable(ECLIPSE_PACKAGE, eclipsePackage);
         resolveVariables();
     }
 

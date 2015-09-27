@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.fuin.owndeb.OwnDeb;
@@ -49,27 +48,27 @@ public final class OwnDebMojo extends AbstractMojo {
     @Parameter(name = "target-dir", property = "project.build.directory")
     private File targetDir = new File("./target");
 
-    /** A list of module classes to be bound to the JAXB context. */
-    @Parameter(name = "module-classes")
-    private String[] moduleClasses;
+    /** A list of package classes to be bound to the JAXB context. */
+    @Parameter(name = "package-classes")
+    private String[] packageClasses;
 
     /**
-     * Returns the list of module classes to be bound to the JAXB context.
+     * Returns the list of package classes to be bound to the JAXB context.
      * 
-     * @return Full qualified module class names.
+     * @return Full qualified package class names.
      */
-    public final String[] getModuleClasses() {
-        return moduleClasses;
+    public final String[] getPackageClasses() {
+        return packageClasses;
     }
 
     /**
-     * Sets the list of module classes to be bound to the JAXB context.
+     * Sets the list of package classes to be bound to the JAXB context.
      * 
      * @param moduleClasses
-     *            Full qualified module class names.
+     *            Full qualified package class names.
      */
-    public final void setModuleClasses(final String[] moduleClasses) {
-        this.moduleClasses = moduleClasses;
+    public final void setPackageClasses(final String[] moduleClasses) {
+        this.packageClasses = moduleClasses;
     }
 
     /**
@@ -147,8 +146,8 @@ public final class OwnDebMojo extends AbstractMojo {
             throws MojoExecutionException {
         final Set<Class<?>> classes = new HashSet<Class<?>>();
         classes.add(DebConfig.class);
-        if ((moduleClasses != null) && (moduleClasses.length > 0)) {
-            for (final String name : moduleClasses) {
+        if ((packageClasses != null) && (packageClasses.length > 0)) {
+            for (final String name : packageClasses) {
                 try {
                     final Class<?> clasz = classLoader.loadClass(name);
                     classes.add(clasz);

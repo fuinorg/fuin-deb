@@ -22,7 +22,7 @@ import static org.assertj.core.api.StrictAssertions.assertThat;
 import java.io.File;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.fuin.owndeb.modules.example.ExampleModule;
+import org.fuin.owndeb.pkg.example.ExamplePackage;
 import org.junit.Test;
 
 /**
@@ -42,7 +42,7 @@ public class OwnDebMojoTest {
         final OwnDebMojo testee = new OwnDebMojo();
         testee.setConfigFile(file);
         testee.setTargetDir(buildDir);
-        testee.setModuleClasses(new String[] { ExampleModule.class.getName() });
+        testee.setPackageClasses(new String[] { ExamplePackage.class.getName() });
 
         // TEST
         testee.execute();
@@ -58,8 +58,8 @@ public class OwnDebMojoTest {
         final File changesFile2 = new File(buildDir,
                 "abc-p2_1.2.3_amd64.changes");
         final File debFile2 = new File(buildDir, "abc-p2_1.2.3_amd64.deb");
-        assertThat(changesFile1).exists();
-        assertThat(debFile1).exists();
+        assertThat(changesFile2).exists();
+        assertThat(debFile2).exists();
 
     }
 
