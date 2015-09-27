@@ -35,9 +35,9 @@
 				<version>1.0.0-SNAPSHOT</version>
 				<configuration>
 				    <config-file>./test-config.xml</config-file>
-					<module-classes>
-						<param>org.fuin.owndeb.pkg.example.ExampleModule</param>
-					</module-classes>
+					<package-classes>
+						<param>org.fuin.owndeb.pkg.example.ExamplePackage</param>
+					</package-classes>
 				</configuration>
 				<executions>
 					<execution>

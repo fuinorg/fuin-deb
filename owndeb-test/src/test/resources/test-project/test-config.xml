@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <owndeb-config>
 
-	<variables>
-		<variable name="prefix" value="abc-" />
-	</variables>
+    <variables>
+        <variable name="prefix" value="abc-" />
+    </variables>
 
 	<packages maintainer="you@your.tld" arch="amd64"
-		installation-path="/opt">
+		installation-path="/opt" section="devel" priority="low">
 
-		<example-package name="${prefix}p1" version="1.2.3"
-			description="My Package 1" />
-			
-		<example-package name="${prefix}p2" version="1.2.3"
-			description="My Package 2" />
+		<example-package name="${prefix}p1" version="1.2.3" description="My Package 1" />
+        <example-package name="${prefix}p2" version="1.2.3" description="My Package 2" />
 
 	</packages>
 

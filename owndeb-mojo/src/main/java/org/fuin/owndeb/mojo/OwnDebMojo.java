@@ -148,6 +148,7 @@ public final class OwnDebMojo extends AbstractMojo {
         classes.add(DebConfig.class);
         if ((packageClasses != null) && (packageClasses.length > 0)) {
             for (final String name : packageClasses) {
+                LOG.info("Load package class: " + name);
                 try {
                     final Class<?> clasz = classLoader.loadClass(name);
                     classes.add(clasz);
