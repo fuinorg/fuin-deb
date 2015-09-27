@@ -31,7 +31,7 @@ import org.fuin.objects4j.common.Contract;
 import org.fuin.owndeb.commons.DebConfig;
 import org.fuin.owndeb.commons.DebPackage;
 import org.fuin.owndeb.commons.DebPackages;
-import org.fuin.owndeb.modules.jdk.JdkPackage;
+import org.fuin.owndeb.pkg.jdk.JdkPackage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

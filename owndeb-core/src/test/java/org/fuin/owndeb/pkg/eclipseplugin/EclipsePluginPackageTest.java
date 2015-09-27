@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.owndeb.modules.eclipseplugin;
+package org.fuin.owndeb.pkg.eclipseplugin;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.fuin.utils4j.JaxbUtils.unmarshal;
@@ -26,8 +26,9 @@ import java.net.URL;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.fuin.owndeb.commons.DebConfig;
-import org.fuin.owndeb.modules.eclipse.EclipsePackage;
-import org.fuin.owndeb.modules.jdk.JdkPackage;
+import org.fuin.owndeb.pkg.eclipse.EclipsePackage;
+import org.fuin.owndeb.pkg.eclipseplugin.EclipsePluginPackage;
+import org.fuin.owndeb.pkg.jdk.JdkPackage;
 import org.fuin.utils4j.Utils4J;
 import org.junit.Test;
 

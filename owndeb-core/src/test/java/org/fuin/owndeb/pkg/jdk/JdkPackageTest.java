@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.owndeb.modules.jdk;
+package org.fuin.owndeb.pkg.jdk;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -23,6 +23,7 @@ import java.io.File;
 
 import org.fuin.owndeb.commons.DebPackage;
 import org.fuin.owndeb.commons.DebPackageResolver;
+import org.fuin.owndeb.pkg.jdk.JdkPackage;
 import org.junit.Ignore;
 import org.junit.Test;
 

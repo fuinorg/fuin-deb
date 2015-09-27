@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.owndeb.modules.jdk;
+package org.fuin.owndeb.pkg.eclipse;
 
 import static org.fuin.owndeb.commons.DebUtils.writeReplacedResource;
 
@@ -24,34 +24,44 @@ import java.util.List;
 import java.util.Map;
 
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.objects4j.common.NotEmpty;
 import org.fuin.objects4j.common.Nullable;
 import org.fuin.owndeb.commons.DebDependency;
-import org.fuin.owndeb.commons.DebPackage;
 import org.fuin.owndeb.commons.DebPackages;
 import org.fuin.owndeb.commons.DebUtils;
-import org.fuin.owndeb.modules.base.AbstractDownloadTarGzPackage;
+import org.fuin.owndeb.pkg.base.AbstractDownloadTarGzPackage;
 
 /**
- * Downloads and Oracle JDK and creates a binary Debian package from it.
+ * Downloads Eclipse and creates a binary Debian package from it.
  */
-@XmlRootElement(name = "jdk-package")
-public final class JdkPackage extends AbstractDownloadTarGzPackage {
+@XmlRootElement(name = "eclipse-package")
+public final class EclipsePackage extends AbstractDownloadTarGzPackage {
+
+    private static final String VMARGS = "vmargs";
+
+    private static final String VM = "vm";
 
     /** Name of the package. */
-    public static final String NAME = "jdk-package";
+    public static final String NAME = "eclipse-package";
+
+    @XmlAttribute(name = VM)
+    private String vm;
+
+    @XmlAttribute(name = VMARGS)
+    private String vmArgs;
 
     /**
      * Default constructor for JAXB.
      */
-    protected JdkPackage() {
+    protected EclipsePackage() {
         super();
     }
 
     /**
-     * Constructor with dependency array.
+     * Constructor with package array.
      * 
      * @param name
      *            Unique package name.
@@ -69,24 +79,24 @@ public final class JdkPackage extends AbstractDownloadTarGzPackage {
      *            Section like "devel".
      * @param priority
      *            Priority like "low".
-     * @param jdkUrl
-     *            URL with "tar.gz" JDK file.
+     * @param url
+     *            URL with "tar.gz" file.
      * @param dependencies
      *            Array of dependencies.
      */
-    public JdkPackage(@NotEmpty final String name,
+    public EclipsePackage(@NotEmpty final String name,
             @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
-            @NotNull final String jdkUrl,
+            @NotNull final String url,
             @Nullable final DebDependency... dependencies) {
         super(name, version, description, maintainer, arch, installationPath,
-                section, priority, jdkUrl, dependencies);
+                section, priority, url, dependencies);
     }
 
     /**
-     * Constructor with dependency list.
+     * Constructor with package list.
      * 
      * @param name
      *            Unique package name.
@@ -104,20 +114,20 @@ public final class JdkPackage extends AbstractDownloadTarGzPackage {
      *            Section like "devel".
      * @param priority
      *            Priority like "low".
-     * @param jdkUrl
-     *            URL with "tar.gz" JDK file.
+     * @param url
+     *            URL with "tar.gz" file.
      * @param dependencies
      *            List of dependencies.
      */
-    public JdkPackage(@NotEmpty final String name,
+    public EclipsePackage(@NotEmpty final String name,
             @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
-            @NotNull final String jdkUrl,
+            @NotNull final String url,
             @Nullable final List<DebDependency> dependencies) {
         super(name, version, description, maintainer, arch, installationPath,
-                section, priority, jdkUrl, dependencies);
+                section, priority, url, dependencies);
     }
 
     @Override
@@ -125,25 +135,51 @@ public final class JdkPackage extends AbstractDownloadTarGzPackage {
         return NAME;
     }
 
-    @Override
-    public final void init(@Nullable final DebPackages parent) {
-        addNonExistingVariables(parent);
-        initDownloadTarGzPackage(parent);
-        resolveVariables();
+    /**
+     * Returns the VM settings.
+     * 
+     * @return VM or <code>null</code>.
+     */
+    @Nullable
+    public final String getVm() {
+        return variableValue(VM);
+    }
+
+    /**
+     * Returns the VM arguments.
+     * 
+     * @return VM arguments or <code>null</code>.
+     */
+    @Nullable
+    public final String getVmArgs() {
+        return variableValue(VMARGS);
     }
 
     @Override
     protected final void applyModifications(final File packageDir) {
-        // No modifications
+
+    }
+
+    /**
+     * Initializes the instance and it's childs.
+     * 
+     * @param parent
+     *            Current parent.
+     */
+    public final void init(@Nullable final DebPackages parent) {
+        addNonExistingVariables(parent);
+        initDownloadTarGzPackage(parent);
+        addOrReplaceVariable(VM, vm);
+        addOrReplaceVariable(VMARGS, vmArgs);
+        resolveVariables();
     }
 
     @Override
     protected final void copyControlFiles(final File controlDir) {
-        final Map<String, String> vars = DebUtils.asMap(getParent()
-                .getVariables());
-        writeReplacedResource(JdkPackage.class, "/" + getPackageName()
+        final Map<String, String> vars = DebUtils.asMap(getVariables());
+        writeReplacedResource(EclipsePackage.class, "/" + getPackageName()
                 + "/control", controlDir, vars);
-        writeReplacedResource(JdkPackage.class, "/" + getPackageName()
+        writeReplacedResource(EclipsePackage.class, "/" + getPackageName()
                 + "/postinst", controlDir, vars);
     }
 

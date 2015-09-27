@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.owndeb.modules.eclipse;
+package org.fuin.owndeb.pkg.example;
 
 import static org.fuin.owndeb.commons.DebUtils.writeReplacedResource;
 
@@ -23,45 +23,41 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.tools.ant.Project;
+import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.NotEmpty;
 import org.fuin.objects4j.common.Nullable;
 import org.fuin.owndeb.commons.DebDependency;
+import org.fuin.owndeb.commons.DebPackage;
 import org.fuin.owndeb.commons.DebPackages;
 import org.fuin.owndeb.commons.DebUtils;
-import org.fuin.owndeb.modules.base.AbstractDownloadTarGzPackage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.vafer.jdeb.ant.Data;
+import org.vafer.jdeb.ant.DebAntTask;
+import org.vafer.jdeb.ant.Mapper;
 
 /**
- * Downloads Eclipse and creates a binary Debian package from it.
+ * Example package that only installs a "hello.txt" file into the '/opt'
+ * directory.
  */
-@XmlRootElement(name = "eclipse-package")
-public final class EclipsePackage extends AbstractDownloadTarGzPackage {
+@XmlRootElement(name = "example-package")
+public class ExamplePackage extends DebPackage {
 
-    private static final String VMARGS = "vmargs";
-
-    private static final String VM = "vm";
-
-    /** Name of the package. */
-    public static final String NAME = "eclipse-package";
-
-    @XmlAttribute(name = VM)
-    private String vm;
-
-    @XmlAttribute(name = VMARGS)
-    private String vmArgs;
+    private static final Logger LOG = LoggerFactory
+            .getLogger(ExamplePackage.class);
 
     /**
      * Default constructor for JAXB.
      */
-    protected EclipsePackage() {
+    protected ExamplePackage() {
         super();
     }
 
     /**
-     * Constructor with package array.
+     * Constructor with dependency array.
      * 
      * @param name
      *            Unique package name.
@@ -79,24 +75,21 @@ public final class EclipsePackage extends AbstractDownloadTarGzPackage {
      *            Section like "devel".
      * @param priority
      *            Priority like "low".
-     * @param url
-     *            URL with "tar.gz" file.
      * @param dependencies
      *            Array of dependencies.
      */
-    public EclipsePackage(@NotEmpty final String name,
+    public ExamplePackage(@NotEmpty final String name,
             @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
-            @NotNull final String url,
             @Nullable final DebDependency... dependencies) {
         super(name, version, description, maintainer, arch, installationPath,
-                section, priority, url, dependencies);
+                section, priority, dependencies);
     }
 
     /**
-     * Constructor with package list.
+     * Constructor with dependency list.
      * 
      * @param name
      *            Unique package name.
@@ -114,73 +107,99 @@ public final class EclipsePackage extends AbstractDownloadTarGzPackage {
      *            Section like "devel".
      * @param priority
      *            Priority like "low".
-     * @param url
-     *            URL with "tar.gz" file.
      * @param dependencies
      *            List of dependencies.
      */
-    public EclipsePackage(@NotEmpty final String name,
+    public ExamplePackage(@NotEmpty final String name,
             @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
-            @NotNull final String url,
             @Nullable final List<DebDependency> dependencies) {
         super(name, version, description, maintainer, arch, installationPath,
-                section, priority, url, dependencies);
+                section, priority, dependencies);
     }
 
     @Override
     public final String getPackageName() {
-        return NAME;
-    }
-
-    /**
-     * Returns the VM settings.
-     * 
-     * @return VM or <code>null</code>.
-     */
-    @Nullable
-    public final String getVm() {
-        return variableValue(VM);
-    }
-
-    /**
-     * Returns the VM arguments.
-     * 
-     * @return VM arguments or <code>null</code>.
-     */
-    @Nullable
-    public final String getVmArgs() {
-        return variableValue(VMARGS);
+        return "example-package";
     }
 
     @Override
-    protected final void applyModifications(final File packageDir) {
+    public final void create(final File buildDirectory) {
+
+        Contract.requireArgNotNull("buildDirectory", buildDirectory);
+        LOG.info("Creating package in: {}", buildDirectory);
+
+        final File packageDir = new File(buildDirectory, getName());
+        final File controlDir = new File(buildDirectory, getName() + "-control");
+        final File helloFile = new File(packageDir, "hello.txt");
+        DebUtils.copyResourceToFile(this.getClass(), "/" + getPackageName()
+                + "/hello.txt", helloFile);
+
+        LOG.debug("packageDir: {}", packageDir);
+        LOG.debug("controlDir: {}", controlDir);
+
+        copyControlFiles(this, getPackageName(), controlDir);
+        createDebianPackage(this, buildDirectory, controlDir, packageDir);
 
     }
 
-    /**
-     * Initializes the instance and it's childs.
-     * 
-     * @param parent
-     *            Current parent.
-     */
+    @Override
     public final void init(@Nullable final DebPackages parent) {
         addNonExistingVariables(parent);
-        initDownloadTarGzPackage(parent);
-        addOrReplaceVariable(VM, vm);
-        addOrReplaceVariable(VMARGS, vmArgs);
+        initPackage(parent);
         resolveVariables();
     }
 
-    @Override
-    protected final void copyControlFiles(final File controlDir) {
-        final Map<String, String> vars = DebUtils.asMap(getVariables());
-        writeReplacedResource(EclipsePackage.class, "/" + getPackageName()
+    private static void copyControlFiles(final DebPackage debPackage,
+            final String packageName, final File controlDir) {
+
+        DebUtils.mkdirs(controlDir);
+        final Map<String, String> vars = DebUtils.asMap(debPackage
+                .getVariables());
+        writeReplacedResource(ExamplePackage.class, "/" + packageName
                 + "/control", controlDir, vars);
-        writeReplacedResource(EclipsePackage.class, "/" + getPackageName()
-                + "/postinst", controlDir, vars);
+
+    }
+
+    private static void createDebianPackage(final DebPackage debPackage,
+            final File buildDirectory, final File controlDir,
+            final File packageDir) {
+
+        LOG.info("Start creating Debian package");
+
+        final File debName = new File(buildDirectory,
+                debPackage.getDebFilename());
+
+        LOG.debug("packageDir: {}", packageDir);
+        LOG.debug("controlDir: {}", controlDir);
+        LOG.debug("debName: {}", debName);
+
+        final Project project = new Project();
+
+        final DebAntTask task = new DebAntTask();
+        task.setProject(project);
+        task.setDestfile(debName);
+        task.setControl(controlDir);
+
+        final Data data = new Data();
+        data.setSrc(packageDir);
+        data.setType("directory");
+        final Mapper mapper = new Mapper();
+        mapper.setType("perm");
+        mapper.setPrefix(debPackage.getInstallationPath() + "/"
+                + packageDir.getName());
+        mapper.setUser("root");
+        mapper.setGroup("developer");
+        data.addMapper(mapper);
+
+        task.addData(data);
+
+        task.execute();
+
+        LOG.info("Finished creating Debian package");
+
     }
 
     @Override
