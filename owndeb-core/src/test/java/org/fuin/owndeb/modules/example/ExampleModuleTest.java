@@ -22,6 +22,7 @@ import static org.fest.assertions.Assertions.assertThat;
 import java.io.File;
 
 import org.fuin.owndeb.commons.DebPackage;
+import org.fuin.owndeb.commons.DebPackageResolver;
 import org.junit.Test;
 
 /**
@@ -45,6 +46,13 @@ public final class ExampleModuleTest {
         final ExampleModule testee = new ExampleModule(version, description,
                 maintainer, arch, installationPath, section, priority, pkg);
         testee.init(null);
+        testee.resolveDependencies(new DebPackageResolver() {
+            @Override
+            public DebPackage findDebPackage(final String packageName) {
+                // Nothing to resolve in this test
+                return null;
+            }
+        });
 
         final File buildDir = new File("./target");
 
