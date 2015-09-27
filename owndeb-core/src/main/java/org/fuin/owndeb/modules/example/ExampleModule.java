@@ -23,15 +23,15 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.tools.ant.Project;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.NotEmpty;
 import org.fuin.objects4j.common.Nullable;
+import org.fuin.owndeb.commons.DebDependency;
 import org.fuin.owndeb.commons.DebModule;
 import org.fuin.owndeb.commons.DebModules;
-import org.fuin.owndeb.commons.DebPackage;
 import org.fuin.owndeb.commons.DebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,8 +57,10 @@ public class ExampleModule extends DebModule {
     }
 
     /**
-     * Constructor with package array.
+     * Constructor with dependency array.
      * 
+     * @param name
+     *            Unique package name.
      * @param version
      *            Package version.
      * @param description
@@ -73,22 +75,24 @@ public class ExampleModule extends DebModule {
      *            Section like "devel".
      * @param priority
      *            Priority like "low".
-     * @param packages
-     *            Array of packages to create.
+     * @param dependencies
+     *            Array of dependencies.
      */
-    public ExampleModule(@Nullable final String version,
-            @Nullable final String description,
+    public ExampleModule(@NotEmpty final String name,
+            @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
-            @NotNull final DebPackage... packages) {
-        super(version, description, maintainer, arch, installationPath,
-                section, priority, packages);
+            @Nullable final DebDependency... dependencies) {
+        super(name, version, description, maintainer, arch, installationPath,
+                section, priority, dependencies);
     }
 
     /**
-     * Constructor with package list.
+     * Constructor with dependency list.
      * 
+     * @param name
+     *            Unique package name.
      * @param version
      *            Package version.
      * @param description
@@ -103,17 +107,17 @@ public class ExampleModule extends DebModule {
      *            Section like "devel".
      * @param priority
      *            Priority like "low".
-     * @param packages
-     *            List of packages to create.
+     * @param dependencies
+     *            List of dependencies.
      */
-    public ExampleModule(@Nullable final String version,
-            @Nullable final String description,
+    public ExampleModule(@NotEmpty final String name,
+            @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
-            @NotNull final List<DebPackage> packages) {
-        super(version, description, maintainer, arch, installationPath,
-                section, priority, packages);
+            @Nullable final List<DebDependency> dependencies) {
+        super(name, version, description, maintainer, arch, installationPath,
+                section, priority, dependencies);
     }
 
     @Override
@@ -127,27 +131,17 @@ public class ExampleModule extends DebModule {
         Contract.requireArgNotNull("buildDirectory", buildDirectory);
         LOG.info("Creating module in: {}", buildDirectory);
 
-        final List<DebPackage> debPackages = getPackages();
-        for (final DebPackage pkg : debPackages) {
+        final File packageDir = new File(buildDirectory, getName());
+        final File controlDir = new File(buildDirectory, getName() + "-control");
+        final File helloFile = new File(packageDir, "hello.txt");
+        DebUtils.copyResourceToFile(this.getClass(), "/" + getModuleName()
+                + "/hello.txt", helloFile);
 
-            LOG.info("Creating package: {}", pkg.getName());
+        LOG.debug("packageDir: {}", packageDir);
+        LOG.debug("controlDir: {}", controlDir);
 
-            final File packageDir = new File(buildDirectory,
-                    pkg.getName());
-            final File controlDir = new File(buildDirectory,
-                    pkg.getName() + "-control");
-            final File helloFile = new File(packageDir, "hello.txt");
-            DebUtils.copyResourceToFile(this.getClass(), "/" + getModuleName()
-                    + "/hello.txt", helloFile);
-
-            LOG.debug("packageDir: {}", packageDir);
-            LOG.debug("controlDir: {}", controlDir);
-
-            copyControlFiles(pkg, getModuleName(), controlDir);
-            createDebianPackage(pkg, buildDirectory, controlDir,
-                    packageDir);
-
-        }
+        copyControlFiles(this, getModuleName(), controlDir);
+        createDebianPackage(this, buildDirectory, controlDir, packageDir);
 
     }
 
@@ -158,7 +152,7 @@ public class ExampleModule extends DebModule {
         resolveVariables();
     }
 
-    private static void copyControlFiles(final DebPackage debPackage,
+    private static void copyControlFiles(final DebModule debPackage,
             final String moduleName, final File controlDir) {
 
         DebUtils.mkdirs(controlDir);
@@ -169,7 +163,7 @@ public class ExampleModule extends DebModule {
 
     }
 
-    private static void createDebianPackage(final DebPackage debPackage,
+    private static void createDebianPackage(final DebModule debPackage,
             final File buildDirectory, final File controlDir,
             final File packageDir) {
 

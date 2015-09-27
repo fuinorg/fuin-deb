@@ -27,14 +27,13 @@ import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.fuin.objects4j.common.NotEmpty;
 import org.fuin.objects4j.common.Nullable;
+import org.fuin.owndeb.commons.DebDependency;
+import org.fuin.owndeb.commons.DebModule;
 import org.fuin.owndeb.commons.DebModules;
-import org.fuin.owndeb.commons.DebPackage;
 import org.fuin.owndeb.commons.DebUtils;
-import org.fuin.owndeb.commons.Variable;
 import org.fuin.owndeb.modules.base.AbstractDownloadTarGzModule;
-import org.fuin.utils4j.Utils4J;
-import org.fuin.utils4j.VariableResolver;
 
 /**
  * Downloads Eclipse and creates a binary Debian package from it.
@@ -65,6 +64,8 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
     /**
      * Constructor with package array.
      * 
+     * @param name
+     *            Unique package name.
      * @param version
      *            Package version.
      * @param description
@@ -81,22 +82,25 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
      *            Priority like "low".
      * @param url
      *            URL with "tar.gz" file.
-     * @param packages
-     *            Array of packages to create.
+     * @param dependencies
+     *            Array of dependencies.
      */
-    public EclipseModule(@Nullable final String version,
-            @Nullable final String description,
+    public EclipseModule(@NotEmpty final String name,
+            @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
-            @NotNull final String url, @NotNull final DebPackage... packages) {
-        super(version, description, maintainer, arch, installationPath,
-                section, priority, url, packages);
+            @NotNull final String url,
+            @Nullable final DebDependency... dependencies) {
+        super(name, version, description, maintainer, arch, installationPath,
+                section, priority, url, dependencies);
     }
 
     /**
      * Constructor with package list.
      * 
+     * @param name
+     *            Unique package name.
      * @param version
      *            Package version.
      * @param description
@@ -113,17 +117,18 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
      *            Priority like "low".
      * @param url
      *            URL with "tar.gz" file.
-     * @param packages
-     *            List of packages to create.
+     * @param dependencies
+     *            List of dependencies.
      */
-    public EclipseModule(@Nullable final String version,
-            @Nullable final String description,
+    public EclipseModule(@NotEmpty final String name,
+            @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
-            @NotNull final String url, @NotNull final List<DebPackage> packages) {
-        super(version, description, maintainer, arch, installationPath,
-                section, priority, url, packages);
+            @NotNull final String url,
+            @Nullable final List<DebDependency> dependencies) {
+        super(name, version, description, maintainer, arch, installationPath,
+                section, priority, url, dependencies);
     }
 
     @Override
@@ -152,7 +157,7 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
     }
 
     @Override
-    protected final void applyModifications(final DebPackage debPackage,
+    protected final void applyModifications(final DebModule debPackage,
             final File packageDir) {
 
     }
@@ -172,9 +177,10 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
     }
 
     @Override
-    protected final void copyControlFiles(final DebPackage debPackage,
+    protected final void copyControlFiles(final DebModule debPackage,
             final File controlDir) {
-        final Map<String, String> vars = DebUtils.asMap(debPackage.getVariables());
+        final Map<String, String> vars = DebUtils.asMap(debPackage
+                .getVariables());
         writeReplacedResource(EclipseModule.class, "/" + getModuleName()
                 + "/control", controlDir, vars);
         writeReplacedResource(EclipseModule.class, "/" + getModuleName()

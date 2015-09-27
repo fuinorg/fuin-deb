@@ -21,7 +21,8 @@ import static org.fest.assertions.Assertions.assertThat;
 
 import java.io.File;
 
-import org.fuin.owndeb.commons.DebPackage;
+import org.fuin.owndeb.commons.DebModule;
+import org.fuin.owndeb.commons.DebPackageResolver;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -36,6 +37,7 @@ public final class JdkModuleTest {
     public final void testCreate() {
 
         // PREPARE
+        final String name = "jdk8";
         final String version = "1.8.0.60";
         final String description = "Java SE Development Kit 8";
         final String maintainer = "michael@fuin.org";
@@ -44,11 +46,16 @@ public final class JdkModuleTest {
         final String section = "devel";
         final String priority = "low";
         final String jdkUrl = "http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jdk-8u60-linux-x64.tar.gz";
-        final DebPackage pkg = new DebPackage("jdk8");
-        final JdkModule testee = new JdkModule(version, description,
-                maintainer, arch, installationPath, section, priority, jdkUrl,
-                pkg);
+        final JdkModule testee = new JdkModule(name, version, description,
+                maintainer, arch, installationPath, section, priority, jdkUrl);
         testee.init(null);
+        testee.resolveDependencies(new DebPackageResolver() {
+            @Override
+            public DebModule findDebPackage(String packageName) {
+                // Nothing to resolve
+                return null;
+            }
+        });
 
         final File buildDir = new File("./target");
 

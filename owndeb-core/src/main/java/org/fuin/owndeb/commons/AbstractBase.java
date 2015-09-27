@@ -125,7 +125,7 @@ public abstract class AbstractBase implements VariablesContainer {
     public final String getInstallationPath() {
         return variableValue(INSTALLATION_PATH);
     }
-    
+
     /**
      * Returns the installation path.
      * 

@@ -55,22 +55,12 @@ public final class EclipsePluginModuleTest {
         testee.create(buildDir);
 
         // VERIFY
-
-        // Luna
         final File changesFileLuna = new File(buildDir,
                 "fuin-eclipse-jee-luna-plugins-checkstyle_6.5.0_amd64.changes");
         final File debFileLuna = new File(buildDir,
                 "fuin-eclipse-jee-luna-plugins-checkstyle_6.5.0_amd64.deb");
         assertThat(changesFileLuna).exists();
         assertThat(debFileLuna).exists();
-
-        // Mars
-        final File changesFileMars = new File(buildDir,
-                "fuin-eclipse-jee-mars-plugins-checkstyle_6.5.0_amd64.changes");
-        final File debFileMars = new File(buildDir,
-                "fuin-eclipse-jee-mars-plugins-checkstyle_6.5.0_amd64.deb");
-        assertThat(changesFileMars).exists();
-        assertThat(debFileMars).exists();
 
     }
 

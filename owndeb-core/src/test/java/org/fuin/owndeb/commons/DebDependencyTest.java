@@ -23,6 +23,8 @@ import static org.fuin.utils4j.JaxbUtils.marshal;
 import static org.fuin.utils4j.JaxbUtils.unmarshal;
 import static org.junit.Assert.fail;
 
+import java.io.File;
+
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -118,10 +120,22 @@ public class DebDependencyTest {
     public final void testResolveTrue() {
 
         // PREPARE
-        final DebPackage pkg = new DebPackage(NAME);
+        final DebModule pkg = new DebModule(NAME) {
+            @Override
+            public String getModuleName() {
+                return "whatever";
+            }
+            @Override
+            public void create(File buildDirectory) {                
+            }
+            @Override
+            public void init(DebModules parent) {
+            }
+            
+        };
         final DebPackageResolver resolver = new DebPackageResolver() {
             @Override
-            public DebPackage findDebPackage(final String packageName) {
+            public DebModule findDebPackage(final String packageName) {
                 return pkg;
             }
         };
@@ -141,7 +155,7 @@ public class DebDependencyTest {
         // PREPARE
         final DebPackageResolver resolver = new DebPackageResolver() {
             @Override
-            public DebPackage findDebPackage(final String packageName) {
+            public DebModule findDebPackage(final String packageName) {
                 return null;
             }
         };

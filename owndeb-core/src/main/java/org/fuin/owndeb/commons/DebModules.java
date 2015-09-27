@@ -122,12 +122,11 @@ public final class DebModules extends AbstractPackage implements
     }
 
     @Override
-    public final DebPackage findDebPackage(final String packageName) {
+    public final DebModule findDebPackage(final String packageName) {
         if (modules != null) {
             for (final DebModule module : modules) {
-                final DebPackage pkg = module.findPackageByName(packageName);
-                if (pkg != null) {
-                    return pkg;
+                if (module.getName() != packageName) {
+                    return module;
                 }
             }
         }
@@ -158,7 +157,7 @@ public final class DebModules extends AbstractPackage implements
             for (final DebModule module : modules) {
                 module.init(this);
             }
-        }        
+        }
     }
 
 }

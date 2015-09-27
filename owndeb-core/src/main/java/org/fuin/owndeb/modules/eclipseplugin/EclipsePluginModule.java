@@ -18,7 +18,6 @@
 package org.fuin.owndeb.modules.eclipseplugin;
 
 import static org.fuin.owndeb.commons.DebUtils.writeReplacedResource;
-import static org.fuin.utils4j.JaxbUtils.marshal;
 
 import java.io.File;
 import java.util.List;
@@ -30,10 +29,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.tools.ant.Project;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.NotEmpty;
 import org.fuin.objects4j.common.Nullable;
+import org.fuin.owndeb.commons.DebDependency;
 import org.fuin.owndeb.commons.DebModule;
 import org.fuin.owndeb.commons.DebModules;
-import org.fuin.owndeb.commons.DebPackage;
 import org.fuin.owndeb.commons.DebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,8 +69,10 @@ public class EclipsePluginModule extends DebModule {
     }
 
     /**
-     * Constructor with package array.
+     * Constructor with dependencies array.
      * 
+     * @param name
+     *            Unique package name.
      * @param version
      *            Package version.
      * @param description
@@ -89,18 +91,18 @@ public class EclipsePluginModule extends DebModule {
      *            Eclipse P2 repsoitory URL.
      * @param installIUs
      *            List of units to install.
-     * @param packages
-     *            Array of packages to create.
+     * @param dependencies
+     *            Array of dependencies.
      */
-    public EclipsePluginModule(@Nullable final String version,
-            @Nullable final String description,
+    public EclipsePluginModule(@NotEmpty final String name,
+            @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
             @NotNull final String repository, @NotNull final String installIUs,
-            @NotNull final DebPackage... packages) {
-        super(version, description, maintainer, arch, installationPath,
-                section, priority, packages);
+            @Nullable final DebDependency... dependencies) {
+        super(name, version, description, maintainer, arch, installationPath,
+                section, priority, dependencies);
         Contract.requireArgNotNull(REPOSITORY, repository);
         Contract.requireArgNotNull(INSTALLIUS, installIUs);
         this.repository = repository;
@@ -108,8 +110,10 @@ public class EclipsePluginModule extends DebModule {
     }
 
     /**
-     * Constructor with package list.
+     * Constructor with dependencies list.
      * 
+     * @param name
+     *            Unique package name.
      * @param version
      *            Package version.
      * @param description
@@ -128,18 +132,18 @@ public class EclipsePluginModule extends DebModule {
      *            Eclipse P2 repsoitory URL.
      * @param installIUs
      *            List of units to install.
-     * @param packages
-     *            List of packages to create.
+     * @param dependencies
+     *            List of dependencies.
      */
-    public EclipsePluginModule(@Nullable final String version,
-            @Nullable final String description,
+    public EclipsePluginModule(@NotEmpty final String name,
+            @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
             @NotNull final String repository, @NotNull final String installIUs,
-            @NotNull final List<DebPackage> packages) {
-        super(version, description, maintainer, arch, installationPath,
-                section, priority, packages);
+            @Nullable final List<DebDependency> dependencies) {
+        super(name, version, description, maintainer, arch, installationPath,
+                section, priority, dependencies);
         Contract.requireArgNotNull(REPOSITORY, repository);
         Contract.requireArgNotNull(INSTALLIUS, installIUs);
         this.repository = repository;
@@ -177,20 +181,12 @@ public class EclipsePluginModule extends DebModule {
         Contract.requireArgNotNull("buildDirectory", buildDirectory);
         LOG.info("Creating module in: {}", buildDirectory);
 
-        final List<DebPackage> debPackages = getPackages();
-        for (final DebPackage pkg : debPackages) {
+        final File controlDir = new File(buildDirectory, getName() + "-control");
 
-            LOG.info("Creating package: {}", pkg.getName());
+        LOG.debug("controlDir: {}", controlDir);
 
-            final File controlDir = new File(buildDirectory,
-                    pkg.getName() + "-control");
-
-            LOG.debug("controlDir: {}", controlDir);
-
-            copyControlFiles(pkg, getModuleName(), controlDir);
-            createDebianPackage(pkg, buildDirectory, controlDir);
-
-        }
+        copyControlFiles(this, getModuleName(), controlDir);
+        createDebianPackage(this, buildDirectory, controlDir);
 
     }
 
@@ -203,7 +199,7 @@ public class EclipsePluginModule extends DebModule {
         resolveVariables();
     }
 
-    private static void copyControlFiles(final DebPackage debPackage,
+    private static void copyControlFiles(final DebModule debPackage,
             final String moduleName, final File controlDir) {
 
         DebUtils.mkdirs(controlDir);
@@ -218,7 +214,7 @@ public class EclipsePluginModule extends DebModule {
 
     }
 
-    private static void createDebianPackage(final DebPackage debPackage,
+    private static void createDebianPackage(final DebModule debPackage,
             final File buildDirectory, final File controlDir) {
 
         LOG.info("Start creating package " + debPackage.getName());

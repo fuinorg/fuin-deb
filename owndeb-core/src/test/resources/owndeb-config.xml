@@ -11,58 +11,59 @@
 		installation-path="/opt" section="devel" priority="low">
 
         <!-- Every module can override the inherited properties -->
-		<jdk-module version="1.8.0.60" description="Java SE Development Kit 8"
-			url="http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jdk-8u60-linux-x64.tar.gz">
+		<jdk-module
+		    name="${prefix}jdk8" 
+		    version="1.8.0.60" description="Java SE Development Kit 8"
+			url="http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jdk-8u60-linux-x64.tar.gz" />
 
-			<!-- The full name of the package is 'fuin-jdk8' (prefix+name) -->
-			<package name="${prefix}jdk8" />
-
-		</jdk-module>
-
-		<eclipse-module version="4.4"
+		<eclipse-module
+		    name="${prefix}eclipse-jee-luna" 
+		    version="4.4"
 			description="Eclipse Luna IDE for Java EE Developers"
 			url="http://ftp.halifax.rwth-aachen.de/eclipse/technology/epp/downloads/release/luna/SR2/eclipse-jee-luna-SR2-linux-gtk-x86_64.tar.gz"
             vm="${installation-path}/${prefix}jdk8/bin/java"
             vmargs="-Dosgi.requiredJavaVersion=1.6 -XX:MaxPermSize=256m -Xms128m -Xmx1024m">
 
-			<package name="${prefix}eclipse-jee-luna">
-				<!-- Requires the module jdk8 to be installed -->
-				<dependency name="${prefix}jdk8" />
-			</package>
+			<dependency name="${prefix}jdk8" />
 
 		</eclipse-module>
 
-		<eclipse-module version="4.5"
+		<eclipse-module
+		    name="${prefix}eclipse-jee-mars" 
+		    version="4.5"
 			description="Eclipse Mars IDE for Java EE Developers"
 			url="http://ftp.halifax.rwth-aachen.de/eclipse/technology/epp/downloads/release/mars/R/eclipse-jee-mars-R-linux-gtk-x86_64.tar.gz"
             vm="${installation-path}/${prefix}jdk8/bin/java"
             vmargs="-Dosgi.requiredJavaVersion=1.6 -XX:MaxPermSize=256m -Xms128m -Xmx1024m">
 
-			<package name="${prefix}eclipse-jee-mars">
-				<!-- Requires the module jdk8 to be installed -->
-				<dependency name="${prefix}jdk8" />
-			</package>
+			<!-- Requires the module jdk8 to be installed -->
+			<dependency name="${prefix}jdk8" />
 
 		</eclipse-module>
 
-		<eclipse-plugin-module version="6.5.0"
-			repository="http://eclipse-cs.sourceforge.net/update/" installIUs="net.sf.eclipsecs.feature.group">
-
-			<!-- Creates two binary packages with different names, descriptions and dependencies -->
-
-			<!-- Requires Eclipse Luna to be installed -->
-			<package name="${prefix}eclipse-jee-luna-plugins-checkstyle"
-				description="Eclipse Luna Checkstyle Plugin">
-				<dependency name="${prefix}eclipse-jee-luna" />
-			</package>
-
-			<!-- Requires Eclipse Mars to be installed -->
-			<package name="${prefix}eclipse-jee-mars-plugins-checkstyle"
-				description="Eclipse Mars Checkstyle Plugin">
-				<dependency name="${prefix}eclipse-jee-mars" />
-			</package>
-
+		<eclipse-plugin-module
+		    name="${prefix}eclipse-jee-luna-plugins-checkstyle" 
+		    version="6.5.0"
+            description="Eclipse Luna Checkstyle Plugin"
+			repository="http://eclipse-cs.sourceforge.net/update/"
+			installIUs="net.sf.eclipsecs.feature.group"
+			eclipse="${prefix}eclipse-jee-luna">
+			
+			<!-- Dependency to Eclipse Luna is defined using the 'eclipse' attribute above -->
+			
 		</eclipse-plugin-module>
+
+        <eclipse-plugin-module
+            name="${prefix}eclipse-jee-mars-plugins-checkstyle"
+            version="6.5.0"
+            description="Eclipse Mars Checkstyle Plugin" 
+            repository="http://eclipse-cs.sourceforge.net/update/"
+            installIUs="net.sf.eclipsecs.feature.group"
+            eclipse="${prefix}eclipse-jee-mars">
+            
+            <!-- Dependency to Eclipse Mars is defined using the 'eclipse' attribute above -->
+            
+        </eclipse-plugin-module>
 
 	</modules>
 

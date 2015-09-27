@@ -36,6 +36,6 @@ public interface DebPackageResolver {
      *         exists.
      */
     @Nullable
-    public DebPackage findDebPackage(@NotNull String packageName);
+    public DebModule findDebPackage(@NotNull String packageName);
 
 }

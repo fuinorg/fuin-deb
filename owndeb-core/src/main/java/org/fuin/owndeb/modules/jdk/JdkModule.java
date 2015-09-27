@@ -26,14 +26,13 @@ import java.util.Map;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.fuin.objects4j.common.NotEmpty;
 import org.fuin.objects4j.common.Nullable;
+import org.fuin.owndeb.commons.DebDependency;
+import org.fuin.owndeb.commons.DebModule;
 import org.fuin.owndeb.commons.DebModules;
-import org.fuin.owndeb.commons.DebPackage;
 import org.fuin.owndeb.commons.DebUtils;
-import org.fuin.owndeb.commons.Variable;
 import org.fuin.owndeb.modules.base.AbstractDownloadTarGzModule;
-import org.fuin.utils4j.Utils4J;
-import org.fuin.utils4j.VariableResolver;
 
 /**
  * Downloads and Oracle JDK and creates a binary Debian package from it.
@@ -52,8 +51,10 @@ public final class JdkModule extends AbstractDownloadTarGzModule {
     }
 
     /**
-     * Constructor with package array.
+     * Constructor with dependency array.
      * 
+     * @param name
+     *            Unique package name.
      * @param version
      *            Package version.
      * @param description
@@ -70,50 +71,53 @@ public final class JdkModule extends AbstractDownloadTarGzModule {
      *            Priority like "low".
      * @param jdkUrl
      *            URL with "tar.gz" JDK file.
-     * @param packages
-     *            Array of packages to create.
+     * @param dependencies
+     *            Array of dependencies.
      */
-    public JdkModule(@Nullable final String version,
-            @Nullable final String description,
-            @Nullable final String maintainer, @Nullable final String arch,
-            @Nullable final String installationPath,
-            @Nullable final String section, @Nullable final String priority,
-            @NotNull final String jdkUrl, @NotNull final DebPackage... packages) {
-        super(version, description, maintainer, arch, installationPath,
-                section, priority, jdkUrl, packages);
-    }
-
-    /**
-     * Constructor with package list.
-     * 
-     * @param version
-     *            Package version.
-     * @param description
-     *            Package description.
-     * @param maintainer
-     *            Maintainer of the package.
-     * @param arch
-     *            Architecture identifier like "amd64".
-     * @param installationPath
-     *            Installation path like "/opt".
-     * @param section
-     *            Section like "devel".
-     * @param priority
-     *            Priority like "low".
-     * @param jdkUrl
-     *            URL with "tar.gz" JDK file.
-     * @param packages
-     *            List of packages to create.
-     */
-    public JdkModule(@Nullable final String version,
-            @Nullable final String description,
+    public JdkModule(@NotEmpty final String name,
+            @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
             @NotNull final String jdkUrl,
-            @NotNull final List<DebPackage> packages) {
-        super(version, description, maintainer, arch, installationPath,
-                section, priority, jdkUrl, packages);
+            @Nullable final DebDependency... dependencies) {
+        super(name, version, description, maintainer, arch, installationPath,
+                section, priority, jdkUrl, dependencies);
+    }
+
+    /**
+     * Constructor with dependency list.
+     * 
+     * @param name
+     *            Unique package name.
+     * @param version
+     *            Package version.
+     * @param description
+     *            Package description.
+     * @param maintainer
+     *            Maintainer of the package.
+     * @param arch
+     *            Architecture identifier like "amd64".
+     * @param installationPath
+     *            Installation path like "/opt".
+     * @param section
+     *            Section like "devel".
+     * @param priority
+     *            Priority like "low".
+     * @param jdkUrl
+     *            URL with "tar.gz" JDK file.
+     * @param dependencies
+     *            List of dependencies.
+     */
+    public JdkModule(@NotEmpty final String name,
+            @Nullable final String version, @Nullable final String description,
+            @Nullable final String maintainer, @Nullable final String arch,
+            @Nullable final String installationPath,
+            @Nullable final String section, @Nullable final String priority,
+            @NotNull final String jdkUrl,
+            @Nullable final List<DebDependency> dependencies) {
+        super(name, version, description, maintainer, arch, installationPath,
+                section, priority, jdkUrl, dependencies);
     }
 
     @Override
@@ -129,13 +133,13 @@ public final class JdkModule extends AbstractDownloadTarGzModule {
     }
 
     @Override
-    protected final void applyModifications(final DebPackage debPackage,
+    protected final void applyModifications(final DebModule debPackage,
             final File packageDir) {
         // No modifications
     }
 
     @Override
-    protected final void copyControlFiles(final DebPackage debPackage,
+    protected final void copyControlFiles(final DebModule debPackage,
             final File controlDir) {
         final Map<String, String> vars = DebUtils.asMap(getParent()
                 .getVariables());

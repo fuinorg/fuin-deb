@@ -17,7 +17,6 @@
  */
 package org.fuin.owndeb.commons;
 
-import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
 
 import org.fuin.objects4j.common.Nullable;

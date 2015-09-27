@@ -23,10 +23,11 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.ContractViolationException;
+import org.fuin.objects4j.common.NotEmpty;
 import org.fuin.objects4j.common.Nullable;
 
 /**
@@ -34,8 +35,17 @@ import org.fuin.objects4j.common.Nullable;
  */
 public abstract class DebModule extends AbstractPackage {
 
-    @XmlElement(name = "package")
-    private List<DebPackage> packages;
+    private static final String DEPENDS = "depends";
+
+    private static final String FULL_INSTALLATION_PATH = "fullInstallationPath";
+
+    private static final String NAME = "name";
+
+    @XmlAttribute(name = NAME)
+    private String name;
+
+    @XmlElement(name = "dependency")
+    private List<DebDependency> dependencies;
 
     /**
      * Default constructor.
@@ -45,8 +55,20 @@ public abstract class DebModule extends AbstractPackage {
     }
 
     /**
-     * Constructor with package array.
+     * Constructor with mandator name.
      * 
+     * @param name
+     *            Unique package name.
+     */
+    public DebModule(@NotEmpty final String name) {
+        this(name, null, null, null, null, null, null, null);
+    }
+
+    /**
+     * Constructor with dependency array.
+     * 
+     * @param name
+     *            Unique package name.
      * @param version
      *            Package version.
      * @param description
@@ -57,26 +79,29 @@ public abstract class DebModule extends AbstractPackage {
      *            Architecture identifier like "amd64".
      * @param installationPath
      *            Installation path like "/opt".
-     * @param packages
-     *            Array of packages to create.
      * @param section
      *            Section like "devel".
      * @param priority
      *            Priority like "low".
+     * @param dependencies
+     *            Array of dependencies.
      */
-    public DebModule(@Nullable final String version,
-            @Nullable final String description,
+    public DebModule(@NotEmpty final String name,
+            @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
-            @NotNull final DebPackage... packages) {
-        this(version, description, maintainer, arch, installationPath, section,
-                priority, Arrays.asList(packages));
+            @Nullable final DebDependency... dependencies) {
+        this(name, version, description, maintainer, arch, installationPath,
+                section, priority, dependencies == null ? null : Arrays
+                        .asList(dependencies));
     }
 
     /**
      * Constructor with package list.
      * 
+     * @param name
+     *            Unique package name.
      * @param version
      *            Package version.
      * @param description
@@ -91,52 +116,94 @@ public abstract class DebModule extends AbstractPackage {
      *            Section like "devel".
      * @param priority
      *            Priority like "low".
-     * @param packages
-     *            List of packages to create.
+     * @param dependencies
+     *            List of dependencies.
      */
-    public DebModule(@Nullable final String version,
-            @Nullable final String description,
+    public DebModule(@NotEmpty final String name,
+            @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
-            @NotNull final List<DebPackage> packages) {
+            @Nullable final List<DebDependency> dependencies) {
         super(version, description, maintainer, arch, installationPath,
                 section, priority);
-        Contract.requireArgNotNull("packages", packages);
-        if (packages.isEmpty()) {
-            throw new ContractViolationException(
-                    "The list 'packages' cannot be ampty");
+        Contract.requireArgNotEmpty("name", name);
+        this.name = name;
+        this.dependencies = dependencies;
+    }
+
+    /**
+     * Returns the package name.
+     * 
+     * @return Unique package name.
+     */
+    public final String getName() {
+        return variableValue(NAME);
+    }
+
+    /**
+     * Returns the package name.
+     * 
+     * @return Unique package name.
+     */
+    public final String getNameIntern() {
+        return name;
+    }
+
+    /**
+     * Returns the Debian filename.
+     * 
+     * @return Filename of the package.
+     */
+    public final String getDebFilename() {
+        return getName() + "_" + getVersion() + "_" + getArch() + ".deb";
+    }
+
+    /**
+     * Returns the list of dependencies.
+     * 
+     * @return Immutable dependency list.
+     */
+    @Nullable
+    public final List<DebDependency> getDependencies() {
+        if (dependencies == null) {
+            return null;
         }
-        this.packages = packages;
+        return Collections.unmodifiableList(dependencies);
     }
 
     /**
-     * Returns the list of packages to create.
+     * Returns the list of dependencies as comma separated string.
      * 
-     * @return Immutable package list.
+     * @return All dependency names.
      */
-    public final List<DebPackage> getPackages() {
-        return Collections.unmodifiableList(packages);
-    }
-
-    /**
-     * Locates a package by it's name.
-     * 
-     * @param packageName
-     *            Name of the package to find.
-     * 
-     * @return Package or <code>null</code> if no package with the given name
-     *         was found.
-     */
-    public final DebPackage findPackageByName(final String packageName) {
-        if (packages != null) {
-            for (final DebPackage pkg : packages) {
-                if (pkg.getName().equals(packageName)) {
-                    return pkg;
+    @NotNull
+    public final String getDependenciesAsControlString() {
+        final StringBuilder sb = new StringBuilder();
+        if (dependencies != null) {
+            for (int i = 0; i < dependencies.size(); i++) {
+                if (i > 0) {
+                    sb.append(", ");
                 }
+                final DebDependency dependency = dependencies.get(i);
+                final DebModule debPackage = dependency.getResolvedDependency();
+                if (debPackage == null) {
+                    throw new IllegalStateException("Unresolved dependency: "
+                            + dependency.getName());
+                }
+                sb.append(debPackage.getName());
             }
         }
-        return null;
+        return sb.toString();
+    }
+
+    /**
+     * Returns the installation path and the name.
+     * 
+     * @return Full installation path.
+     */
+    public final String getFullInstallationPath() {
+        return variableValue(FULL_INSTALLATION_PATH);
     }
 
     /**
@@ -146,24 +213,34 @@ public abstract class DebModule extends AbstractPackage {
      *            Knows all packages.
      */
     public final void resolveDependencies(final DebPackageResolver resolver) {
-        if (packages != null) {
-            for (final DebPackage pkg : packages) {
-                pkg.resolveDependencies(resolver);
+        if (dependencies != null) {
+            for (final DebDependency dependency : dependencies) {
+                if (!dependency.resolve(resolver)) {
+                    throw new IllegalStateException(
+                            "Unresolved dependency from package '" + name
+                                    + "' to '" + dependency.getName() + "'");
+                }
             }
         }
+        addOrReplaceVariable(DEPENDS, getDependenciesAsControlString());
     }
 
-        /**
+    /**
      * Initialize the module.
      * 
      * @param parent
      *            Parent to set.
      */
     public final void initModule(final DebModules parent) {
+        addNonExistingVariables(parent);
         initPackage(parent);
-        if (packages != null) {
-            for (final DebPackage pkg : packages) {
-                pkg.init(this);
+        addOrReplaceVariable(NAME, name);
+        addOrReplaceVariable(FULL_INSTALLATION_PATH,
+                getInstallationPathIntern() + "/" + getNameIntern());
+        resolveVariables();
+        if (dependencies != null) {
+            for (final DebDependency dependency : dependencies) {
+                dependency.init(this);
             }
         }
     }
