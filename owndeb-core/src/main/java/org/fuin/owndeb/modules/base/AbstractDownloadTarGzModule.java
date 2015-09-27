@@ -50,10 +50,12 @@ import org.vafer.jdeb.ant.Mapper;
  */
 public abstract class AbstractDownloadTarGzModule extends DebModule {
 
+    private static final String URL = "url";
+
     private static final Logger LOG = LoggerFactory
             .getLogger(AbstractDownloadTarGzModule.class);
 
-    @XmlAttribute(name = "url")
+    @XmlAttribute(name = URL)
     private String urlStr;
 
     /**
@@ -93,7 +95,7 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
             @NotNull final String url, @NotNull final DebPackage... packages) {
         super(version, description, maintainer, arch, installationPath,
                 section, priority, packages);
-        Contract.requireArgNotNull("url", url);
+        Contract.requireArgNotNull(URL, url);
         this.urlStr = url;
     }
 
@@ -127,7 +129,7 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
             @NotNull final String url, @NotNull final List<DebPackage> packages) {
         super(version, description, maintainer, arch, installationPath,
                 section, priority, packages);
-        Contract.requireArgNotNull("url", url);
+        Contract.requireArgNotNull(URL, url);
         this.urlStr = url;
     }
 
@@ -179,7 +181,7 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
      */
     protected final void initDownloadTarGzModule(final DebModules parent) {
         initModule(parent);
-        addOrReplaceVariable("url", urlStr);
+        addOrReplaceVariable(URL, urlStr);
     }
 
     /**
@@ -188,7 +190,7 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
      * @return URL.
      */
     public final String getUrlStr() {
-        return variableValue("url");
+        return variableValue(URL);
     }
 
     /**

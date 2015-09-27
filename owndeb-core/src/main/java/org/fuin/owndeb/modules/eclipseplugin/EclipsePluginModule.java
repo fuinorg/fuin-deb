@@ -45,16 +45,20 @@ import org.vafer.jdeb.ant.DebAntTask;
 @XmlRootElement(name = "eclipse-plugin-module")
 public class EclipsePluginModule extends DebModule {
 
+    private static final String REPOSITORY = "repository";
+
+    private static final String INSTALLIUS = "installIUs";
+
     /** Name of the module. */
     public static final String NAME = "eclipse-plugin-module";
 
     private static final Logger LOG = LoggerFactory
             .getLogger(EclipsePluginModule.class);
 
-    @XmlAttribute(name = "repository")
+    @XmlAttribute(name = REPOSITORY)
     private String repository;
 
-    @XmlAttribute(name = "installIUs")
+    @XmlAttribute(name = INSTALLIUS)
     private String installIUs;
 
     /**
@@ -97,8 +101,8 @@ public class EclipsePluginModule extends DebModule {
             @NotNull final DebPackage... packages) {
         super(version, description, maintainer, arch, installationPath,
                 section, priority, packages);
-        Contract.requireArgNotNull("repository", repository);
-        Contract.requireArgNotNull("installIUs", installIUs);
+        Contract.requireArgNotNull(REPOSITORY, repository);
+        Contract.requireArgNotNull(INSTALLIUS, installIUs);
         this.repository = repository;
         this.installIUs = installIUs;
     }
@@ -136,8 +140,8 @@ public class EclipsePluginModule extends DebModule {
             @NotNull final List<DebPackage> packages) {
         super(version, description, maintainer, arch, installationPath,
                 section, priority, packages);
-        Contract.requireArgNotNull("repository", repository);
-        Contract.requireArgNotNull("installIUs", installIUs);
+        Contract.requireArgNotNull(REPOSITORY, repository);
+        Contract.requireArgNotNull(INSTALLIUS, installIUs);
         this.repository = repository;
         this.installIUs = installIUs;
     }
@@ -149,7 +153,7 @@ public class EclipsePluginModule extends DebModule {
      */
     @NotNull
     public final String getRepository() {
-        return variableValue("repository");
+        return variableValue(REPOSITORY);
     }
 
     /**
@@ -159,7 +163,7 @@ public class EclipsePluginModule extends DebModule {
      */
     @NotNull
     public final String getInstallIUs() {
-        return variableValue("installIUs");
+        return variableValue(INSTALLIUS);
     }
 
     @Override
@@ -194,8 +198,8 @@ public class EclipsePluginModule extends DebModule {
     public final void init(@Nullable final DebModules parent) {
         addNonExistingVariables(parent);
         initModule(parent);
-        addOrReplaceVariable("repository", repository);
-        addOrReplaceVariable("installIUs", installIUs);
+        addOrReplaceVariable(REPOSITORY, repository);
+        addOrReplaceVariable(INSTALLIUS, installIUs);
         resolveVariables();
     }
 

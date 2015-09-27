@@ -33,19 +33,29 @@ import org.fuin.objects4j.common.Nullable;
  */
 public abstract class AbstractBase implements VariablesContainer {
 
-    @XmlAttribute(name = "maintainer")
+    private static final String PRIORITY = "priority";
+
+    private static final String SECTION = "section";
+
+    private static final String INSTALLATION_PATH = "installation-path";
+
+    private static final String ARCH = "arch";
+
+    private static final String MAINTAINER = "maintainer";
+
+    @XmlAttribute(name = MAINTAINER)
     private String maintainer;
 
-    @XmlAttribute(name = "arch")
+    @XmlAttribute(name = ARCH)
     private String arch;
 
-    @XmlAttribute(name = "installation-path")
+    @XmlAttribute(name = INSTALLATION_PATH)
     private String installationPath;
 
-    @XmlAttribute(name = "section")
+    @XmlAttribute(name = SECTION)
     private String section;
 
-    @XmlAttribute(name = "priority")
+    @XmlAttribute(name = PRIORITY)
     private String priority;
 
     @XmlElement(name = "variable")
@@ -93,7 +103,7 @@ public abstract class AbstractBase implements VariablesContainer {
      */
     @Nullable
     public final String getMaintainer() {
-        return variableValue("maintainer");
+        return variableValue(MAINTAINER);
     }
 
     /**
@@ -103,7 +113,7 @@ public abstract class AbstractBase implements VariablesContainer {
      */
     @Nullable
     public final String getArch() {
-        return variableValue("arch");
+        return variableValue(ARCH);
     }
 
     /**
@@ -113,7 +123,17 @@ public abstract class AbstractBase implements VariablesContainer {
      */
     @Nullable
     public final String getInstallationPath() {
-        return variableValue("installation-path");
+        return variableValue(INSTALLATION_PATH);
+    }
+    
+    /**
+     * Returns the installation path.
+     * 
+     * @return Installation path like "/opt".
+     */
+    @Nullable
+    protected final String getInstallationPathIntern() {
+        return installationPath;
     }
 
     /**
@@ -123,7 +143,7 @@ public abstract class AbstractBase implements VariablesContainer {
      */
     @Nullable
     public final String getSection() {
-        return variableValue("section");
+        return variableValue(SECTION);
     }
 
     /**
@@ -133,7 +153,7 @@ public abstract class AbstractBase implements VariablesContainer {
      */
     @Nullable
     public final String getPriority() {
-        return variableValue("priority");
+        return variableValue(PRIORITY);
     }
 
     @Override
@@ -233,11 +253,11 @@ public abstract class AbstractBase implements VariablesContainer {
      */
     public final void initBase(@Nullable final VariablesContainer parent) {
         this.parent = parent;
-        addOrReplaceVariable("maintainer", maintainer);
-        addOrReplaceVariable("arch", arch);
-        addOrReplaceVariable("installation-path", installationPath);
-        addOrReplaceVariable("section", section);
-        addOrReplaceVariable("priority", priority);
+        addOrReplaceVariable(MAINTAINER, maintainer);
+        addOrReplaceVariable(ARCH, arch);
+        addOrReplaceVariable(INSTALLATION_PATH, installationPath);
+        addOrReplaceVariable(SECTION, section);
+        addOrReplaceVariable(PRIORITY, priority);
     }
 
 }

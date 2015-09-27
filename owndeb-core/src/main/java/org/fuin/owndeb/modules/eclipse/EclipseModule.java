@@ -42,13 +42,17 @@ import org.fuin.utils4j.VariableResolver;
 @XmlRootElement(name = "eclipse-module")
 public final class EclipseModule extends AbstractDownloadTarGzModule {
 
+    private static final String VMARGS = "vmargs";
+
+    private static final String VM = "vm";
+
     /** Name of the module. */
     public static final String NAME = "eclipse-module";
 
-    @XmlAttribute(name = "vm")
+    @XmlAttribute(name = VM)
     private String vm;
 
-    @XmlAttribute(name = "vmargs")
+    @XmlAttribute(name = VMARGS)
     private String vmArgs;
 
     /**
@@ -134,7 +138,7 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
      */
     @Nullable
     public final String getVm() {
-        return variableValue("vm");
+        return variableValue(VM);
     }
 
     /**
@@ -144,7 +148,7 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
      */
     @Nullable
     public final String getVmArgs() {
-        return variableValue("vmargs");
+        return variableValue(VMARGS);
     }
 
     @Override
@@ -162,8 +166,8 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
     public final void init(@Nullable final DebModules parent) {
         addNonExistingVariables(parent);
         initDownloadTarGzModule(parent);
-        addOrReplaceVariable("vm", vm);
-        addOrReplaceVariable("vmargs", vmArgs);
+        addOrReplaceVariable(VM, vm);
+        addOrReplaceVariable(VMARGS, vmArgs);
         resolveVariables();
     }
 

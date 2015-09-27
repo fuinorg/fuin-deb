@@ -17,13 +17,11 @@
  */
 package org.fuin.owndeb.commons;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -39,7 +37,13 @@ import org.fuin.objects4j.common.Nullable;
 @XmlRootElement(name = "package")
 public final class DebPackage extends AbstractPackage {
 
-    @XmlAttribute(name = "name")
+    private static final String DEPENDS = "depends";
+
+    private static final String FULL_INSTALLATION_PATH = "fullInstallationPath";
+
+    private static final String NAME = "name";
+
+    @XmlAttribute(name = NAME)
     private String name;
 
     @XmlElement(name = "dependency")
@@ -60,7 +64,7 @@ public final class DebPackage extends AbstractPackage {
      */
     public DebPackage(@NotEmpty final String name) {
         super();
-        Contract.requireArgNotEmpty("name", name);
+        Contract.requireArgNotEmpty(NAME, name);
         this.name = name;
     }
 
@@ -75,7 +79,7 @@ public final class DebPackage extends AbstractPackage {
     public DebPackage(@NotEmpty final String name,
             @Nullable final DebDependency... dependencies) {
         super();
-        Contract.requireArgNotEmpty("name", name);
+        Contract.requireArgNotEmpty(NAME, name);
         this.name = name;
         if (dependencies == null) {
             this.dependencies = null;
@@ -114,7 +118,7 @@ public final class DebPackage extends AbstractPackage {
             @Nullable final DebDependency... dependencies) {
         super(version, description, maintainer, arch, installationPath,
                 section, priority);
-        Contract.requireArgNotEmpty("name", name);
+        Contract.requireArgNotEmpty(NAME, name);
         this.name = name;
         if (dependencies == null) {
             this.dependencies = null;
@@ -153,7 +157,7 @@ public final class DebPackage extends AbstractPackage {
             @Nullable final List<DebDependency> dependencies) {
         super(maintainer, arch, installationPath, section, priority, version,
                 description);
-        Contract.requireArgNotEmpty("name", name);
+        Contract.requireArgNotEmpty(NAME, name);
         this.name = name;
         this.dependencies = dependencies;
     }
@@ -164,7 +168,16 @@ public final class DebPackage extends AbstractPackage {
      * @return Unique package name.
      */
     public final String getName() {
-        return variableValue("name");
+        return variableValue(NAME);
+    }
+
+    /**
+     * Returns the package name.
+     * 
+     * @return Unique package name.
+     */
+    public final String getNameIntern() {
+        return name;
     }
 
     /**
@@ -221,7 +234,7 @@ public final class DebPackage extends AbstractPackage {
      * @return Full installation path.
      */
     public final String getFullInstallationPath() {
-        return getInstallationPath() + "/" + getName();
+        return variableValue(FULL_INSTALLATION_PATH);
     }
 
     /**
@@ -240,7 +253,7 @@ public final class DebPackage extends AbstractPackage {
                 }
             }
         }
-        addOrReplaceVariable("depends", getDependenciesAsControlString());
+        addOrReplaceVariable(DEPENDS, getDependenciesAsControlString());
     }
 
     /**
@@ -252,8 +265,9 @@ public final class DebPackage extends AbstractPackage {
     public final void init(@Nullable final DebModule parent) {
         addNonExistingVariables(parent);
         initPackage(parent);
-        addOrReplaceVariable("name", name);
-        addOrReplaceVariable("fullInstallationPath", getFullInstallationPath());
+        addOrReplaceVariable(NAME, name);
+        addOrReplaceVariable(FULL_INSTALLATION_PATH,
+                getInstallationPathIntern() + "/" + getNameIntern());
         resolveVariables();
         if (dependencies != null) {
             for (final DebDependency dependency : dependencies) {
@@ -286,5 +300,5 @@ public final class DebPackage extends AbstractPackage {
     public final String toString() {
         return "DebPackage [name=" + name + "]";
     }
-    
+
 }

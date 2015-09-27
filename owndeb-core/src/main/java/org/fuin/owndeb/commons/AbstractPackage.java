@@ -27,10 +27,14 @@ import org.fuin.objects4j.common.Nullable;
  */
 public abstract class AbstractPackage extends AbstractBase {
 
-    @XmlAttribute(name = "version")
+    private static final String DESCRIPTION = "description";
+
+    private static final String VERSION = "version";
+
+    @XmlAttribute(name = VERSION)
     private String version;
 
-    @XmlAttribute(name = "description")
+    @XmlAttribute(name = DESCRIPTION)
     private String description;
 
     /**
@@ -75,7 +79,7 @@ public abstract class AbstractPackage extends AbstractBase {
      */
     @Nullable
     public final String getVersion() {
-        return variableValue("version");
+        return variableValue(VERSION);
     }
 
     /**
@@ -85,7 +89,7 @@ public abstract class AbstractPackage extends AbstractBase {
      */
     @Nullable
     public final String getDescription() {
-        return variableValue("description");
+        return variableValue(DESCRIPTION);
     }
 
     /**
@@ -96,8 +100,8 @@ public abstract class AbstractPackage extends AbstractBase {
      */
     public final void initPackage(final VariablesContainer parent) {
         initBase(parent);
-        addOrReplaceVariable("version", version);
-        addOrReplaceVariable("description", description);
+        addOrReplaceVariable(VERSION, version);
+        addOrReplaceVariable(DESCRIPTION, description);
     }
 
 }
