@@ -21,16 +21,16 @@ import static org.fest.assertions.Assertions.assertThat;
 
 import java.io.File;
 
-import org.fuin.owndeb.commons.DebModule;
+import org.fuin.owndeb.commons.DebPackage;
 import org.fuin.owndeb.commons.DebPackageResolver;
 import org.junit.Ignore;
 import org.junit.Test;
 
 /**
- * Tests the {@link JdkModule} class.
+ * Tests the {@link JdkPackage} class.
  */
 // CHECKSTYLE:OFF for tests
-public final class JdkModuleTest {
+public final class JdkPackageTest {
 
     @Ignore("Download is too big - Think about better solution later")
     @Test
@@ -46,12 +46,12 @@ public final class JdkModuleTest {
         final String section = "devel";
         final String priority = "low";
         final String jdkUrl = "http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jdk-8u60-linux-x64.tar.gz";
-        final JdkModule testee = new JdkModule(name, version, description,
+        final JdkPackage testee = new JdkPackage(name, version, description,
                 maintainer, arch, installationPath, section, priority, jdkUrl);
         testee.init(null);
         testee.resolveDependencies(new DebPackageResolver() {
             @Override
-            public DebModule findDebPackage(String packageName) {
+            public DebPackage findDebPackage(String packageName) {
                 // Nothing to resolve
                 return null;
             }

@@ -25,8 +25,8 @@ import java.io.File;
 
 import org.fuin.objects4j.common.ContractViolationException;
 import org.fuin.owndeb.commons.DebConfig;
-import org.fuin.owndeb.commons.DebModule;
-import org.fuin.owndeb.commons.DebModules;
+import org.fuin.owndeb.commons.DebPackage;
+import org.fuin.owndeb.commons.DebPackages;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,13 +43,13 @@ public class OwnDebTest {
     private static final File TARGET_DIR = new File("./target");
 
     @Mock
-    private DebModule module1;
+    private DebPackage package1;
 
     @Captor
     private ArgumentCaptor<File> arg1;
 
     @Mock
-    private DebModule module2;
+    private DebPackage package2;
 
     @Captor
     private ArgumentCaptor<File> arg2;
@@ -58,10 +58,10 @@ public class OwnDebTest {
 
     @Before
     public void setup() {
-        final DebModules modules = new DebModules("1.2.3", "Whatever",
+        final DebPackages packages = new DebPackages("1.2.3", "Whatever",
                 "your-name@mydomain.tld", "amd64", "/opt", "devel", "low",
-                module1, module2);
-        final DebConfig config = new DebConfig(modules);
+                package1, package2);
+        final DebConfig config = new DebConfig(packages);
         testee = new OwnDeb(config, TARGET_DIR);
     }
 
@@ -79,9 +79,9 @@ public class OwnDebTest {
         testee.execute();
 
         // VERIFY
-        verify(module1).create(arg1.capture());
+        verify(package1).create(arg1.capture());
         assertThat(arg1.getValue()).isEqualTo(TARGET_DIR);
-        verify(module2).create(arg2.capture());
+        verify(package2).create(arg2.capture());
         assertThat(arg2.getValue()).isEqualTo(TARGET_DIR);
 
     }
@@ -100,7 +100,7 @@ public class OwnDebTest {
     @Test
     public void testNullTargetDir() {
         try {
-            new OwnDeb(new DebConfig(new DebModules()), null);
+            new OwnDeb(new DebConfig(new DebPackages()), null);
             fail();
         } catch (final ContractViolationException ex) {
             assertThat(ex.getMessage()).isEqualTo(

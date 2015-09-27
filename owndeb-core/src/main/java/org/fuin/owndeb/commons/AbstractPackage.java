@@ -97,7 +97,7 @@ public abstract class AbstractPackage extends AbstractBase {
      * @param parent
      *            Parent to set.
      */
-    public final void initPackage(final VariablesContainer parent) {
+    public final void initAbstractPackage(final VariablesContainer parent) {
         initBase(parent);
         addOrReplaceVariable(VERSION, version);
         addOrReplaceVariable(DESCRIPTION, description);

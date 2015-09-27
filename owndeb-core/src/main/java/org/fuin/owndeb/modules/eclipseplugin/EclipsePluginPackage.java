@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.owndeb.modules.example;
+package org.fuin.owndeb.modules.eclipseplugin;
 
 import static org.fuin.owndeb.commons.DebUtils.writeReplacedResource;
 
@@ -23,6 +23,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.tools.ant.Project;
@@ -30,34 +32,44 @@ import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.NotEmpty;
 import org.fuin.objects4j.common.Nullable;
 import org.fuin.owndeb.commons.DebDependency;
-import org.fuin.owndeb.commons.DebModule;
-import org.fuin.owndeb.commons.DebModules;
+import org.fuin.owndeb.commons.DebPackage;
+import org.fuin.owndeb.commons.DebPackages;
 import org.fuin.owndeb.commons.DebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vafer.jdeb.ant.Data;
 import org.vafer.jdeb.ant.DebAntTask;
-import org.vafer.jdeb.ant.Mapper;
 
 /**
- * Example module that only installs a "hello.txt" file into the '/opt'
- * directory.
+ * Creates a binary Debian package for an Eclipse plugin.
  */
-@XmlRootElement(name = "example-module")
-public class ExampleModule extends DebModule {
+@XmlRootElement(name = "eclipse-plugin-package")
+public class EclipsePluginPackage extends DebPackage {
+
+    private static final String REPOSITORY = "repository";
+
+    private static final String INSTALLIUS = "installIUs";
+
+    /** Name of the package. */
+    public static final String NAME = "eclipse-plugin-package";
 
     private static final Logger LOG = LoggerFactory
-            .getLogger(ExampleModule.class);
+            .getLogger(EclipsePluginPackage.class);
+
+    @XmlAttribute(name = REPOSITORY)
+    private String repository;
+
+    @XmlAttribute(name = INSTALLIUS)
+    private String installIUs;
 
     /**
      * Default constructor for JAXB.
      */
-    protected ExampleModule() {
+    protected EclipsePluginPackage() {
         super();
     }
 
     /**
-     * Constructor with dependency array.
+     * Constructor with dependencies array.
      * 
      * @param name
      *            Unique package name.
@@ -75,21 +87,30 @@ public class ExampleModule extends DebModule {
      *            Section like "devel".
      * @param priority
      *            Priority like "low".
+     * @param repository
+     *            Eclipse P2 repsoitory URL.
+     * @param installIUs
+     *            List of units to install.
      * @param dependencies
      *            Array of dependencies.
      */
-    public ExampleModule(@NotEmpty final String name,
+    public EclipsePluginPackage(@NotEmpty final String name,
             @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
+            @NotNull final String repository, @NotNull final String installIUs,
             @Nullable final DebDependency... dependencies) {
         super(name, version, description, maintainer, arch, installationPath,
                 section, priority, dependencies);
+        Contract.requireArgNotNull(REPOSITORY, repository);
+        Contract.requireArgNotNull(INSTALLIUS, installIUs);
+        this.repository = repository;
+        this.installIUs = installIUs;
     }
 
     /**
-     * Constructor with dependency list.
+     * Constructor with dependencies list.
      * 
      * @param name
      *            Unique package name.
@@ -107,74 +128,101 @@ public class ExampleModule extends DebModule {
      *            Section like "devel".
      * @param priority
      *            Priority like "low".
+     * @param repository
+     *            Eclipse P2 repsoitory URL.
+     * @param installIUs
+     *            List of units to install.
      * @param dependencies
      *            List of dependencies.
      */
-    public ExampleModule(@NotEmpty final String name,
+    public EclipsePluginPackage(@NotEmpty final String name,
             @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
+            @NotNull final String repository, @NotNull final String installIUs,
             @Nullable final List<DebDependency> dependencies) {
         super(name, version, description, maintainer, arch, installationPath,
                 section, priority, dependencies);
+        Contract.requireArgNotNull(REPOSITORY, repository);
+        Contract.requireArgNotNull(INSTALLIUS, installIUs);
+        this.repository = repository;
+        this.installIUs = installIUs;
+    }
+
+    /**
+     * Returns the Eclipse repository.
+     * 
+     * @return Repository.
+     */
+    @NotNull
+    public final String getRepository() {
+        return variableValue(REPOSITORY);
+    }
+
+    /**
+     * Returns the Eclipse feature groups.
+     * 
+     * @return Features to install.
+     */
+    @NotNull
+    public final String getInstallIUs() {
+        return variableValue(INSTALLIUS);
     }
 
     @Override
-    public final String getModuleName() {
-        return "example-module";
+    public final String getPackageName() {
+        return NAME;
     }
 
     @Override
     public final void create(final File buildDirectory) {
 
         Contract.requireArgNotNull("buildDirectory", buildDirectory);
-        LOG.info("Creating module in: {}", buildDirectory);
+        LOG.info("Creating package in: {}", buildDirectory);
 
-        final File packageDir = new File(buildDirectory, getName());
         final File controlDir = new File(buildDirectory, getName() + "-control");
-        final File helloFile = new File(packageDir, "hello.txt");
-        DebUtils.copyResourceToFile(this.getClass(), "/" + getModuleName()
-                + "/hello.txt", helloFile);
 
-        LOG.debug("packageDir: {}", packageDir);
         LOG.debug("controlDir: {}", controlDir);
 
-        copyControlFiles(this, getModuleName(), controlDir);
-        createDebianPackage(this, buildDirectory, controlDir, packageDir);
+        copyControlFiles(this, getPackageName(), controlDir);
+        createDebianPackage(this, buildDirectory, controlDir);
 
     }
 
     @Override
-    public final void init(@Nullable final DebModules parent) {
+    public final void init(@Nullable final DebPackages parent) {
         addNonExistingVariables(parent);
-        initModule(parent);
+        initPackage(parent);
+        addOrReplaceVariable(REPOSITORY, repository);
+        addOrReplaceVariable(INSTALLIUS, installIUs);
         resolveVariables();
     }
 
-    private static void copyControlFiles(final DebModule debPackage,
-            final String moduleName, final File controlDir) {
+    private static void copyControlFiles(final DebPackage debPackage,
+            final String packageName, final File controlDir) {
 
         DebUtils.mkdirs(controlDir);
         final Map<String, String> vars = DebUtils.asMap(debPackage
                 .getVariables());
-        writeReplacedResource(ExampleModule.class, "/" + moduleName
+        writeReplacedResource(EclipsePluginPackage.class, "/" + packageName
                 + "/control", controlDir, vars);
+        writeReplacedResource(EclipsePluginPackage.class, "/" + packageName
+                + "/postinst", controlDir, vars);
+        writeReplacedResource(EclipsePluginPackage.class, "/" + packageName
+                + "/postrm", controlDir, vars);
 
     }
 
-    private static void createDebianPackage(final DebModule debPackage,
-            final File buildDirectory, final File controlDir,
-            final File packageDir) {
+    private static void createDebianPackage(final DebPackage debPackage,
+            final File buildDirectory, final File controlDir) {
 
-        LOG.info("Start creating Debian package");
+        LOG.info("Start creating package " + debPackage.getName());
 
         final File debName = new File(buildDirectory,
                 debPackage.getDebFilename());
 
-        LOG.debug("packageDir: {}", packageDir);
         LOG.debug("controlDir: {}", controlDir);
-        LOG.debug("debName: {}", debName);
 
         final Project project = new Project();
 
@@ -183,28 +231,15 @@ public class ExampleModule extends DebModule {
         task.setDestfile(debName);
         task.setControl(controlDir);
 
-        final Data data = new Data();
-        data.setSrc(packageDir);
-        data.setType("directory");
-        final Mapper mapper = new Mapper();
-        mapper.setType("perm");
-        mapper.setPrefix(debPackage.getInstallationPath() + "/"
-                + packageDir.getName());
-        mapper.setUser("root");
-        mapper.setGroup("developer");
-        data.addMapper(mapper);
-
-        task.addData(data);
-
         task.execute();
 
-        LOG.info("Finished creating Debian package");
+        LOG.info("Finished creating package " + debPackage.getName());
 
     }
 
     @Override
     public final String toString() {
-        return getModuleName();
+        return getPackageName();
     }
 
 }

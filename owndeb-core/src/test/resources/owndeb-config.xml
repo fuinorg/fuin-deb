@@ -6,19 +6,17 @@
 		<variable name="prefix" value="fuin-" />
 	</variables>
 
-	<!-- The 'modules' section defines standards that are inherited by all childs -->
-	<modules maintainer="michael@fuin.org" arch="amd64"
+	<!-- The 'packages' section defines standards that are inherited by all childs -->
+	<packages maintainer="michael@fuin.org" arch="amd64"
 		installation-path="/opt" section="devel" priority="low">
 
-        <!-- Every module can override the inherited properties -->
-		<jdk-module
+        <!-- Every package can override the inherited properties -->
+		<jdk-package
 		    name="${prefix}jdk8" 
 		    version="1.8.0.60" description="Java SE Development Kit 8"
 			url="http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jdk-8u60-linux-x64.tar.gz" />
 
-		<eclipse-module
-		    name="${prefix}eclipse-jee-luna" 
-		    version="4.4"
+		<eclipse-package name="${prefix}eclipse-jee-luna" version="4.4"
 			description="Eclipse Luna IDE for Java EE Developers"
 			url="http://ftp.halifax.rwth-aachen.de/eclipse/technology/epp/downloads/release/luna/SR2/eclipse-jee-luna-SR2-linux-gtk-x86_64.tar.gz"
             vm="${installation-path}/${prefix}jdk8/bin/java"
@@ -26,23 +24,20 @@
 
 			<dependency name="${prefix}jdk8" />
 
-		</eclipse-module>
+		</eclipse-package>
 
-		<eclipse-module
-		    name="${prefix}eclipse-jee-mars" 
-		    version="4.5"
+		<eclipse-package name="${prefix}eclipse-jee-mars" version="4.5"
 			description="Eclipse Mars IDE for Java EE Developers"
 			url="http://ftp.halifax.rwth-aachen.de/eclipse/technology/epp/downloads/release/mars/R/eclipse-jee-mars-R-linux-gtk-x86_64.tar.gz"
             vm="${installation-path}/${prefix}jdk8/bin/java"
             vmargs="-Dosgi.requiredJavaVersion=1.6 -XX:MaxPermSize=256m -Xms128m -Xmx1024m">
 
-			<!-- Requires the module jdk8 to be installed -->
+			<!-- Requires the package jdk8 to be installed -->
 			<dependency name="${prefix}jdk8" />
 
-		</eclipse-module>
+		</eclipse-package>
 
-		<eclipse-plugin-module
-		    name="${prefix}eclipse-jee-luna-plugins-checkstyle" 
+		<eclipse-plugin-package name="${prefix}eclipse-jee-luna-plugins-checkstyle" 
 		    version="6.5.0"
             description="Eclipse Luna Checkstyle Plugin"
 			repository="http://eclipse-cs.sourceforge.net/update/"
@@ -51,10 +46,9 @@
 			
 			<!-- Dependency to Eclipse Luna is defined using the 'eclipse' attribute above -->
 			
-		</eclipse-plugin-module>
+		</eclipse-plugin-package>
 
-        <eclipse-plugin-module
-            name="${prefix}eclipse-jee-mars-plugins-checkstyle"
+        <eclipse-plugin-package name="${prefix}eclipse-jee-mars-plugins-checkstyle"
             version="6.5.0"
             description="Eclipse Mars Checkstyle Plugin" 
             repository="http://eclipse-cs.sourceforge.net/update/"
@@ -63,8 +57,8 @@
             
             <!-- Dependency to Eclipse Mars is defined using the 'eclipse' attribute above -->
             
-        </eclipse-plugin-module>
+        </eclipse-plugin-package>
 
-	</modules>
+	</packages>
 
 </owndeb-config>

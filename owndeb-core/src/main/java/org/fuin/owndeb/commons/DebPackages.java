@@ -30,19 +30,19 @@ import org.fuin.objects4j.common.ContractViolationException;
 import org.fuin.objects4j.common.Nullable;
 
 /**
- * Provides default settings for the modules it contains.
+ * Provides default settings for the packages it contains.
  */
-@XmlRootElement(name = "modules")
-public final class DebModules extends AbstractPackage implements
+@XmlRootElement(name = "packages")
+public final class DebPackages extends AbstractPackage implements
         DebPackageResolver {
 
     @XmlAnyElement(lax = true)
-    private List<DebModule> modules;
+    private List<DebPackage> packages;
 
     /**
      * Default constructor.
      */
-    public DebModules() {
+    public DebPackages() {
         super();
     }
 
@@ -63,17 +63,17 @@ public final class DebModules extends AbstractPackage implements
      *            Section like "devel".
      * @param priority
      *            Priority like "low".
-     * @param modules
-     *            Array of modules to create.
+     * @param packages
+     *            Array of packages to create.
      */
-    public DebModules(@Nullable final String version,
+    public DebPackages(@Nullable final String version,
             @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
-            @NotNull final DebModule... modules) {
+            @NotNull final DebPackage... packages) {
         this(version, description, maintainer, arch, installationPath, section,
-                priority, Arrays.asList(modules));
+                priority, Arrays.asList(packages));
     }
 
     /**
@@ -93,40 +93,40 @@ public final class DebModules extends AbstractPackage implements
      *            Section like "devel".
      * @param priority
      *            Priority like "low".
-     * @param modules
-     *            List of modules to create.
+     * @param packages
+     *            List of packages to create.
      */
-    public DebModules(@Nullable final String version,
+    public DebPackages(@Nullable final String version,
             @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
             @Nullable final String section, @Nullable final String priority,
-            @NotNull final List<DebModule> modules) {
+            @NotNull final List<DebPackage> packages) {
         super(version, description, maintainer, arch, installationPath,
                 section, priority);
-        Contract.requireArgNotNull("modules", modules);
-        if (modules.isEmpty()) {
+        Contract.requireArgNotNull("packages", packages);
+        if (packages.isEmpty()) {
             throw new ContractViolationException(
-                    "The list 'modules' cannot be empty");
+                    "The list 'packages' cannot be empty");
         }
-        this.modules = modules;
+        this.packages = packages;
     }
 
     /**
-     * Returns the list of modules to create.
+     * Returns the list of packages to create.
      * 
-     * @return Immutable modules list.
+     * @return Immutable packages list.
      */
-    public final List<DebModule> getModules() {
-        return Collections.unmodifiableList(modules);
+    public final List<DebPackage> getPackages() {
+        return Collections.unmodifiableList(packages);
     }
 
     @Override
-    public final DebModule findDebPackage(final String packageName) {
-        if (modules != null) {
-            for (final DebModule module : modules) {
-                if (module.getName() != packageName) {
-                    return module;
+    public final DebPackage findDebPackage(final String packageName) {
+        if (packages != null) {
+            for (final DebPackage pkg : packages) {
+                if (pkg.getName() != packageName) {
+                    return pkg;
                 }
             }
         }
@@ -137,9 +137,9 @@ public final class DebModules extends AbstractPackage implements
      * Updates the package references for all dependencies.
      */
     public final void resolveDependencies() {
-        if (modules != null) {
-            for (final DebModule module : modules) {
-                module.resolveDependencies(this);
+        if (packages != null) {
+            for (final DebPackage pkg : packages) {
+                pkg.resolveDependencies(this);
             }
         }
     }
@@ -152,10 +152,10 @@ public final class DebModules extends AbstractPackage implements
      */
     public final void init(@Nullable final DebConfig parent) {
         addNonExistingVariables(parent);
-        initPackage(parent);
-        if (modules != null) {
-            for (final DebModule module : modules) {
-                module.init(this);
+        initAbstractPackage(parent);
+        if (packages != null) {
+            for (final DebPackage pkg : packages) {
+                pkg.init(this);
             }
         }
     }

@@ -120,22 +120,22 @@ public class DebDependencyTest {
     public final void testResolveTrue() {
 
         // PREPARE
-        final DebModule pkg = new DebModule(NAME) {
+        final DebPackage pkg = new DebPackage(NAME) {
             @Override
-            public String getModuleName() {
+            public String getPackageName() {
                 return "whatever";
             }
             @Override
             public void create(File buildDirectory) {                
             }
             @Override
-            public void init(DebModules parent) {
+            public void init(DebPackages parent) {
             }
             
         };
         final DebPackageResolver resolver = new DebPackageResolver() {
             @Override
-            public DebModule findDebPackage(final String packageName) {
+            public DebPackage findDebPackage(final String packageName) {
                 return pkg;
             }
         };
@@ -155,7 +155,7 @@ public class DebDependencyTest {
         // PREPARE
         final DebPackageResolver resolver = new DebPackageResolver() {
             @Override
-            public DebModule findDebPackage(final String packageName) {
+            public DebPackage findDebPackage(final String packageName) {
                 return null;
             }
         };

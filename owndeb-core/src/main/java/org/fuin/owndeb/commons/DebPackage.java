@@ -33,7 +33,7 @@ import org.fuin.objects4j.common.Nullable;
 /**
  * Provides default settings for the packages it contains.
  */
-public abstract class DebModule extends AbstractPackage {
+public abstract class DebPackage extends AbstractPackage {
 
     private static final String DEPENDS = "depends";
 
@@ -50,7 +50,7 @@ public abstract class DebModule extends AbstractPackage {
     /**
      * Default constructor.
      */
-    public DebModule() {
+    public DebPackage() {
         super();
     }
 
@@ -60,7 +60,7 @@ public abstract class DebModule extends AbstractPackage {
      * @param name
      *            Unique package name.
      */
-    public DebModule(@NotEmpty final String name) {
+    public DebPackage(@NotEmpty final String name) {
         this(name, null, null, null, null, null, null, null);
     }
 
@@ -86,7 +86,7 @@ public abstract class DebModule extends AbstractPackage {
      * @param dependencies
      *            Array of dependencies.
      */
-    public DebModule(@NotEmpty final String name,
+    public DebPackage(@NotEmpty final String name,
             @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
@@ -119,7 +119,7 @@ public abstract class DebModule extends AbstractPackage {
      * @param dependencies
      *            List of dependencies.
      */
-    public DebModule(@NotEmpty final String name,
+    public DebPackage(@NotEmpty final String name,
             @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
@@ -186,7 +186,7 @@ public abstract class DebModule extends AbstractPackage {
                     sb.append(", ");
                 }
                 final DebDependency dependency = dependencies.get(i);
-                final DebModule debPackage = dependency.getResolvedDependency();
+                final DebPackage debPackage = dependency.getResolvedDependency();
                 if (debPackage == null) {
                     throw new IllegalStateException("Unresolved dependency: "
                             + dependency.getName());
@@ -226,14 +226,14 @@ public abstract class DebModule extends AbstractPackage {
     }
 
     /**
-     * Initialize the module.
+     * Initialize the package.
      * 
      * @param parent
      *            Parent to set.
      */
-    public final void initModule(final DebModules parent) {
+    public final void initPackage(final DebPackages parent) {
         addNonExistingVariables(parent);
-        initPackage(parent);
+        initAbstractPackage(parent);
         addOrReplaceVariable(NAME, name);
         addOrReplaceVariable(FULL_INSTALLATION_PATH,
                 getInstallationPathIntern() + "/" + getNameIntern());
@@ -246,26 +246,26 @@ public abstract class DebModule extends AbstractPackage {
     }
 
     /**
-     * Returns the unique name of the module.
+     * Returns the unique name of the package.
      * 
-     * @return Module name.
+     * @return Package name.
      */
-    public abstract String getModuleName();
+    public abstract String getPackageName();
 
     /**
-     * Creates all packages of the module.
+     * Creates the package.
      * 
      * @param buildDirectory
-     *            Directory to create the packages inside.
+     *            Directory to create the package inside.
      */
     public abstract void create(@NotNull File buildDirectory);
 
     /**
-     * Initializes the module.
+     * Initializes the package.
      * 
      * @param parent
      *            Parent.
      */
-    public abstract void init(@Nullable DebModules parent);
+    public abstract void init(@Nullable DebPackages parent);
 
 }

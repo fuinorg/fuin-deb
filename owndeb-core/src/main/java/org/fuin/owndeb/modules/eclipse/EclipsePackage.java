@@ -30,23 +30,22 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.fuin.objects4j.common.NotEmpty;
 import org.fuin.objects4j.common.Nullable;
 import org.fuin.owndeb.commons.DebDependency;
-import org.fuin.owndeb.commons.DebModule;
-import org.fuin.owndeb.commons.DebModules;
+import org.fuin.owndeb.commons.DebPackages;
 import org.fuin.owndeb.commons.DebUtils;
-import org.fuin.owndeb.modules.base.AbstractDownloadTarGzModule;
+import org.fuin.owndeb.modules.base.AbstractDownloadTarGzPackage;
 
 /**
  * Downloads Eclipse and creates a binary Debian package from it.
  */
-@XmlRootElement(name = "eclipse-module")
-public final class EclipseModule extends AbstractDownloadTarGzModule {
+@XmlRootElement(name = "eclipse-package")
+public final class EclipsePackage extends AbstractDownloadTarGzPackage {
 
     private static final String VMARGS = "vmargs";
 
     private static final String VM = "vm";
 
-    /** Name of the module. */
-    public static final String NAME = "eclipse-module";
+    /** Name of the package. */
+    public static final String NAME = "eclipse-package";
 
     @XmlAttribute(name = VM)
     private String vm;
@@ -57,7 +56,7 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
     /**
      * Default constructor for JAXB.
      */
-    protected EclipseModule() {
+    protected EclipsePackage() {
         super();
     }
 
@@ -85,7 +84,7 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
      * @param dependencies
      *            Array of dependencies.
      */
-    public EclipseModule(@NotEmpty final String name,
+    public EclipsePackage(@NotEmpty final String name,
             @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
@@ -120,7 +119,7 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
      * @param dependencies
      *            List of dependencies.
      */
-    public EclipseModule(@NotEmpty final String name,
+    public EclipsePackage(@NotEmpty final String name,
             @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
@@ -132,7 +131,7 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
     }
 
     @Override
-    public final String getModuleName() {
+    public final String getPackageName() {
         return NAME;
     }
 
@@ -157,8 +156,7 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
     }
 
     @Override
-    protected final void applyModifications(final DebModule debPackage,
-            final File packageDir) {
+    protected final void applyModifications(final File packageDir) {
 
     }
 
@@ -168,28 +166,26 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
      * @param parent
      *            Current parent.
      */
-    public final void init(@Nullable final DebModules parent) {
+    public final void init(@Nullable final DebPackages parent) {
         addNonExistingVariables(parent);
-        initDownloadTarGzModule(parent);
+        initDownloadTarGzPackage(parent);
         addOrReplaceVariable(VM, vm);
         addOrReplaceVariable(VMARGS, vmArgs);
         resolveVariables();
     }
 
     @Override
-    protected final void copyControlFiles(final DebModule debPackage,
-            final File controlDir) {
-        final Map<String, String> vars = DebUtils.asMap(debPackage
-                .getVariables());
-        writeReplacedResource(EclipseModule.class, "/" + getModuleName()
+    protected final void copyControlFiles(final File controlDir) {
+        final Map<String, String> vars = DebUtils.asMap(getVariables());
+        writeReplacedResource(EclipsePackage.class, "/" + getPackageName()
                 + "/control", controlDir, vars);
-        writeReplacedResource(EclipseModule.class, "/" + getModuleName()
+        writeReplacedResource(EclipsePackage.class, "/" + getPackageName()
                 + "/postinst", controlDir, vars);
     }
 
     @Override
     public final String toString() {
-        return getModuleName();
+        return getPackageName();
     }
 
 }

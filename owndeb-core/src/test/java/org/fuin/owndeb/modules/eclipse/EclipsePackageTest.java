@@ -22,17 +22,17 @@ import static org.fest.assertions.Assertions.assertThat;
 import java.io.File;
 
 import org.fuin.owndeb.commons.DebDependency;
-import org.fuin.owndeb.commons.DebModule;
+import org.fuin.owndeb.commons.DebPackage;
 import org.fuin.owndeb.commons.DebPackageResolver;
-import org.fuin.owndeb.modules.jdk.JdkModule;
+import org.fuin.owndeb.modules.jdk.JdkPackage;
 import org.junit.Ignore;
 import org.junit.Test;
 
 /**
- * Tests the {@link EclipseModule} class.
+ * Tests the {@link EclipsePackage} class.
  */
 // CHECKSTYLE:OFF for tests
-public final class EclipseModuleTest {
+public final class EclipsePackageTest {
 
     @Ignore("Download is too big - Think about better solution later")
     @Test
@@ -49,7 +49,7 @@ public final class EclipseModuleTest {
         final String priority = "low";
         final String url = "http://ftp.halifax.rwth-aachen.de/eclipse/technology/epp/downloads/release/luna/SR2/eclipse-jee-luna-SR2-linux-gtk-x86_64.tar.gz";
         final DebDependency dependency = createDependencyJdk8();
-        final EclipseModule testee = new EclipseModule(name, version,
+        final EclipsePackage testee = new EclipsePackage(name, version,
                 description, maintainer, arch, installationPath, section,
                 priority, url, dependency);
         testee.init(null);
@@ -70,16 +70,16 @@ public final class EclipseModuleTest {
     }
 
     private DebDependency createDependencyJdk8() {
-        final JdkModule jdkModule = new JdkModule("jdk8", "1.8.0.60",
+        final JdkPackage jdkPackage = new JdkPackage("jdk8", "1.8.0.60",
                 "Java SE Development Kit 8", "michael@fuin.org", "amd64",
                 "/opt", "devel", "low", "");
-        jdkModule.init(null);
+        jdkPackage.init(null);
         final DebDependency dependency = new DebDependency("jdk8");
-        dependency.init(jdkModule);
+        dependency.init(jdkPackage);
         dependency.resolve(new DebPackageResolver() {
             @Override
-            public DebModule findDebPackage(String packageName) {
-                return jdkModule;
+            public DebPackage findDebPackage(String packageName) {
+                return jdkPackage;
             }
         });
         return dependency;

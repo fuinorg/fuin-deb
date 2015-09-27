@@ -33,9 +33,9 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.fuin.objects4j.common.ContractViolationException;
-import org.fuin.owndeb.modules.eclipse.EclipseModule;
-import org.fuin.owndeb.modules.eclipseplugin.EclipsePluginModule;
-import org.fuin.owndeb.modules.jdk.JdkModule;
+import org.fuin.owndeb.modules.eclipse.EclipsePackage;
+import org.fuin.owndeb.modules.eclipseplugin.EclipsePluginPackage;
+import org.fuin.owndeb.modules.jdk.JdkPackage;
 import org.fuin.utils4j.Utils4J;
 import org.junit.After;
 import org.junit.Before;
@@ -55,10 +55,10 @@ public class DebConfigTest {
         final String installationPath = "/opt";
         final String section = "devel";
         final String priority = "low";
-        final DebModules modules = new DebModules(version, description,
+        final DebPackages packages = new DebPackages(version, description,
                 maintainer, arch, installationPath, section, priority,
-                new DebModuleA());
-        testee = new DebConfig(modules);
+                new DebPackageA());
+        testee = new DebConfig(packages);
     }
 
     @After
@@ -73,7 +73,7 @@ public class DebConfigTest {
             fail();
         } catch (final ContractViolationException ex) {
             assertThat(ex.getMessage()).isEqualTo(
-                    "The argument 'modules' cannot be null");
+                    "The argument 'packages' cannot be null");
         }
     }
 
@@ -85,15 +85,15 @@ public class DebConfigTest {
 
         // TEST
         String xml = marshal(original, createXmlAdapter(), DebConfig.class,
-                DebModuleA.class);
+                DebPackageA.class);
 
         // VERIFY
         XMLUnit.setIgnoreWhitespace(true);
         XMLAssert.assertXMLEqual(XML_PREFIX + "<owndeb-config>"
-                + "<modules version=\"1.2.3\" description=\"Aa Bb Cc\" "
+                + "<packages version=\"1.2.3\" description=\"Aa Bb Cc\" "
                 + "maintainer=\"michael@fuin.org\" arch=\"amd64\" "
                 + "section=\"devel\" " + "priority=\"low\" "
-                + "installation-path=\"/opt\">" + "<moduleA/>" + "</modules>"
+                + "installation-path=\"/opt\">" + "<packageA/>" + "</packages>"
                 + "</owndeb-config>", xml);
 
     }
@@ -106,23 +106,23 @@ public class DebConfigTest {
 
         // TEST
         final String xml = marshal(original, createXmlAdapter(),
-                DebConfig.class, DebModuleA.class);
+                DebConfig.class, DebPackageA.class);
 
         final DebConfig copy = unmarshal(xml, createXmlAdapter(),
-                DebConfig.class, DebModuleA.class);
+                DebConfig.class, DebPackageA.class);
 
         // VERIFY
-        final DebModules modules = copy.getModules();
-        assertThat(modules.getVersion()).isEqualTo("1.2.3");
-        assertThat(modules.getDescription()).isEqualTo("Aa Bb Cc");
-        assertThat(modules.getMaintainer()).isEqualTo("michael@fuin.org");
-        assertThat(modules.getArch()).isEqualTo("amd64");
-        assertThat(modules.getInstallationPath()).isEqualTo("/opt");
-        assertThat(modules.getSection()).isEqualTo("devel");
-        assertThat(modules.getPriority()).isEqualTo("low");
-        assertThat(modules.getModules()).hasSize(1);
-        assertThat(modules.getModules().get(0).getClass()).isEqualTo(
-                DebModuleA.class);
+        final DebPackages packages = copy.getPackages();
+        assertThat(packages.getVersion()).isEqualTo("1.2.3");
+        assertThat(packages.getDescription()).isEqualTo("Aa Bb Cc");
+        assertThat(packages.getMaintainer()).isEqualTo("michael@fuin.org");
+        assertThat(packages.getArch()).isEqualTo("amd64");
+        assertThat(packages.getInstallationPath()).isEqualTo("/opt");
+        assertThat(packages.getSection()).isEqualTo("devel");
+        assertThat(packages.getPriority()).isEqualTo("low");
+        assertThat(packages.getPackages()).hasSize(1);
+        assertThat(packages.getPackages().get(0).getClass()).isEqualTo(
+                DebPackageA.class);
     }
 
     @Test
@@ -134,43 +134,46 @@ public class DebConfigTest {
 
         // TEST
         final DebConfig config = unmarshal(xml, createXmlAdapter(),
-                DebConfig.class, JdkModule.class, EclipseModule.class,
-                EclipsePluginModule.class);
+                DebConfig.class, JdkPackage.class, EclipsePackage.class,
+                EclipsePluginPackage.class);
 
         // VERIFY
         assertThat(config).isNotNull();
-        assertThat(config.getModules()).isNotNull();
-        assertThat(config.getModules().getModules()).isNotNull();
-        assertThat(config.getModules().getModules()).hasSize(5);
+        assertThat(config.getPackages()).isNotNull();
+        assertThat(config.getPackages().getPackages()).isNotNull();
+        assertThat(config.getPackages().getPackages()).hasSize(5);
 
-        final JdkModule jdkModule = (JdkModule) config.getModules()
-                .getModules().get(0);
-        assertThat(jdkModule.getVersion()).isEqualTo("1.8.0.60");
-        assertThat(jdkModule.getDescription()).isEqualTo(
+        final JdkPackage jdkPackage = (JdkPackage) config.getPackages()
+                .getPackages().get(0);
+        assertThat(jdkPackage.getName()).isEqualTo("fuin-jdk8");
+        assertThat(jdkPackage.getVersion()).isEqualTo("1.8.0.60");
+        assertThat(jdkPackage.getDescription()).isEqualTo(
                 "Java SE Development Kit 8");
-        assertThat(jdkModule.getMaintainer()).isEqualTo("michael@fuin.org");
-        assertThat(jdkModule.getArch()).isEqualTo("amd64");
-        assertThat(jdkModule.getInstallationPath()).isEqualTo("/opt");
-        assertThat(jdkModule.getSection()).isEqualTo("devel");
-        assertThat(jdkModule.getPriority()).isEqualTo("low");
-        assertThat(jdkModule.getUrlStr())
+        assertThat(jdkPackage.getMaintainer()).isEqualTo("michael@fuin.org");
+        assertThat(jdkPackage.getArch()).isEqualTo("amd64");
+        assertThat(jdkPackage.getInstallationPath()).isEqualTo("/opt");
+        assertThat(jdkPackage.getSection()).isEqualTo("devel");
+        assertThat(jdkPackage.getPriority()).isEqualTo("low");
+        assertThat(jdkPackage.getUrlStr())
                 .isEqualTo(
                         "http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jdk-8u60-linux-x64.tar.gz");
 
-        final EclipseModule lunaModule = (EclipseModule) config.getModules()
-                .getModules().get(1);
-        assertThat(lunaModule.getVersion()).isEqualTo("4.4");
-        assertThat(lunaModule.getDescription()).isEqualTo(
+        final EclipsePackage lunaPackage = (EclipsePackage) config.getPackages()
+                .getPackages().get(1);
+        assertThat(lunaPackage.getName()).isEqualTo("fuin-eclipse-jee-luna");
+        assertThat(lunaPackage.getVersion()).isEqualTo("4.4");
+        assertThat(lunaPackage.getDescription()).isEqualTo(
                 "Eclipse Luna IDE for Java EE Developers");
-        assertThat(lunaModule.getVm()).isEqualTo("/opt/fuin-jdk8/bin/java");
-        assertThat(lunaModule.getVmArgs())
+        assertThat(lunaPackage.getVm()).isEqualTo("/opt/fuin-jdk8/bin/java");
+        assertThat(lunaPackage.getVmArgs())
                 .isEqualTo(
                         "-Dosgi.requiredJavaVersion=1.6 -XX:MaxPermSize=256m -Xms128m -Xmx1024m");
 
-        final EclipseModule marsModule = (EclipseModule) config.getModules()
-                .getModules().get(2);
-        assertThat(marsModule.getVersion()).isEqualTo("4.5");
-        assertThat(marsModule.getDescription()).isEqualTo(
+        final EclipsePackage marsPackage = (EclipsePackage) config.getPackages()
+                .getPackages().get(2);
+        assertThat(marsPackage.getName()).isEqualTo("fuin-eclipse-jee-mars");
+        assertThat(marsPackage.getVersion()).isEqualTo("4.5");
+        assertThat(marsPackage.getDescription()).isEqualTo(
                 "Eclipse Mars IDE for Java EE Developers");
 
     }
@@ -181,14 +184,14 @@ public class DebConfigTest {
     }
 
     /**
-     * Test module 1.
+     * Test package A.
      */
-    @XmlRootElement(name = "moduleA")
-    public static class DebModuleA extends DebModule {
+    @XmlRootElement(name = "packageA")
+    public static class DebPackageA extends DebPackage {
 
         @Override
-        public final String getModuleName() {
-            return "moduleA";
+        public final String getPackageName() {
+            return "packageA";
         }
 
         @Override
@@ -197,7 +200,7 @@ public class DebConfigTest {
         }
 
         @Override
-        public final void init(final DebModules parent) {
+        public final void init(final DebPackages parent) {
             // Do nothing
         }
 

@@ -21,15 +21,15 @@ import static org.fest.assertions.Assertions.assertThat;
 
 import java.io.File;
 
-import org.fuin.owndeb.commons.DebModule;
+import org.fuin.owndeb.commons.DebPackage;
 import org.fuin.owndeb.commons.DebPackageResolver;
 import org.junit.Test;
 
 /**
- * Tests the {@link ExampleModule} class.
+ * Tests the {@link ExamplePackage} class.
  */
 // CHECKSTYLE:OFF for tests
-public final class ExampleModuleTest {
+public final class ExamplePackageTest {
 
     @Test
     public final void testCreate() {
@@ -37,18 +37,18 @@ public final class ExampleModuleTest {
         // PREPARE
         final String name = "example1";
         final String version = "1.0.0";
-        final String description = "Example Module 1";
+        final String description = "Example Package 1";
         final String maintainer = "michael@fuin.org";
         final String arch = "amd64";
         final String installationPath = "/opt";
         final String section = "devel";
         final String priority = "low";
-        final ExampleModule testee = new ExampleModule(name, version, description,
+        final ExamplePackage testee = new ExamplePackage(name, version, description,
                 maintainer, arch, installationPath, section, priority);
         testee.init(null);
         testee.resolveDependencies(new DebPackageResolver() {
             @Override
-            public DebModule findDebPackage(final String packageName) {
+            public DebPackage findDebPackage(final String packageName) {
                 // Nothing to resolve in this test
                 return null;
             }

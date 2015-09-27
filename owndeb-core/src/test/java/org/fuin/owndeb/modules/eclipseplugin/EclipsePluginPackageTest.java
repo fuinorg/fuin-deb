@@ -26,16 +26,16 @@ import java.net.URL;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.fuin.owndeb.commons.DebConfig;
-import org.fuin.owndeb.modules.eclipse.EclipseModule;
-import org.fuin.owndeb.modules.jdk.JdkModule;
+import org.fuin.owndeb.modules.eclipse.EclipsePackage;
+import org.fuin.owndeb.modules.jdk.JdkPackage;
 import org.fuin.utils4j.Utils4J;
 import org.junit.Test;
 
 /**
- * Tests the {@link EclipsePluginModule} class.
+ * Tests the {@link EclipsePluginPackage} class.
  */
 // CHECKSTYLE:OFF for tests
-public final class EclipsePluginModuleTest {
+public final class EclipsePluginPackageTest {
 
     @Test
     public final void testCreate() {
@@ -44,10 +44,10 @@ public final class EclipsePluginModuleTest {
         final URL url = Utils4J.url("classpath:owndeb-config.xml");
         final String xml = Utils4J.readAsString(url, "utf-8", 1024);
         final DebConfig config = unmarshal(xml, createXmlAdapter(),
-                DebConfig.class, JdkModule.class, EclipseModule.class,
-                EclipsePluginModule.class);
-        final EclipsePluginModule testee = (EclipsePluginModule) config
-                .getModules().getModules().get(3);
+                DebConfig.class, JdkPackage.class, EclipsePackage.class,
+                EclipsePluginPackage.class);
+        final EclipsePluginPackage testee = (EclipsePluginPackage) config
+                .getPackages().getPackages().get(3);
 
         final File buildDir = new File("./target");
 

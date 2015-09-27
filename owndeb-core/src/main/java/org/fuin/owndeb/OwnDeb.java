@@ -29,9 +29,9 @@ import javax.xml.bind.ValidationEventHandler;
 
 import org.fuin.objects4j.common.Contract;
 import org.fuin.owndeb.commons.DebConfig;
-import org.fuin.owndeb.commons.DebModule;
-import org.fuin.owndeb.commons.DebModules;
-import org.fuin.owndeb.modules.jdk.JdkModule;
+import org.fuin.owndeb.commons.DebPackage;
+import org.fuin.owndeb.commons.DebPackages;
+import org.fuin.owndeb.modules.jdk.JdkPackage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,10 +83,10 @@ public final class OwnDeb {
      */
     public final void execute() {
         LOG.info("Started creating packages");
-        final List<DebModule> modules = config.getModules().getModules();
-        for (final DebModule module : modules) {
-            LOG.info("Creating module: {}", module.getModuleName());
-            module.create(targetDir);
+        final List<DebPackage> packages = config.getPackages().getPackages();
+        for (final DebPackage pkg : packages) {
+            LOG.info("Creating package: {}", pkg.getPackageName());
+            pkg.create(targetDir);
         }
         LOG.info("Finished creating packages");
     }

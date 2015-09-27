@@ -29,24 +29,24 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.fuin.objects4j.common.NotEmpty;
 import org.fuin.objects4j.common.Nullable;
 import org.fuin.owndeb.commons.DebDependency;
-import org.fuin.owndeb.commons.DebModule;
-import org.fuin.owndeb.commons.DebModules;
+import org.fuin.owndeb.commons.DebPackage;
+import org.fuin.owndeb.commons.DebPackages;
 import org.fuin.owndeb.commons.DebUtils;
-import org.fuin.owndeb.modules.base.AbstractDownloadTarGzModule;
+import org.fuin.owndeb.modules.base.AbstractDownloadTarGzPackage;
 
 /**
  * Downloads and Oracle JDK and creates a binary Debian package from it.
  */
-@XmlRootElement(name = "jdk-module")
-public final class JdkModule extends AbstractDownloadTarGzModule {
+@XmlRootElement(name = "jdk-package")
+public final class JdkPackage extends AbstractDownloadTarGzPackage {
 
-    /** Name of the module. */
-    public static final String NAME = "jdk-module";
+    /** Name of the package. */
+    public static final String NAME = "jdk-package";
 
     /**
      * Default constructor for JAXB.
      */
-    protected JdkModule() {
+    protected JdkPackage() {
         super();
     }
 
@@ -74,7 +74,7 @@ public final class JdkModule extends AbstractDownloadTarGzModule {
      * @param dependencies
      *            Array of dependencies.
      */
-    public JdkModule(@NotEmpty final String name,
+    public JdkPackage(@NotEmpty final String name,
             @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
@@ -109,7 +109,7 @@ public final class JdkModule extends AbstractDownloadTarGzModule {
      * @param dependencies
      *            List of dependencies.
      */
-    public JdkModule(@NotEmpty final String name,
+    public JdkPackage(@NotEmpty final String name,
             @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
@@ -121,37 +121,35 @@ public final class JdkModule extends AbstractDownloadTarGzModule {
     }
 
     @Override
-    public final String getModuleName() {
+    public final String getPackageName() {
         return NAME;
     }
 
     @Override
-    public final void init(@Nullable final DebModules parent) {
+    public final void init(@Nullable final DebPackages parent) {
         addNonExistingVariables(parent);
-        initDownloadTarGzModule(parent);
+        initDownloadTarGzPackage(parent);
         resolveVariables();
     }
 
     @Override
-    protected final void applyModifications(final DebModule debPackage,
-            final File packageDir) {
+    protected final void applyModifications(final File packageDir) {
         // No modifications
     }
 
     @Override
-    protected final void copyControlFiles(final DebModule debPackage,
-            final File controlDir) {
+    protected final void copyControlFiles(final File controlDir) {
         final Map<String, String> vars = DebUtils.asMap(getParent()
                 .getVariables());
-        writeReplacedResource(JdkModule.class, "/" + getModuleName()
+        writeReplacedResource(JdkPackage.class, "/" + getPackageName()
                 + "/control", controlDir, vars);
-        writeReplacedResource(JdkModule.class, "/" + getModuleName()
+        writeReplacedResource(JdkPackage.class, "/" + getPackageName()
                 + "/postinst", controlDir, vars);
     }
 
     @Override
     public final String toString() {
-        return getModuleName();
+        return getPackageName();
     }
 
 }

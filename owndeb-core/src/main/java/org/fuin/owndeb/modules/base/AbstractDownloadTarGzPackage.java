@@ -37,8 +37,8 @@ import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.NotEmpty;
 import org.fuin.objects4j.common.Nullable;
 import org.fuin.owndeb.commons.DebDependency;
-import org.fuin.owndeb.commons.DebModule;
-import org.fuin.owndeb.commons.DebModules;
+import org.fuin.owndeb.commons.DebPackage;
+import org.fuin.owndeb.commons.DebPackages;
 import org.fuin.owndeb.commons.DebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,12 +49,12 @@ import org.vafer.jdeb.ant.Mapper;
 /**
  * Downloads an archive and creates a binary Debian package from it.
  */
-public abstract class AbstractDownloadTarGzModule extends DebModule {
+public abstract class AbstractDownloadTarGzPackage extends DebPackage {
 
     private static final String URL = "url";
 
     private static final Logger LOG = LoggerFactory
-            .getLogger(AbstractDownloadTarGzModule.class);
+            .getLogger(AbstractDownloadTarGzPackage.class);
 
     @XmlAttribute(name = URL)
     private String urlStr;
@@ -62,7 +62,7 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
     /**
      * Default constructor for JAXB.
      */
-    protected AbstractDownloadTarGzModule() {
+    protected AbstractDownloadTarGzPackage() {
         super();
     }
 
@@ -90,7 +90,7 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
      * @param dependencies
      *            Array of dependencies.
      */
-    public AbstractDownloadTarGzModule(@NotEmpty final String name,
+    public AbstractDownloadTarGzPackage(@NotEmpty final String name,
             @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
@@ -127,7 +127,7 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
      * @param dependencies
      *            Array of dependencies.
      */
-    public AbstractDownloadTarGzModule(@NotEmpty final String name,
+    public AbstractDownloadTarGzPackage(@NotEmpty final String name,
             @Nullable final String version, @Nullable final String description,
             @Nullable final String maintainer, @Nullable final String arch,
             @Nullable final String installationPath,
@@ -144,7 +144,8 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
     public final void create(final File buildDirectory) {
 
         Contract.requireArgNotNull("buildDirectory", buildDirectory);
-        LOG.info("Creating module '{}' in: {}", getModuleName(), buildDirectory);
+        LOG.info("Creating package '{}' in: {}", getPackageName(),
+                buildDirectory);
 
         final File archiveFile = cachedDownload(url(urlStr), buildDirectory);
 
@@ -161,11 +162,11 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
         }
         unTarGz(archiveFile);
         renameOriginalToPackageDir(srcDir, packageDir);
-        applyModifications(this, packageDir);
+        applyModifications(packageDir);
 
         final File tarFile = tarGz(buildDirectory, getName());
         DebUtils.mkdirs(controlDir);
-        copyControlFiles(this, controlDir);
+        copyControlFiles(controlDir);
         createDebianPackage(this, buildDirectory, packageDir, controlDir,
                 tarFile);
 
@@ -177,8 +178,8 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
      * @param parent
      *            Parent to set.
      */
-    protected final void initDownloadTarGzModule(final DebModules parent) {
-        initModule(parent);
+    protected final void initDownloadTarGzPackage(final DebPackages parent) {
+        initPackage(parent);
         addOrReplaceVariable(URL, urlStr);
     }
 
@@ -225,7 +226,7 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
         return new File(buildDirectory, folderName);
     }
 
-    private static void createDebianPackage(final DebModule debPackage,
+    private static void createDebianPackage(final DebPackage debPackage,
             final File buildDirectory, final File packageDir,
             final File controlDir, final File tarFile) {
 
@@ -266,24 +267,18 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
     /**
      * Modifies the original package content.
      * 
-     * @param debPackage
-     *            Current package.
      * @param packageDir
      *            Directory that contains the package content.
      */
-    protected abstract void applyModifications(@NotNull DebModule debPackage,
-            @NotNull File packageDir);
+    protected abstract void applyModifications(@NotNull File packageDir);
 
     /**
-     * Copies the control files for the given package and module into the
-     * control directory.
+     * Copies the control files for the given package into the control
+     * directory.
      * 
-     * @param debPackage
-     *            Current package.
      * @param controlDir
      *            Target control directory.
      */
-    protected abstract void copyControlFiles(@NotNull DebModule debPackage,
-            @NotNull File controlDir);
+    protected abstract void copyControlFiles(@NotNull File controlDir);
 
 }

@@ -42,7 +42,7 @@ public final class DebConfig implements VariablesContainer {
     private List<Variable> variables;
 
     @XmlElement
-    private DebModules modules;
+    private DebPackages packages;
 
     /**
      * Default constructor for JAXB.
@@ -52,43 +52,43 @@ public final class DebConfig implements VariablesContainer {
     }
 
     /**
-     * Constructor with modules.
+     * Constructor with packages.
      * 
-     * @param modules
-     *            Modules object.
+     * @param packages
+     *            Packages object.
      */
-    public DebConfig(@NotNull final DebModules modules) {
-        this(modules, (List<Variable>) null);
+    public DebConfig(@NotNull final DebPackages packages) {
+        this(packages, (List<Variable>) null);
     }
 
     /**
-     * Constructor modules and variable array.
+     * Constructor packages and variable array.
      * 
-     * @param modules
-     *            Modules object.
+     * @param packages
+     *            Packages object.
      * @param variables
      *            Variable array.
      */
-    public DebConfig(@NotNull final DebModules modules,
+    public DebConfig(@NotNull final DebPackages packages,
             @Nullable final Variable... variables) {
         // CHECKSTYLE:OFF Inline conditional is here the only way to go
-        this(modules, variables == null ? null : Arrays.asList(variables));
+        this(packages, variables == null ? null : Arrays.asList(variables));
         // CHECKSTYLE:ON
     }
 
     /**
-     * Constructor modules and variable list.
+     * Constructor packages and variable list.
      * 
-     * @param modules
-     *            Modules object.
+     * @param packages
+     *            Packages object.
      * @param variables
      *            Variable list.
      */
-    public DebConfig(@NotNull final DebModules modules,
+    public DebConfig(@NotNull final DebPackages packages,
             @Nullable final List<Variable> variables) {
         super();
-        Contract.requireArgNotNull("modules", modules);
-        this.modules = modules;
+        Contract.requireArgNotNull("packages", packages);
+        this.packages = packages;
         if (variables == null) {
             this.variables = null;
         } else {
@@ -97,13 +97,13 @@ public final class DebConfig implements VariablesContainer {
     }
 
     /**
-     * Returns the list of modules to create.
+     * Returns the list of packages to create.
      * 
-     * @return Immutable modules list.
+     * @return Immutable packages list.
      */
     @NotNull
-    public final DebModules getModules() {
-        return modules;
+    public final DebPackages getPackages() {
+        return packages;
     }
 
     @Override
@@ -136,9 +136,9 @@ public final class DebConfig implements VariablesContainer {
      */
     public final void afterUnmarshal(final Unmarshaller unmarshaller,
             final Object parent) {
-        if (modules != null) {
-            modules.init(this);
-            modules.resolveDependencies();
+        if (packages != null) {
+            packages.init(this);
+            packages.resolveDependencies();
         }
     }
 

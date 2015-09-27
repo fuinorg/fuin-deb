@@ -35,9 +35,9 @@ public final class DebDependency {
     @XmlAttribute(name = "name")
     private String name;
 
-    private transient DebModule resolvedDependency;
+    private transient DebPackage resolvedDependency;
 
-    private transient DebModule parent;
+    private transient DebPackage parent;
 
     /**
      * Default constructor for JAXB.
@@ -73,13 +73,13 @@ public final class DebDependency {
      * 
      * @return Referenced package.
      */
-    public final DebModule getResolvedDependency() {
+    public final DebPackage getResolvedDependency() {
         return resolvedDependency;
     }
 
     /**
      * Tries to resolve the package the is referenced by the name. After this
-     * method was called the {@link #resolvedDependency} is set if a module with
+     * method was called the {@link #resolvedDependency} is set if a package with
      * that name was found.
      * 
      * @param resolver
@@ -98,7 +98,7 @@ public final class DebDependency {
      * 
      * @return Current parent.
      */
-    public final DebModule getParent() {
+    public final DebPackage getParent() {
         return parent;
     }
 
@@ -108,7 +108,7 @@ public final class DebDependency {
      * @param parent
      *            Current parent.
      */
-    public final void init(@Nullable final DebModule parent) {
+    public final void init(@Nullable final DebPackage parent) {
         this.parent = parent;
         this.name = Utils4J.replaceVars(name,
                 DebUtils.asMap(parent.getVariables()));

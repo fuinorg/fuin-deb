@@ -33,7 +33,7 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 
 //CHECKSTYLE:OFF for tests
-public class DebModulesTest {
+public class DebPackagesTest {
 
     @Test
     public final void testMarshalUnmarshalXML() throws Exception {
@@ -46,28 +46,28 @@ public class DebModulesTest {
         final String installationPath = "/opt";
         final String section = "devel";
         final String priority = "low";
-        final DebModule module1 = new DebModule1();
-        final DebModule module2 = new DebModule2();
-        final DebModules original = new DebModules(version, description,
-                maintainer, arch, installationPath, section, priority, module1,
-                module2);
+        final DebPackage package1 = new DebPackage1();
+        final DebPackage package2 = new DebPackage2();
+        final DebPackages original = new DebPackages(version, description,
+                maintainer, arch, installationPath, section, priority, package1,
+                package2);
 
         // TEST
         final String xml = marshal(original, createXmlAdapter(),
-                DebModules.class, DebModule1.class, DebModule2.class);
+                DebPackages.class, DebPackage1.class, DebPackage2.class);
 
         // VERIFY
         XMLUnit.setIgnoreWhitespace(true);
         XMLAssert
                 .assertXMLEqual(
                         XML_PREFIX
-                                + "<modules version=\"1.2.3\" description=\"Aa Bb Cc\" "
+                                + "<packages version=\"1.2.3\" description=\"Aa Bb Cc\" "
                                 + "maintainer=\"michael@fuin.org\" arch=\"amd64\" "
                                 + "section=\"devel\" " + "priority=\"low\" "
                                 + "installation-path=\"/opt\">"
-                                + "<module1/> <module2/>" + "</modules>", xml);
-        final DebModules copy = unmarshal(xml, createXmlAdapter(),
-                DebModules.class, DebModule1.class, DebModule2.class);
+                                + "<package1/> <package2/>" + "</packages>", xml);
+        final DebPackages copy = unmarshal(xml, createXmlAdapter(),
+                DebPackages.class, DebPackage1.class, DebPackage2.class);
         copy.init(null);
         assertThat(copy.getVersion()).isEqualTo("1.2.3");
         assertThat(copy.getDescription()).isEqualTo("Aa Bb Cc");
@@ -76,11 +76,11 @@ public class DebModulesTest {
         assertThat(copy.getInstallationPath()).isEqualTo("/opt");
         assertThat(copy.getSection()).isEqualTo("devel");
         assertThat(copy.getPriority()).isEqualTo("low");
-        assertThat(copy.getModules()).hasSize(2);
-        assertThat(copy.getModules().get(0).getClass()).isEqualTo(
-                DebModule1.class);
-        assertThat(copy.getModules().get(1).getClass()).isEqualTo(
-                DebModule2.class);
+        assertThat(copy.getPackages()).hasSize(2);
+        assertThat(copy.getPackages().get(0).getClass()).isEqualTo(
+                DebPackage1.class);
+        assertThat(copy.getPackages().get(1).getClass()).isEqualTo(
+                DebPackage2.class);
 
     }
 
@@ -90,14 +90,14 @@ public class DebModulesTest {
     }
 
     /**
-     * Test module 1.
+     * Test package 1.
      */
-    @XmlRootElement(name = "module1")
-    public static class DebModule1 extends DebModule {
+    @XmlRootElement(name = "package1")
+    public static class DebPackage1 extends DebPackage {
 
         @Override
-        public final String getModuleName() {
-            return "module1";
+        public final String getPackageName() {
+            return "package1";
         }
 
         @Override
@@ -106,21 +106,21 @@ public class DebModulesTest {
         }
 
         @Override
-        public final void init(final DebModules parent) {
+        public final void init(final DebPackages parent) {
             // Do nothing
         }
 
     }
 
     /**
-     * Test module 2.
+     * Test package 2.
      */
-    @XmlRootElement(name = "module2")
-    public static class DebModule2 extends DebModule {
+    @XmlRootElement(name = "package2")
+    public static class DebPackage2 extends DebPackage {
 
         @Override
-        public final String getModuleName() {
-            return "module2";
+        public final String getPackageName() {
+            return "package2";
         }
 
         @Override
@@ -129,7 +129,7 @@ public class DebModulesTest {
         }
 
         @Override
-        public final void init(final DebModules parent) {
+        public final void init(final DebPackages parent) {
             // Do nothing
         }
 
