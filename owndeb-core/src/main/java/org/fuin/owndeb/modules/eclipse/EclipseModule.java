@@ -134,7 +134,7 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
      */
     @Nullable
     public final String getVm() {
-        return vm;
+        return variableValue("vm");
     }
 
     /**
@@ -144,33 +144,7 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
      */
     @Nullable
     public final String getVmArgs() {
-        return vmArgs;
-    }
-
-    /**
-     * Replaces variables in the properties.
-     * 
-     * @param vars
-     *            Variables to use.
-     */
-    private void replaceVariables() {
-        final Map<String, String> vars = new VariableResolver(
-                DebUtils.asMap(getVariables())).getResolved();
-        vm = Utils4J.replaceVars(vm, vars);
-        vmArgs = Utils4J.replaceVars(vmArgs, vars);
-    }
-
-    /**
-     * Adds the properties defined in this class as variables. If any of them
-     * already exist, an {@link IllegalStateException} will be thrown.
-     */
-    private final void addVariables() {
-        if (vm != null) {
-            addVariable(new Variable("vm", vm));
-        }
-        if (vmArgs != null) {
-            addVariable(new Variable("vmargs", vmArgs));
-        }
+        return variableValue("vmargs");
     }
 
     @Override
@@ -186,12 +160,11 @@ public final class EclipseModule extends AbstractDownloadTarGzModule {
      *            Current parent.
      */
     public final void init(@Nullable final DebModules parent) {
+        addNonExistingVariables(parent);
         initDownloadTarGzModule(parent);
-        addVariables();
-        if (parent != null) {
-            addNonExistingVariables(parent.getVariables());
-        }
-        replaceVariables();
+        addOrReplaceVariable("vm", vm);
+        addOrReplaceVariable("vmargs", vmArgs);
+        resolveVariables();
     }
 
     @Override

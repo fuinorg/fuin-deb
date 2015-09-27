@@ -123,12 +123,11 @@ public final class JdkModule extends AbstractDownloadTarGzModule {
 
     @Override
     public final void init(@Nullable final DebModules parent) {
+        addNonExistingVariables(parent);
         initDownloadTarGzModule(parent);
-        if (parent != null) {
-            addNonExistingVariables(parent.getVariables());
-        }
+        resolveVariables();
     }
-    
+
     @Override
     protected final void applyModifications(final DebPackage debPackage,
             final File packageDir) {
@@ -138,7 +137,8 @@ public final class JdkModule extends AbstractDownloadTarGzModule {
     @Override
     protected final void copyControlFiles(final DebPackage debPackage,
             final File controlDir) {
-        final Map<String, String> vars = DebUtils.asMap(getParent().getVariables());
+        final Map<String, String> vars = DebUtils.asMap(getParent()
+                .getVariables());
         writeReplacedResource(JdkModule.class, "/" + getModuleName()
                 + "/control", controlDir, vars);
         writeReplacedResource(JdkModule.class, "/" + getModuleName()

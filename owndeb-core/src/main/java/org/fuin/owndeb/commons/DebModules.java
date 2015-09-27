@@ -152,15 +152,13 @@ public final class DebModules extends AbstractPackage implements
      *            Current parent.
      */
     public final void init(@Nullable final DebConfig parent) {
+        addNonExistingVariables(parent);
         initPackage(parent);
-        if (parent != null) {
-            addNonExistingVariables(parent.getVariables());
-        }
         if (modules != null) {
             for (final DebModule module : modules) {
                 module.init(this);
             }
-        }
+        }        
     }
 
 }

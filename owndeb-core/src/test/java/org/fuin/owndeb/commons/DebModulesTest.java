@@ -68,6 +68,7 @@ public class DebModulesTest {
                                 + "<module1/> <module2/>" + "</modules>", xml);
         final DebModules copy = unmarshal(xml, createXmlAdapter(),
                 DebModules.class, DebModule1.class, DebModule2.class);
+        copy.init(null);
         assertThat(copy.getVersion()).isEqualTo("1.2.3");
         assertThat(copy.getDescription()).isEqualTo("Aa Bb Cc");
         assertThat(copy.getMaintainer()).isEqualTo("michael@fuin.org");

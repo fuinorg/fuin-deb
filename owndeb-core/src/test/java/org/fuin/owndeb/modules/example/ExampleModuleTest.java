@@ -44,6 +44,7 @@ public final class ExampleModuleTest {
         final DebPackage pkg = new DebPackage("example1");
         final ExampleModule testee = new ExampleModule(version, description,
                 maintainer, arch, installationPath, section, priority, pkg);
+        testee.init(null);
 
         final File buildDir = new File("./target");
 

@@ -27,7 +27,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -40,10 +39,6 @@ import org.fuin.owndeb.commons.DebModule;
 import org.fuin.owndeb.commons.DebModules;
 import org.fuin.owndeb.commons.DebPackage;
 import org.fuin.owndeb.commons.DebUtils;
-import org.fuin.owndeb.commons.Variable;
-import org.fuin.owndeb.commons.VariablesContainer;
-import org.fuin.utils4j.Utils4J;
-import org.fuin.utils4j.VariableResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vafer.jdeb.ant.Data;
@@ -147,14 +142,12 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
         final List<DebPackage> debPackages = getPackages();
         for (final DebPackage pkg : debPackages) {
 
-            final DebPackage debPackage = new DebPackage(pkg);
-
-            LOG.info("Creating package: {}", debPackage.getName());
+            LOG.info("Creating package: {}", pkg.getName());
 
             final File packageDir = new File(buildDirectory,
-                    debPackage.getName());
+                    pkg.getName());
             final File controlDir = new File(buildDirectory,
-                    debPackage.getName() + "-control");
+                    pkg.getName() + "-control");
 
             LOG.debug("packageDir: {}", packageDir);
             LOG.debug("controlDir: {}", controlDir);
@@ -168,47 +161,14 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
             renameOriginalToPackageDir(srcDir, packageDir);
             applyModifications(pkg, packageDir);
 
-            final File tarFile = tarGz(buildDirectory, debPackage.getName());
+            final File tarFile = tarGz(buildDirectory, pkg.getName());
             DebUtils.mkdirs(controlDir);
-            copyControlFiles(debPackage, controlDir);
-            createDebianPackage(debPackage, buildDirectory, packageDir,
+            copyControlFiles(pkg, controlDir);
+            createDebianPackage(pkg, buildDirectory, packageDir,
                     controlDir, tarFile);
 
         }
 
-    }
-
-    /**
-     * Copy all attributes from the given object if the field is
-     * <code>null</code>.
-     * 
-     * @param other
-     *            Object to copy values from.
-     */
-    private void applyDefaults(final VariablesContainer parent) {
-        // No defaults from parent wanted
-    }
-
-    /**
-     * Replaces variables in the properties.
-     * 
-     * @param vars
-     *            Variables to use.
-     */
-    private void replaceVariables() {
-        final Map<String, String> vars = new VariableResolver(
-                DebUtils.asMap(getVariables())).getResolved();
-        urlStr = Utils4J.replaceVars(urlStr, vars);
-    }
-
-    /**
-     * Adds the properties defined in this class as variables. If any of them
-     * already exist, an {@link IllegalStateException} will be thrown.
-     */
-    private final void addVariables() {
-        if (urlStr != null) {
-            addVariable(new Variable("url", urlStr));
-        }
     }
 
     /**
@@ -219,9 +179,7 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
      */
     protected final void initDownloadTarGzModule(final DebModules parent) {
         initModule(parent);
-        applyDefaults(parent);
-        addVariables();
-        replaceVariables();
+        addOrReplaceVariable("url", urlStr);
     }
 
     /**
@@ -230,7 +188,7 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
      * @return URL.
      */
     public final String getUrlStr() {
-        return urlStr;
+        return variableValue("url");
     }
 
     /**
@@ -239,7 +197,7 @@ public abstract class AbstractDownloadTarGzModule extends DebModule {
      * @return URL.
      */
     public final URL getUrl() {
-        return url(urlStr);
+        return url(getUrlStr());
     }
 
     private static void renameOriginalToPackageDir(final File srcDir,

@@ -17,14 +17,10 @@
  */
 package org.fuin.owndeb.commons;
 
-import java.util.Map;
-
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
 
 import org.fuin.objects4j.common.Nullable;
-import org.fuin.utils4j.Utils4J;
-import org.fuin.utils4j.VariableResolver;
 
 /**
  * Provides default configuration for sub classes.
@@ -73,25 +69,13 @@ public abstract class AbstractPackage extends AbstractBase {
     }
 
     /**
-     * Copy constructor.
-     * 
-     * @param other
-     *            Package to copy.
-     */
-    public AbstractPackage(@NotNull final AbstractPackage other) {
-        super(other);
-        this.version = other.version;
-        this.description = other.description;
-    }    
-    
-    /**
      * Returns the package version.
      * 
      * @return Version.
      */
     @Nullable
     public final String getVersion() {
-        return version;
+        return variableValue("version");
     }
 
     /**
@@ -101,51 +85,7 @@ public abstract class AbstractPackage extends AbstractBase {
      */
     @Nullable
     public final String getDescription() {
-        return description;
-    }
-
-    /**
-     * Copy all attributes from the given object if the field is
-     * <code>null</code>.
-     * 
-     * @param other
-     *            Object to copy values from.
-     */
-    private void applyDefaults(final VariablesContainer parent) {
-        if (parent != null) {
-            if (version == null) {
-                this.version = parent.variableValue("version");
-            }
-            if (description == null) {
-                this.description = parent.variableValue("description");
-            }
-        }
-    }
-
-    /**
-     * Replaces variables in the properties.
-     * 
-     * @param vars
-     *            Variables to use.
-     */
-    private void replaceVariables() {
-        final Map<String, String> vars = new VariableResolver(
-                DebUtils.asMap(getVariables())).getResolved();
-        version = Utils4J.replaceVars(version, vars);
-        description = Utils4J.replaceVars(description, vars);
-    }
-
-    /**
-     * Adds the properties defined in this class as variables. If any of them
-     * already exist, an {@link IllegalStateException} will be thrown.
-     */
-    private final void addVariables() {
-        if (version != null) {
-            addVariable(new Variable("version", version));
-        }
-        if (description != null) {
-            addVariable(new Variable("description", description));
-        }
+        return variableValue("description");
     }
 
     /**
@@ -156,9 +96,8 @@ public abstract class AbstractPackage extends AbstractBase {
      */
     public final void initPackage(final VariablesContainer parent) {
         initBase(parent);
-        applyDefaults(parent);
-        addVariables();
-        replaceVariables();
+        addOrReplaceVariable("version", version);
+        addOrReplaceVariable("description", description);
     }
 
 }

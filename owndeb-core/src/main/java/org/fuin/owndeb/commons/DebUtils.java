@@ -29,6 +29,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -47,6 +48,7 @@ import org.apache.http.client.fluent.Request;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Nullable;
 import org.fuin.utils4j.Utils4J;
+import org.fuin.utils4j.VariableResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vafer.jdeb.shaded.compress.io.IOUtils;
@@ -292,7 +294,8 @@ public final class DebUtils {
         try {
             final InputStream in = clasz.getResourceAsStream(resource);
             if (in == null) {
-                throw new IllegalArgumentException("Resource not found: " + resource);
+                throw new IllegalArgumentException("Resource not found: "
+                        + resource);
             }
             try {
                 FileUtils.copyInputStreamToFile(in, targetFile);
@@ -396,6 +399,28 @@ public final class DebUtils {
             map.put(var.getName(), var.getValue());
         }
         return map;
+    }
+
+    /**
+     * Resolves the variables in all values.
+     * 
+     * @param vars
+     *            Variable list to resolve variable references.
+     * 
+     * @return Reoslved variables.
+     */
+    public static List<Variable> resolve(final List<Variable> vars) {
+        final Map<String, String> varMap = new VariableResolver(asMap(vars))
+                .getResolved();
+        final List<Variable> variables = new ArrayList<>();
+        final Iterator<String> it = varMap.keySet().iterator();
+        while (it.hasNext()) {
+            final String key = it.next();
+            final String value = varMap.get(key);
+            final Variable var = new Variable(key, value);
+            variables.add(var);
+        }
+        return variables;
     }
 
 }

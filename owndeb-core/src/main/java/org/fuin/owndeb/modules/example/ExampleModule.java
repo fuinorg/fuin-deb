@@ -130,15 +130,12 @@ public class ExampleModule extends DebModule {
         final List<DebPackage> debPackages = getPackages();
         for (final DebPackage pkg : debPackages) {
 
-            final DebPackage debPackage = new DebPackage(pkg);
-            debPackage.init(this);
-
-            LOG.info("Creating package: {}", debPackage.getName());
+            LOG.info("Creating package: {}", pkg.getName());
 
             final File packageDir = new File(buildDirectory,
-                    debPackage.getName());
+                    pkg.getName());
             final File controlDir = new File(buildDirectory,
-                    debPackage.getName() + "-control");
+                    pkg.getName() + "-control");
             final File helloFile = new File(packageDir, "hello.txt");
             DebUtils.copyResourceToFile(this.getClass(), "/" + getModuleName()
                     + "/hello.txt", helloFile);
@@ -146,8 +143,8 @@ public class ExampleModule extends DebModule {
             LOG.debug("packageDir: {}", packageDir);
             LOG.debug("controlDir: {}", controlDir);
 
-            copyControlFiles(debPackage, getModuleName(), controlDir);
-            createDebianPackage(debPackage, buildDirectory, controlDir,
+            copyControlFiles(pkg, getModuleName(), controlDir);
+            createDebianPackage(pkg, buildDirectory, controlDir,
                     packageDir);
 
         }
@@ -156,10 +153,9 @@ public class ExampleModule extends DebModule {
 
     @Override
     public final void init(@Nullable final DebModules parent) {
+        addNonExistingVariables(parent);
         initModule(parent);
-        if (parent != null) {
-            addNonExistingVariables(parent.getVariables());
-        }
+        resolveVariables();
     }
 
     private static void copyControlFiles(final DebPackage debPackage,

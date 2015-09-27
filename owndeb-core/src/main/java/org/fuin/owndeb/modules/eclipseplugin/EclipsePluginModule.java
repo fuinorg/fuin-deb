@@ -35,9 +35,6 @@ import org.fuin.owndeb.commons.DebModule;
 import org.fuin.owndeb.commons.DebModules;
 import org.fuin.owndeb.commons.DebPackage;
 import org.fuin.owndeb.commons.DebUtils;
-import org.fuin.owndeb.commons.Variable;
-import org.fuin.utils4j.Utils4J;
-import org.fuin.utils4j.VariableResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vafer.jdeb.ant.DebAntTask;
@@ -84,6 +81,10 @@ public class EclipsePluginModule extends DebModule {
      *            Section like "devel".
      * @param priority
      *            Priority like "low".
+     * @param repository
+     *            Eclipse P2 repsoitory URL.
+     * @param installIUs
+     *            List of units to install.
      * @param packages
      *            Array of packages to create.
      */
@@ -119,6 +120,10 @@ public class EclipsePluginModule extends DebModule {
      *            Section like "devel".
      * @param priority
      *            Priority like "low".
+     * @param repository
+     *            Eclipse P2 repsoitory URL.
+     * @param installIUs
+     *            List of units to install.
      * @param packages
      *            List of packages to create.
      */
@@ -137,7 +142,6 @@ public class EclipsePluginModule extends DebModule {
         this.installIUs = installIUs;
     }
 
-    
     /**
      * Returns the Eclipse repository.
      * 
@@ -145,7 +149,7 @@ public class EclipsePluginModule extends DebModule {
      */
     @NotNull
     public final String getRepository() {
-        return repository;
+        return variableValue("repository");
     }
 
     /**
@@ -155,7 +159,7 @@ public class EclipsePluginModule extends DebModule {
      */
     @NotNull
     public final String getInstallIUs() {
-        return installIUs;
+        return variableValue("installIUs");
     }
 
     @Override
@@ -172,59 +176,27 @@ public class EclipsePluginModule extends DebModule {
         final List<DebPackage> debPackages = getPackages();
         for (final DebPackage pkg : debPackages) {
 
-            final DebPackage debPackage = new DebPackage(pkg);
-
-            LOG.info("Creating package: {}", debPackage.getName());
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Config:\n{}", marshal(debPackage));
-            }
+            LOG.info("Creating package: {}", pkg.getName());
 
             final File controlDir = new File(buildDirectory,
-                    debPackage.getName() + "-control");
+                    pkg.getName() + "-control");
 
             LOG.debug("controlDir: {}", controlDir);
 
-            copyControlFiles(debPackage, getModuleName(), controlDir);
-            createDebianPackage(debPackage, buildDirectory, controlDir);
+            copyControlFiles(pkg, getModuleName(), controlDir);
+            createDebianPackage(pkg, buildDirectory, controlDir);
 
         }
 
-    }
-
-    /**
-     * Replaces variables in the properties.
-     * 
-     * @param vars
-     *            Variables to use.
-     */
-    private void replaceVariables() {
-        final Map<String, String> vars = new VariableResolver(
-                DebUtils.asMap(getVariables())).getResolved();
-        repository = Utils4J.replaceVars(repository, vars);
-        installIUs = Utils4J.replaceVars(installIUs, vars);
-    }
-
-    /**
-     * Adds the properties defined in this class as variables. If any of them
-     * already exist, an {@link IllegalStateException} will be thrown.
-     */
-    private final void addVariables() {
-        if (repository != null) {
-            addVariable(new Variable("repository", repository));
-        }
-        if (installIUs != null) {
-            addVariable(new Variable("installIUs", installIUs));
-        }
     }
 
     @Override
     public final void init(@Nullable final DebModules parent) {
+        addNonExistingVariables(parent);
         initModule(parent);
-        addVariables();
-        replaceVariables();
-        if (parent != null) {
-            addNonExistingVariables(parent.getVariables());
-        }
+        addOrReplaceVariable("repository", repository);
+        addOrReplaceVariable("installIUs", installIUs);
+        resolveVariables();
     }
 
     private static void copyControlFiles(final DebPackage debPackage,

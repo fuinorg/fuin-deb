@@ -141,7 +141,7 @@ public class DebConfigTest {
         assertThat(config).isNotNull();
         assertThat(config.getModules()).isNotNull();
         assertThat(config.getModules().getModules()).isNotNull();
-        assertThat(config.getModules().getModules()).hasSize(3);
+        assertThat(config.getModules().getModules()).hasSize(4);
 
         final JdkModule jdkModule = (JdkModule) config.getModules()
                 .getModules().get(0);

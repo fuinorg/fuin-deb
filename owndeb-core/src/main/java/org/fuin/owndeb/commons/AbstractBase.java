@@ -20,7 +20,6 @@ package org.fuin.owndeb.commons;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -28,8 +27,6 @@ import javax.xml.bind.annotation.XmlElement;
 
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Nullable;
-import org.fuin.utils4j.Utils4J;
-import org.fuin.utils4j.VariableResolver;
 
 /**
  * Provides default configuration for sub classes.
@@ -90,35 +87,13 @@ public abstract class AbstractBase implements VariablesContainer {
     }
 
     /**
-     * Copy constructor.
-     * 
-     * @param other
-     *            Object to copy.
-     */
-    public AbstractBase(@NotNull final AbstractBase other) {
-        super();
-        Contract.requireArgNotNull("other", other);
-        this.maintainer = other.maintainer;
-        this.arch = other.arch;
-        this.installationPath = other.installationPath;
-        this.section = other.section;
-        this.priority = other.priority;
-        if (other.variables == null) {
-            this.variables = null;
-        } else {
-            this.variables = new ArrayList<>(other.variables);
-        }
-        this.parent = other.parent;
-    }
-
-    /**
      * Returns the maintainer of the package.
      * 
      * @return Maintainer.
      */
     @Nullable
     public final String getMaintainer() {
-        return maintainer;
+        return variableValue("maintainer");
     }
 
     /**
@@ -128,7 +103,7 @@ public abstract class AbstractBase implements VariablesContainer {
      */
     @Nullable
     public final String getArch() {
-        return arch;
+        return variableValue("arch");
     }
 
     /**
@@ -138,7 +113,7 @@ public abstract class AbstractBase implements VariablesContainer {
      */
     @Nullable
     public final String getInstallationPath() {
-        return installationPath;
+        return variableValue("installation-path");
     }
 
     /**
@@ -148,7 +123,7 @@ public abstract class AbstractBase implements VariablesContainer {
      */
     @Nullable
     public final String getSection() {
-        return section;
+        return variableValue("section");
     }
 
     /**
@@ -158,7 +133,7 @@ public abstract class AbstractBase implements VariablesContainer {
      */
     @Nullable
     public final String getPriority() {
-        return priority;
+        return variableValue("priority");
     }
 
     @Override
@@ -192,105 +167,62 @@ public abstract class AbstractBase implements VariablesContainer {
     }
 
     /**
-     * Adds a variable and fails with an {@link IllegalStateException} if it
-     * already exists.
+     * Adds a variable if the given value is not <code>null</code>. Any existing
+     * variable with the same name will be replaced.
      * 
-     * @param varToAdd
-     *            Variable to add.
+     * @param name
+     *            Name of the variable to add.
+     * @param value
+     *            Value of the variable to add.
      */
-    protected final void addVariable(@NotNull final Variable varToAdd) {
-        Contract.requireArgNotNull("varToAdd", varToAdd);
-        if (variables == null) {
-            variables = new ArrayList<>();
-        } else {
-            if (variables.contains(varToAdd)) {
-                throw new IllegalStateException("Variable '"
-                        + varToAdd.getName() + "' already exists: " + this);
+    protected final void addOrReplaceVariable(@NotNull final String name,
+            @Nullable final String value) {
+        Contract.requireArgNotNull("name", name);
+        if (value != null) {
+            if (variables == null) {
+                variables = new ArrayList<>();
+            }
+            final Variable var = new Variable(name, value);
+            final int idx = variables.indexOf(var);
+            if (idx < 0) {
+                variables.add(var);
+            } else {
+                variables.set(idx, var);
             }
         }
-        variables.add(varToAdd);
     }
 
     /**
      * Add some variables and ignores duplicates.
      * 
-     * @param varsToAdd
-     *            Variables that will only be added if they are not in the list
-     *            yet.
+     * @param container
+     *            Container with variables that will only be added if they are
+     *            not in the list yet.
      */
-    protected final void addNonExistingVariables(@Nullable final List<Variable> varsToAdd) {
-        if (varsToAdd != null) {
-            if (variables == null) {
-                variables = new ArrayList<>();
-            }
-            for (final Variable var : varsToAdd) {
-                if (!variables.contains(var)) {
-                    variables.add(var);
-                }
+    protected final void addNonExistingVariables(
+            @Nullable final VariablesContainer container) {
+        if (container == null) {
+            return;
+        }
+        final List<Variable> varsToAdd = container.getVariables();
+        if (varsToAdd == null) {
+            return;
+        }
+        if (variables == null) {
+            variables = new ArrayList<>();
+        }
+        for (final Variable var : varsToAdd) {
+            if (!variables.contains(var)) {
+                variables.add(var);
             }
         }
     }
 
     /**
-     * Adds the properties defined in this class as variables. If any of them
-     * already exist, an {@link IllegalStateException} is thrown.
+     * Resolves all variable references in the variable values.
      */
-    private void addVariables() {
-        if (maintainer != null) {
-            addVariable(new Variable("maintainer", maintainer));
-        }
-        if (arch != null) {
-            addVariable(new Variable("arch", arch));
-        }
-        if (installationPath != null) {
-            addVariable(new Variable("installation-path", installationPath));
-        }
-        if (section != null) {
-            addVariable(new Variable("section", section));
-        }
-        if (priority != null) {
-            addVariable(new Variable("priority", priority));
-        }
-    }
-
-    /**
-     * Replaces variables in the base properties.
-     */
-    private void replaceVariables() {
-        final Map<String, String> vars = new VariableResolver(
-                DebUtils.asMap(variables)).getResolved();
-        installationPath = Utils4J.replaceVars(installationPath, vars);
-        arch = Utils4J.replaceVars(arch, vars);
-        maintainer = Utils4J.replaceVars(maintainer, vars);
-        section = Utils4J.replaceVars(section, vars);
-        priority = Utils4J.replaceVars(priority, vars);
-    }
-
-    /**
-     * Copy all attributes from the given object if the field is
-     * <code>null</code>.
-     * 
-     * @param other
-     *            Object to copy values from.
-     */
-    private void applyDefaults(final VariablesContainer other) {
-        if (parent != null) {
-            if (maintainer == null) {
-                this.maintainer = other.variableValue("maintainer");
-            }
-            if (arch == null) {
-                this.arch = other.variableValue("arch");
-            }
-            if (installationPath == null) {
-                this.installationPath = other.variableValue("installation-path");
-            }
-            if (section == null) {
-                this.section = other.variableValue("section");
-            }
-            if (priority == null) {
-                this.priority = other.variableValue("priority");
-            }
-        }
+    protected final void resolveVariables() {
+        variables = DebUtils.resolve(variables);
     }
 
     /**
@@ -301,9 +233,11 @@ public abstract class AbstractBase implements VariablesContainer {
      */
     public final void initBase(@Nullable final VariablesContainer parent) {
         this.parent = parent;
-        applyDefaults(parent);
-        addVariables();
-        replaceVariables();
+        addOrReplaceVariable("maintainer", maintainer);
+        addOrReplaceVariable("arch", arch);
+        addOrReplaceVariable("installation-path", installationPath);
+        addOrReplaceVariable("section", section);
+        addOrReplaceVariable("priority", priority);
     }
 
 }

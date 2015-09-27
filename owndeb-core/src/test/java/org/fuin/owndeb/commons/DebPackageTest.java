@@ -117,6 +117,7 @@ public class DebPackageTest {
                                 + "</package>", xml);
         final DebPackage copy = unmarshal(xml, createXmlAdapter(),
                 DebPackage.class);
+        copy.init(null);
         assertThat(copy.getName()).isEqualTo("abc");
         assertThat(copy.getVersion()).isEqualTo("1.2.3");
         assertThat(copy.getDescription()).isEqualTo("Aa Bb Cc");

@@ -21,9 +21,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -31,8 +31,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.NotEmpty;
 import org.fuin.objects4j.common.Nullable;
-import org.fuin.utils4j.Utils4J;
-import org.fuin.utils4j.VariableResolver;
 
 /**
  * A binary Debian package to create. Equals and hash code are based on the
@@ -161,28 +159,12 @@ public final class DebPackage extends AbstractPackage {
     }
 
     /**
-     * Copy constructor.
-     * 
-     * @param other
-     *            Package to copy.
-     */
-    public DebPackage(@NotNull final DebPackage other) {
-        super(other);
-        this.name = other.name;
-        if (other.dependencies == null) {
-            this.dependencies = null;
-        } else {
-            this.dependencies = new ArrayList<>(other.dependencies);
-        }
-    }
-
-    /**
      * Returns the package name.
      * 
      * @return Unique package name.
      */
     public final String getName() {
-        return name;
+        return variableValue("name");
     }
 
     /**
@@ -243,28 +225,6 @@ public final class DebPackage extends AbstractPackage {
     }
 
     /**
-     * Adds the properties defined in this class as variables. If any of them
-     * already exist, an {@link IllegalStateException} will be thrown.
-     */
-    private final void addVariables() {
-        addVariable(new Variable("name", name));
-        addVariable(new Variable("depends", getDependenciesAsControlString()));
-        addVariable(new Variable("fullInstallationPath", getFullInstallationPath()));
-    }
-
-    /**
-     * Replaces variables in all properties.
-     * 
-     * @param vars
-     *            Variables to use.
-     */
-    private final void replaceVariables() {
-        final Map<String, String> vars = new VariableResolver(
-                DebUtils.asMap(getVariables())).getResolved();
-        name = Utils4J.replaceVars(name, vars);
-    }
-
-    /**
      * Updates the package references for all dependencies.
      * 
      * @param resolver
@@ -280,6 +240,7 @@ public final class DebPackage extends AbstractPackage {
                 }
             }
         }
+        addOrReplaceVariable("depends", getDependenciesAsControlString());
     }
 
     /**
@@ -289,12 +250,11 @@ public final class DebPackage extends AbstractPackage {
      *            Current parent.
      */
     public final void init(@Nullable final DebModule parent) {
+        addNonExistingVariables(parent);
         initPackage(parent);
-        addVariables();
-        replaceVariables();
-        if (parent != null) {
-            addNonExistingVariables(parent.getVariables());
-        }
+        addOrReplaceVariable("name", name);
+        addOrReplaceVariable("fullInstallationPath", getFullInstallationPath());
+        resolveVariables();
         if (dependencies != null) {
             for (final DebDependency dependency : dependencies) {
                 dependency.init(this);
@@ -326,5 +286,5 @@ public final class DebPackage extends AbstractPackage {
     public final String toString() {
         return "DebPackage [name=" + name + "]";
     }
-
+    
 }
